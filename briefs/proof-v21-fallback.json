@@ -18,7 +18,16 @@
       ],
       "concepts": [
         "shortage"
-      ]
+      ],
+      "prefetchedVisual": {
+        "type": "video",
+        "localPath": "narrated/proof-v21-fallback/scene_1.mp4",
+        "width": 1920,
+        "height": 1080,
+        "videoDuration": 10.066566,
+        "source": "pixabay",
+        "query": "pharmacy counter"
+      }
     },
     {
       "voiceoverText": "and asks who pays when the truck never arrives.",
@@ -28,7 +37,16 @@
         "truck",
         "never"
       ],
-      "concepts": []
+      "concepts": [],
+      "prefetchedVisual": {
+        "type": "video",
+        "localPath": "narrated/proof-v21-fallback/scene_2.mp4",
+        "width": 3840,
+        "height": 2160,
+        "videoDuration": 9.086667,
+        "source": "pixabay",
+        "query": "truck"
+      }
     }
   ],
   "notes": [

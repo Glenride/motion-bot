@@ -18,7 +18,16 @@
       ],
       "concepts": [
         "shortage"
-      ]
+      ],
+      "prefetchedVisual": {
+        "type": "video",
+        "localPath": "narrated/proof-v21-llm/scene_1.mp4",
+        "width": 1920,
+        "height": 1080,
+        "videoDuration": 10.066566,
+        "source": "pixabay",
+        "query": "pharmacy counter"
+      }
     },
     {
       "voiceoverText": "and asks who pays",
@@ -28,7 +37,16 @@
         "family at checkout with fewer items",
         "retail store manager reviewing inventory clipboard"
       ],
-      "concepts": []
+      "concepts": [],
+      "prefetchedVisual": {
+        "type": "video",
+        "localPath": "narrated/proof-v21-llm/scene_2_trim.mp4",
+        "width": 1280,
+        "height": 720,
+        "videoDuration": 10.0,
+        "source": "pixabay",
+        "query": "customer holding empty shopping basket"
+      }
     },
     {
       "voiceoverText": "when the truck never arrives",
@@ -38,7 +56,16 @@
         "freight trucks parked at shipping port at dawn",
         "loading dock worker waiting"
       ],
-      "concepts": []
+      "concepts": [],
+      "prefetchedVisual": {
+        "type": "video",
+        "localPath": "narrated/proof-v21-llm/scene_3_trim.mp4",
+        "width": 3840,
+        "height": 2160,
+        "videoDuration": 11.011,
+        "source": "pixabay",
+        "query": "loading dock worker waiting"
+      }
     }
   ],
   "notes": [

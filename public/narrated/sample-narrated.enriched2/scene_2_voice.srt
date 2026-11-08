@@ -1,0 +1,4 @@
+1
+00:00:00,100 --> 00:00:03,512
+a shortage starts long before the shelf is empty,
+

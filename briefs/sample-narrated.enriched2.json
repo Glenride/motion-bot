@@ -1,8 +1,8 @@
 {
   "version": 1,
   "narrated": true,
-  "hook": "Glenride studies supply chains \u2014 a shortage starts long before the shelf is empty, and the work is to make the chain visible.",
-  "lengthSeconds": 15,
+  "hook": "Glenride studies supply chains — a shortage starts long before the shelf is empty, and the work is to make the chain visible.",
+  "lengthSeconds": 10,
   "scenes": [
     {
       "voiceoverText": "Glenride studies supply chains",
@@ -12,7 +12,8 @@
         "supply",
         "chains"
       ],
-      "prefetchedVisual": {
+      "durationSeconds": 3,
+      "visual": {
         "type": "video",
         "localPath": "narrated/sample/scene_1_trim.mp4",
         "width": 3840,
@@ -20,7 +21,15 @@
         "videoDuration": 10.01,
         "source": "pixabay",
         "query": "glenride studies supply chains"
-      }
+      },
+      "audioPath": "narrated/sample-narrated.enriched2/scene_1_voice.mp3",
+      "captionSegments": [
+        {
+          "text": "Glenride studies supply chains",
+          "startMs": 100,
+          "endMs": 2837
+        }
+      ]
     },
     {
       "voiceoverText": "a shortage starts long before the shelf is empty,",
@@ -30,7 +39,8 @@
         "long",
         "shelf"
       ],
-      "prefetchedVisual": {
+      "durationSeconds": 4,
+      "visual": {
         "type": "video",
         "localPath": "narrated/sample/scene_2_trim.mp4",
         "width": 1920,
@@ -38,7 +48,15 @@
         "videoDuration": 13.013,
         "source": "pixabay",
         "query": "shortage"
-      }
+      },
+      "audioPath": "narrated/sample-narrated.enriched2/scene_2_voice.mp3",
+      "captionSegments": [
+        {
+          "text": "a shortage starts long before the shelf is empty,",
+          "startMs": 100,
+          "endMs": 3512
+        }
+      ]
     },
     {
       "voiceoverText": "and the work is to make the chain visible.",
@@ -48,16 +66,27 @@
         "chain",
         "visible"
       ],
-      "prefetchedVisual": {
+      "durationSeconds": 3,
+      "visual": {
         "type": "video",
         "localPath": "narrated/sample/scene_3_trim.mp4",
         "width": 3840,
         "height": 2160,
-        "videoDuration": 13.0,
+        "videoDuration": 13,
         "source": "pixabay",
         "query": "work make chain visible"
-      }
+      },
+      "audioPath": "narrated/sample-narrated.enriched2/scene_3_voice.mp3",
+      "captionSegments": [
+        {
+          "text": "and the work is to make the chain visible.",
+          "startMs": 100,
+          "endMs": 2975
+        }
+      ]
     }
   ],
-  "notes": []
+  "notes": [
+    "prepared on iMac: 3 scenes, 10s total"
+  ]
 }

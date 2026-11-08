@@ -1,0 +1,7 @@
+1
+00:00:00,100 --> 00:00:02,537
+Nobody trusts a token.
+
+2
+00:00:03,100 --> 00:00:05,112
+They trust each other.
