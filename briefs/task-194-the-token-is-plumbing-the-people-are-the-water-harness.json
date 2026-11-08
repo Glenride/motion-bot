@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "hook": "The token is plumbing. The people are the water.",
+  "lengthSeconds": 12,
+  "palette": {
+    "background": "#111827",
+    "surface": "#242A38",
+    "accent": "#FFB02E",
+    "accentDeep": "#A6721E",
+    "text": "#FFFFFF",
+    "glow": "#FFB02E",
+    "particle": "#FFB02E"
+  },
+  "mood": {
+    "tone": "neutral",
+    "pacing": "medium"
+  },
+  "motif": {
+    "type": "orbit",
+    "scene": 0
+  },
+  "scenes": [
+    {
+      "words": [
+        "The",
+        "token",
+        "is",
+        "plumbing.",
+        "The",
+        "people",
+        "are",
+        "the",
+        "water."
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.08,
+        "fromX": 0,
+        "toX": -26
+      },
+      "transitionOut": "none"
+    }
+  ],
+  "notes": [
+    "motif 'orbit' in scene 1"
+  ],
+  "subtitle": "Glenride",
+  "skills": [
+    "motion-design-skills",
+    "synthwave-style"
+  ],
+  "format": "landscape",
+  "craft_notes": "- motion-design-skills: Base craft: easing curves, safe areas, seamless loops, on-brand type/color.\n- synthwave-style: Synthwave, purple-free: navy sky, striped orange sun, cyan grid, scanlines, chrome title.\n- Format: 1280x720 landscape (Harness composition)."
+}

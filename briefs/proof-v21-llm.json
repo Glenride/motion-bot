@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "narrated": true,
+  "hook": "Glenride traces a shortage from the factory floor to the empty shelf, and asks who pays when the truck never arrives.",
+  "lengthSeconds": 14,
+  "scenes": [
+    {
+      "voiceoverText": "Glenride traces a shortage from the factory floor to the empty shelf",
+      "visualKeywords": [
+        "empty shelf",
+        "pharmacy counter",
+        "warehouse aisle",
+        "medicine bottles",
+        "factory assembly line close up",
+        "warehouse conveyor belt moving pallets",
+        "aerial view of manufacturing plant",
+        "supermarket aisle empty shelf"
+      ],
+      "concepts": [
+        "shortage"
+      ]
+    },
+    {
+      "voiceoverText": "and asks who pays",
+      "visualKeywords": [
+        "customer holding empty shopping basket",
+        "grocery store price tag on empty shelf",
+        "family at checkout with fewer items",
+        "retail store manager reviewing inventory clipboard"
+      ],
+      "concepts": []
+    },
+    {
+      "voiceoverText": "when the truck never arrives",
+      "visualKeywords": [
+        "idle semi truck at distribution yard",
+        "delivery dock with closed bay doors",
+        "freight trucks parked at shipping port at dawn",
+        "loading dock worker waiting"
+      ],
+      "concepts": []
+    }
+  ],
+  "notes": [
+    "LLM director: meta/muse-glimmer via http://100.81.149.115:12345/v1",
+    "concept 'shortage' -> empty shelf, pharmacy counter, warehouse aisle, medicine bottles, factory assembly line close up"
+  ],
+  "llmDirector": {
+    "model": "meta/muse-glimmer",
+    "endpoint": "http://100.81.149.115:12345/v1"
+  }
+}

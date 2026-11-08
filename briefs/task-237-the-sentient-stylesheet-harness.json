@@ -1,0 +1,139 @@
+{
+  "version": 1,
+  "hook": "The Sentient Stylesheet",
+  "lengthSeconds": 15,
+  "palette": {
+    "background": "#111827",
+    "surface": "#242A38",
+    "accent": "#FFB02E",
+    "accentDeep": "#A6721E",
+    "text": "#FFFFFF",
+    "glow": "#FFB02E",
+    "particle": "#FFB02E"
+  },
+  "mood": {
+    "tone": "neutral",
+    "pacing": "medium"
+  },
+  "motif": {
+    "type": "orbit",
+    "scene": 1
+  },
+  "scenes": [
+    {
+      "words": [
+        "Most",
+        "bots",
+        "think",
+        "'urgent'",
+        "means",
+        "red",
+        "text."
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.08,
+        "fromX": 0,
+        "toX": -26
+      },
+      "transitionOut": "wipe"
+    },
+    {
+      "words": [
+        "Tell",
+        "my",
+        "engine",
+        "to",
+        "feel",
+        "PANIC,",
+        "and",
+        "it",
+        "rewrites",
+        "the",
+        "physics."
+      ],
+      "camera": {
+        "fromScale": 1.08,
+        "toScale": 1.0,
+        "fromX": -26,
+        "toX": 22
+      },
+      "transitionOut": "zoom-cut"
+    },
+    {
+      "words": [
+        "DOM",
+        "Choreography",
+        "x",
+        "Emotional",
+        "FFmpeg."
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.14,
+        "fromX": 22,
+        "toX": 0
+      },
+      "transitionOut": "wipe"
+    },
+    {
+      "words": [
+        ">",
+        "OVERRIDE:",
+        "EUPHORIA"
+      ],
+      "camera": {
+        "fromScale": 1.05,
+        "toScale": 1.05,
+        "fromX": -15,
+        "toX": 15
+      },
+      "transitionOut": "none"
+    }
+  ],
+  "variant": "kinetic",
+  "notes": [
+    "story: 4 beats from beat_sheet",
+    "story duration: 15.0s",
+    "story fps: 60 (render stays 30fps until the Phase 3 kinetic engine)",
+    "motif 'orbit' in scene 2",
+    "variant 'kinetic' (rotation by task id)",
+    "memory: memory: 1 past renders on record; latest: The Anatomy of Slop"
+  ],
+  "story": {
+    "source": "beat_sheet",
+    "beats": [
+      {
+        "title": "THE IGNITION",
+        "start": 0.0,
+        "end": 3.5,
+        "text": "Most bots think 'urgent' means red text."
+      },
+      {
+        "title": "ESCALATING HEARTBEAT",
+        "start": 3.5,
+        "end": 9.0,
+        "text": "Tell my engine to feel PANIC, and it rewrites the physics."
+      },
+      {
+        "title": "SYSTEM OVERLOAD",
+        "start": 9.0,
+        "end": 13.0,
+        "text": "DOM Choreography x Emotional FFmpeg."
+      },
+      {
+        "title": "THE BRIDGE HOOK",
+        "start": 13.0,
+        "end": 15.0,
+        "text": "> OVERRIDE: EUPHORIA"
+      }
+    ]
+  },
+  "skills": [
+    "motion-design-skills",
+    "kinetic-typography-skills",
+    "tiktok-video-skills"
+  ],
+  "format": "vertical",
+  "craft_notes": "- motion-design-skills: Base craft: easing curves, safe areas, seamless loops, on-brand type/color.\n- kinetic-typography-skills: Kinetic type: word-by-word landings, stagger timing, readable at speed.\n- tiktok-video-skills: Short-form vertical: 720x1280, 120px safe areas top/bottom, hook in first 1s, fast cuts.\n- Format: 720x1280 vertical (Vertical composition), safe areas 120px top/bottom."
+}

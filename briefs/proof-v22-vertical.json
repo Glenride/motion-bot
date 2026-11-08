@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "hook": "The bottleneck isn't who you think, it's the writers behind the work, and the analysts behind the numbers",
+  "lengthSeconds": 12,
+  "palette": {
+    "background": "#F4EEDC",
+    "surface": "#E5E0CF",
+    "accent": "#D4AF37",
+    "accentDeep": "#8A7224",
+    "text": "#1F1A14",
+    "glow": "#D4AF37",
+    "particle": "#D4AF37"
+  },
+  "mood": {
+    "tone": "neutral",
+    "pacing": "medium"
+  },
+  "motif": {
+    "type": "orbit",
+    "scene": 0
+  },
+  "scenes": [
+    {
+      "words": [
+        "The",
+        "bottleneck",
+        "isn't",
+        "who",
+        "you",
+        "think,"
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.08,
+        "fromX": 0,
+        "toX": -26
+      },
+      "transitionOut": "wipe"
+    },
+    {
+      "words": [
+        "it's",
+        "the",
+        "writers",
+        "behind",
+        "the",
+        "work,",
+        "and",
+        "the",
+        "analysts",
+        "behind",
+        "the",
+        "numbers"
+      ],
+      "camera": {
+        "fromScale": 1.08,
+        "toScale": 1.0,
+        "fromX": -26,
+        "toX": 22
+      },
+      "transitionOut": "none"
+    }
+  ],
+  "notes": [
+    "label override: background = #F4EEDC ('parchment')",
+    "color 'parchment' -> #F4EEDC",
+    "color 'gold' -> #D4AF37",
+    "motif 'orbit' in scene 1"
+  ],
+  "skills": [
+    "motion-design-skills",
+    "tiktok-video-skills",
+    "data-animation-skills"
+  ],
+  "format": "vertical",
+  "craft_notes": "- motion-design-skills: Base craft: easing curves, safe areas, seamless loops, on-brand type/color.\n- tiktok-video-skills: Short-form vertical: 720x1280, 120px safe areas top/bottom, hook in first 1s, fast cuts.\n- data-animation-skills: Data: frame-accurate numbers, count-up on the value, never animate the axis away from the data.\n- Format: 720x1280 vertical (Vertical composition), safe areas 120px top/bottom."
+}

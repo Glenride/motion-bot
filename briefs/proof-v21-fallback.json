@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "narrated": true,
+  "hook": "Glenride traces a shortage from the factory floor to the empty shelf, and asks who pays when the truck never arrives.",
+  "lengthSeconds": 13,
+  "scenes": [
+    {
+      "voiceoverText": "Glenride traces a shortage from the factory floor to the empty shelf,",
+      "visualKeywords": [
+        "empty shelf",
+        "pharmacy counter",
+        "warehouse aisle",
+        "medicine bottles",
+        "glenride",
+        "traces",
+        "factory",
+        "floor"
+      ],
+      "concepts": [
+        "shortage"
+      ]
+    },
+    {
+      "voiceoverText": "and asks who pays when the truck never arrives.",
+      "visualKeywords": [
+        "asks",
+        "pays",
+        "truck",
+        "never"
+      ],
+      "concepts": []
+    }
+  ],
+  "notes": [
+    "concept 'shortage' -> empty shelf, pharmacy counter, warehouse aisle, medicine bottles, glenride"
+  ]
+}

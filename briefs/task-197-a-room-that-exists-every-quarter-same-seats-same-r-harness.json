@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "hook": "A room that exists every quarter \u2014 same seats, same rules, published notes \u2014 is infrastructure.",
+  "lengthSeconds": 12,
+  "palette": {
+    "background": "#F4EEDC",
+    "surface": "#E5E0CF",
+    "accent": "#D4AF37",
+    "accentDeep": "#8A7224",
+    "text": "#1F1A14",
+    "glow": "#D4AF37",
+    "particle": "#D4AF37"
+  },
+  "mood": {
+    "tone": "neutral",
+    "pacing": "medium"
+  },
+  "motif": {
+    "type": "orbit",
+    "scene": 1
+  },
+  "scenes": [
+    {
+      "words": [
+        "A",
+        "room",
+        "that",
+        "exists",
+        "every",
+        "quarter"
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.08,
+        "fromX": 0,
+        "toX": -26
+      },
+      "transitionOut": "wipe"
+    },
+    {
+      "words": [
+        "same",
+        "seats,",
+        "same",
+        "rules,",
+        "published",
+        "notes"
+      ],
+      "camera": {
+        "fromScale": 1.08,
+        "toScale": 1.0,
+        "fromX": -26,
+        "toX": 22
+      },
+      "transitionOut": "zoom-cut"
+    },
+    {
+      "words": [
+        "is",
+        "infrastructure."
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.14,
+        "fromX": 22,
+        "toX": 0
+      },
+      "transitionOut": "none"
+    }
+  ],
+  "variant": "kinetic",
+  "notes": [
+    "label override: background = #F4EEDC ('parchment')",
+    "color 'parchment' -> #F4EEDC",
+    "color 'gold' -> #D4AF37",
+    "motif 'orbit' in scene 2",
+    "variant 'kinetic' (rotation by task id)",
+    "story: 5 beats"
+  ],
+  "project": "The Brightest Minds, Convened",
+  "subtitle": "The Dispatch, November 3",
+  "skills": [
+    "motion-design-skills"
+  ],
+  "format": "landscape",
+  "craft_notes": "- motion-design-skills: Base craft: easing curves, safe areas, seamless loops, on-brand type/color.\n- Format: 1280x720 landscape (Harness composition)."
+}

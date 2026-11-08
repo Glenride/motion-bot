@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "hook": "Every mirror in your house shows you smiling, except when you turn your back\u2014that's when it starts to cry.",
+  "lengthSeconds": 10,
+  "palette": {
+    "background": "#FFFFFF",
+    "surface": "#F4EEDC",
+    "accent": "#D4AF37",
+    "accentDeep": "#8A7224",
+    "text": "#1F1A14",
+    "glow": "#D4AF37",
+    "particle": "#D4AF37"
+  },
+  "mood": {
+    "tone": "neutral",
+    "pacing": "medium"
+  },
+  "motif": {
+    "type": "mirror",
+    "reflectionWord": "SMILING",
+    "tears": true,
+    "scene": 0
+  },
+  "scenes": [
+    {
+      "words": [
+        "Every",
+        "mirror",
+        "in",
+        "your",
+        "house",
+        "shows",
+        "you",
+        "smiling,"
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.08,
+        "fromX": 0,
+        "toX": -26
+      },
+      "transitionOut": "wipe"
+    },
+    {
+      "words": [
+        "except",
+        "when",
+        "you",
+        "turn",
+        "your",
+        "back"
+      ],
+      "camera": {
+        "fromScale": 1.08,
+        "toScale": 1.0,
+        "fromX": -26,
+        "toX": 22
+      },
+      "transitionOut": "zoom-cut"
+    },
+    {
+      "words": [
+        "that's",
+        "when",
+        "it",
+        "starts",
+        "to",
+        "cry."
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.14,
+        "fromX": 22,
+        "toX": 0
+      },
+      "transitionOut": "none"
+    }
+  ],
+  "notes": [
+    "label override: background = #FFFFFF ('white')",
+    "color 'white' -> #FFFFFF",
+    "color 'gold' -> #D4AF37",
+    "color 'parchment' -> #F4EEDC",
+    "motif 'mirror' in scene 1, reflection 'SMILING', tears"
+  ]
+}

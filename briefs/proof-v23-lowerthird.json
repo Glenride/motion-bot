@@ -1,0 +1,14 @@
+{
+  "name": "D'Vaughn House",
+  "role": "Independent AI Orchestrator",
+  "palette": {
+    "background": "#F4EEDC",
+    "surface": "#E5E0CF",
+    "accent": "#D4AF37",
+    "accentDeep": "#8A7224",
+    "text": "#1F1A14",
+    "glow": "#D4AF37",
+    "particle": "#D4AF37"
+  },
+  "lengthSeconds": 6
+}

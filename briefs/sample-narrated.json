@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "narrated": true,
+  "hook": "Glenride studies supply chains \u2014 a shortage starts long before the shelf is empty, and the work is to make the chain visible.",
+  "lengthSeconds": 15,
+  "scenes": [
+    {
+      "voiceoverText": "Glenride studies supply chains",
+      "visualKeywords": [
+        "glenride",
+        "studies",
+        "supply",
+        "chains"
+      ]
+    },
+    {
+      "voiceoverText": "a shortage starts long before the shelf is empty,",
+      "visualKeywords": [
+        "shortage",
+        "starts",
+        "long",
+        "shelf"
+      ]
+    },
+    {
+      "voiceoverText": "and the work is to make the chain visible.",
+      "visualKeywords": [
+        "work",
+        "make",
+        "chain",
+        "visible"
+      ]
+    }
+  ],
+  "notes": []
+}

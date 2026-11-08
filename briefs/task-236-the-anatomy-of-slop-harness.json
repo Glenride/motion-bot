@@ -1,0 +1,144 @@
+{
+  "version": 1,
+  "hook": "The Anatomy of Slop",
+  "lengthSeconds": 15,
+  "palette": {
+    "background": "#111827",
+    "surface": "#242A38",
+    "accent": "#FFB02E",
+    "accentDeep": "#A6721E",
+    "text": "#FFFFFF",
+    "glow": "#FFB02E",
+    "particle": "#FFB02E"
+  },
+  "mood": {
+    "tone": "neutral",
+    "pacing": "medium"
+  },
+  "motif": {
+    "type": "orbit",
+    "scene": 1
+  },
+  "scenes": [
+    {
+      "words": [
+        "3",
+        "Secrets",
+        "to",
+        "10x",
+        "Your",
+        "Workflow"
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.08,
+        "fromX": 0,
+        "toX": -26
+      },
+      "transitionOut": "wipe"
+    },
+    {
+      "words": [
+        "STOP.",
+        "Look",
+        "at",
+        "this",
+        "CSS.",
+        "ease-in-out?",
+        "Centered",
+        "div?",
+        "You",
+        "can",
+        "smell",
+        "the",
+        "template."
+      ],
+      "camera": {
+        "fromScale": 1.08,
+        "toScale": 1.0,
+        "fromX": -26,
+        "toX": 22
+      },
+      "transitionOut": "zoom-cut"
+    },
+    {
+      "words": [
+        "HTML",
+        "handles",
+        "the",
+        "choreography.",
+        "Emotional",
+        "FFmpeg",
+        "handles",
+        "the",
+        "nervous",
+        "system."
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.14,
+        "fromX": 22,
+        "toX": 0
+      },
+      "transitionOut": "wipe"
+    },
+    {
+      "words": [
+        ">",
+        "INIT_EMOTION:",
+        "ANXIETY"
+      ],
+      "camera": {
+        "fromScale": 1.05,
+        "toScale": 1.05,
+        "fromX": -15,
+        "toX": 15
+      },
+      "transitionOut": "none"
+    }
+  ],
+  "variant": "orbit",
+  "notes": [
+    "story: 4 beats from beat_sheet",
+    "story duration: 15.0s",
+    "story fps: 60 (render stays 30fps until the Phase 3 kinetic engine)",
+    "motif 'orbit' in scene 2",
+    "variant 'orbit' (rotation by task id)"
+  ],
+  "story": {
+    "source": "beat_sheet",
+    "beats": [
+      {
+        "title": "THE BAIT",
+        "start": 0.0,
+        "end": 3.0,
+        "text": "3 Secrets to 10x Your Workflow"
+      },
+      {
+        "title": "THE FRACTURE",
+        "start": 3.0,
+        "end": 7.5,
+        "text": "STOP. Look at this CSS. ease-in-out? Centered div? You can smell the template."
+      },
+      {
+        "title": "THE PURGE",
+        "start": 7.5,
+        "end": 12.5,
+        "text": "HTML handles the choreography. Emotional FFmpeg handles the nervous system."
+      },
+      {
+        "title": "THE BRIDGE HOOK",
+        "start": 12.5,
+        "end": 15.0,
+        "text": "> INIT_EMOTION: ANXIETY"
+      }
+    ]
+  },
+  "skills": [
+    "motion-design-skills",
+    "kinetic-typography-skills",
+    "tiktok-video-skills"
+  ],
+  "format": "vertical",
+  "craft_notes": "- motion-design-skills: Base craft: easing curves, safe areas, seamless loops, on-brand type/color.\n- kinetic-typography-skills: Kinetic type: word-by-word landings, stagger timing, readable at speed.\n- tiktok-video-skills: Short-form vertical: 720x1280, 120px safe areas top/bottom, hook in first 1s, fast cuts.\n- Format: 720x1280 vertical (Vertical composition), safe areas 120px top/bottom."
+}

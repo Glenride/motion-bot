@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "narrated": true,
+  "hook": "Nobody trusts a token. They trust each other.",
+  "lengthSeconds": 12,
+  "scenes": [
+    {
+      "voiceoverText": "Nobody trusts a token.",
+      "visualKeywords": [
+        "tarnished gold coin on parchment texture",
+        "hand pushing away metal token close-up",
+        "discarded paper voucher on wooden table",
+        "single coin in dust on aged paper"
+      ],
+      "concepts": [],
+      "prefetchedVisual": {
+        "type": "video",
+        "localPath": "narrated/task-193-nobody-trusts-a-token-they-trust-each-other/scene_1_trim.mp4",
+        "width": 3840,
+        "height": 2160,
+        "videoDuration": 10.01,
+        "source": "pixabay",
+        "query": "tarnished gold coin on parchment texture"
+      }
+    },
+    {
+      "voiceoverText": "They trust each other.",
+      "visualKeywords": [
+        "people sharing bread around wooden table",
+        "close-up hands passing tools in workshop",
+        "community circle sitting on floor interior",
+        "aerial view neighbors building fence together"
+      ],
+      "concepts": [],
+      "prefetchedVisual": {
+        "type": "video",
+        "localPath": "narrated/task-193-nobody-trusts-a-token-they-trust-each-other/scene_2_trim.mp4",
+        "width": 1920,
+        "height": 1080,
+        "videoDuration": 10.0,
+        "source": "pixabay",
+        "query": "people sharing bread around wooden table"
+      }
+    }
+  ],
+  "notes": [
+    "LLM director: meta/muse-glimmer via http://100.81.149.115:12345/v1"
+  ],
+  "llmDirector": {
+    "model": "meta/muse-glimmer",
+    "endpoint": "http://100.81.149.115:12345/v1"
+  },
+  "project": "The People",
+  "subtitle": "The Dispatch, November 1"
+}

@@ -1,0 +1,98 @@
+{
+  "version": 1,
+  "narrated": true,
+  "hook": "Glenride traces a shortage from the factory floor to the empty shelf, and asks who pays when the truck never arrives.",
+  "lengthSeconds": 11,
+  "scenes": [
+    {
+      "voiceoverText": "Glenride traces a shortage from the factory floor to the empty shelf",
+      "visualKeywords": [
+        "empty shelf",
+        "pharmacy counter",
+        "warehouse aisle",
+        "medicine bottles",
+        "factory assembly line close up",
+        "warehouse conveyor belt moving pallets",
+        "aerial view of manufacturing plant",
+        "supermarket aisle empty shelf"
+      ],
+      "durationSeconds": 5,
+      "visual": {
+        "type": "video",
+        "localPath": "narrated/proof-v21-llm/scene_1.mp4",
+        "width": 1920,
+        "height": 1080,
+        "videoDuration": 10.066566,
+        "source": "pixabay",
+        "query": "pharmacy counter"
+      },
+      "audioPath": "narrated/proof-v21-llm/scene_1_voice.mp3",
+      "captionSegments": [
+        {
+          "text": "Glenride traces a shortage from the factory floor to the empty shelf",
+          "startMs": 100,
+          "endMs": 4600
+        }
+      ]
+    },
+    {
+      "voiceoverText": "and asks who pays",
+      "visualKeywords": [
+        "customer holding empty shopping basket",
+        "grocery store price tag on empty shelf",
+        "family at checkout with fewer items",
+        "retail store manager reviewing inventory clipboard"
+      ],
+      "durationSeconds": 3,
+      "visual": {
+        "type": "video",
+        "localPath": "narrated/proof-v21-llm/scene_2_trim.mp4",
+        "width": 1280,
+        "height": 720,
+        "videoDuration": 10,
+        "source": "pixabay",
+        "query": "customer holding empty shopping basket"
+      },
+      "audioPath": "narrated/proof-v21-llm/scene_2_voice.mp3",
+      "captionSegments": [
+        {
+          "text": "and asks who pays",
+          "startMs": 100,
+          "endMs": 2287
+        }
+      ]
+    },
+    {
+      "voiceoverText": "when the truck never arrives",
+      "visualKeywords": [
+        "idle semi truck at distribution yard",
+        "delivery dock with closed bay doors",
+        "freight trucks parked at shipping port at dawn",
+        "loading dock worker waiting"
+      ],
+      "durationSeconds": 3,
+      "visual": {
+        "type": "video",
+        "localPath": "narrated/proof-v21-llm/scene_3_trim.mp4",
+        "width": 3840,
+        "height": 2160,
+        "videoDuration": 11.011,
+        "source": "pixabay",
+        "query": "loading dock worker waiting"
+      },
+      "audioPath": "narrated/proof-v21-llm/scene_3_voice.mp3",
+      "captionSegments": [
+        {
+          "text": "when the truck never arrives",
+          "startMs": 100,
+          "endMs": 2550
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "LLM director: meta/muse-glimmer via http://100.81.149.115:12345/v1",
+    "concept 'shortage' -> empty shelf, pharmacy counter, warehouse aisle, medicine bottles, factory assembly line close up",
+    "prepared on iMac: 3 scenes, 11s total"
+  ]
+}

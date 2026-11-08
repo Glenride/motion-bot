@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "narrated": true,
+  "hook": "Glenride studies supply chains \u2014 a shortage starts long before the shelf is empty, and the work is to make the chain visible.",
+  "lengthSeconds": 15,
+  "scenes": [
+    {
+      "voiceoverText": "Glenride studies supply chains",
+      "visualKeywords": [
+        "freight truck",
+        "shipping port",
+        "warehouse",
+        "cargo containers",
+        "delivery van",
+        "glenride",
+        "studies"
+      ],
+      "concepts": [
+        "supply chains"
+      ]
+    },
+    {
+      "voiceoverText": "a shortage starts long before the shelf is empty,",
+      "visualKeywords": [
+        "empty shelf",
+        "pharmacy counter",
+        "warehouse aisle",
+        "medicine bottles",
+        "shelf",
+        "empty"
+      ],
+      "concepts": [
+        "shortage"
+      ]
+    },
+    {
+      "voiceoverText": "and the work is to make the chain visible.",
+      "visualKeywords": [
+        "freight truck",
+        "shipping port",
+        "warehouse",
+        "cargo containers",
+        "delivery van"
+      ],
+      "concepts": [
+        "supply chains"
+      ]
+    }
+  ],
+  "notes": [
+    "concept 'supply chains' -> freight truck, shipping port, warehouse, cargo containers, delivery van",
+    "concept 'shortage' -> empty shelf, pharmacy counter, warehouse aisle, medicine bottles, shelf",
+    "abstract words dropped from search: starts, long",
+    "concept 'supply chains' -> freight truck, shipping port, warehouse, cargo containers, delivery van",
+    "abstract words dropped from search: work, make, visible"
+  ]
+}

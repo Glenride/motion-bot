@@ -1,0 +1,27 @@
+# Secrets and build output — never committed
+.env*
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+*credentials*
+.DS_Store
+node_modules/
+out/
+dist/
+.next/
+__pycache__/
+*.mp4
+.remotion/
+# Third-party skill packs (clones of other people's repos) — not his code
+skills/ad-video-skills/
+skills/b-roll-skills/
+skills/data-animation-skills/
+skills/ecommerce-video-skills/
+skills/explainer-video-skills/
+skills/ffmpeg-skill/
+skills/kinetic-typography-skills/
+skills/lower-thirds-skills/
+skills/motion-design-skills/
+skills/tiktok-video-skills/

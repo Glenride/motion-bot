@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "hook": "Motion bot create a video",
+  "lengthSeconds": 12,
+  "palette": {
+    "background": "#0A0A0A",
+    "surface": "#1E1E1E",
+    "accent": "#FFB02E",
+    "accentDeep": "#A6721E",
+    "text": "#FFFFFF",
+    "glow": "#FFB02E",
+    "particle": "#FFB02E"
+  },
+  "mood": {
+    "tone": "neutral",
+    "pacing": "medium"
+  },
+  "motif": {
+    "type": "orbit",
+    "scene": 0
+  },
+  "scenes": [
+    {
+      "words": [
+        "Motion",
+        "bot",
+        "create",
+        "a",
+        "video"
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.08,
+        "fromX": 0,
+        "toX": -26
+      },
+      "transitionOut": "none"
+    }
+  ],
+  "notes": [
+    "color 'black' -> #0A0A0A",
+    "motif 'orbit' in scene 1"
+  ]
+}

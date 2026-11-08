@@ -1,0 +1,59 @@
+{
+ "renders": [
+  {
+   "ts": "2026-11-03T15:27:02.368327+00:00",
+   "task_id": 236,
+   "title": "The Anatomy of Slop",
+   "story_source": "beat_sheet",
+   "beats": 4,
+   "critic": "FAIL",
+   "file": "out/task-236-the-anatomy-of-slop-harness.mp4"
+  },
+  {
+   "ts": "2026-11-03T19:22:36.648984+00:00",
+   "task_id": 237,
+   "title": "The Sentient Stylesheet",
+   "story_source": "beat_sheet",
+   "beats": 4,
+   "critic": "FAIL",
+   "file": "task-237-the-sentient-stylesheet-harness.mp4"
+  },
+  {
+   "ts": "2026-11-03T19:23:18.979533+00:00",
+   "task_id": 238,
+   "title": "The Dopamine Render",
+   "story_source": "beat_sheet",
+   "beats": 3,
+   "critic": "FAIL",
+   "file": "task-238-the-dopamine-render-harness.mp4"
+  }
+ ],
+ "corrections": [],
+ "learnings": [
+  {
+   "ts": "2026-11-06T16:37:55.794732+00:00",
+   "text": "Find why the accent never lands: accent family was 0/5 frames on all three Nov 3 renders; check where the accent is drawn before changing anything.",
+   "source": "ponder-2026-11-06"
+  },
+  {
+   "ts": "2026-11-06T16:37:55.798237+00:00",
+   "text": "Run the language-per-beat study as a matrix, not a render order: assign each beat of one past title its language (orbit/hook, kinetic/emphasis, sweep/transition, rise/resolution) and note where the mapping fights the material.",
+   "source": "ponder-2026-11-06"
+  },
+  {
+   "ts": "2026-11-06T16:37:55.798644+00:00",
+   "text": "Add a word-budget check to the gate: flag beat sheets whose on-screen text exceeds roughly 2-3 words per second before rendering.",
+   "source": "ponder-2026-11-06"
+  },
+  {
+   "ts": "2026-11-06T16:37:55.798913+00:00",
+   "text": "Record critic per-check outcomes in memory, not just the overall FAIL, so the next ponder reads which checks passed/failed without reopening JSONs.",
+   "source": "ponder-2026-11-06"
+  },
+  {
+   "ts": "2026-11-06T16:37:55.799189+00:00",
+   "text": "Keep probing the delivered MP4, never the header: resolution, fps, palette, and subtitles are measured from the artifact, not from what the render promised.",
+   "source": "ponder-2026-11-06"
+  }
+ ]
+}

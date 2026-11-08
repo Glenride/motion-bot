@@ -1,0 +1,14 @@
+{
+    "colors": {
+        "accent": "#4FC3F7",
+        "background": "#0F2A43",
+        "text": "#FFFFFF"
+    },
+    "hook": "A sample clip to prove any brief renders.",
+    "images": [
+        "forest.jpg"
+    ],
+    "lengthSeconds": 9,
+    "project": "Acme Demo (sample project \u2014 not real)",
+    "subtitle": "Rendered from briefs/sample-generic.json"
+}

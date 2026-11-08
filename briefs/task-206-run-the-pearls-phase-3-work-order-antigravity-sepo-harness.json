@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "hook": "Run the Pearls Phase 3 work order (Antigravity) \u2014 Sepolia rehearsal",
+  "lengthSeconds": 12,
+  "palette": {
+    "background": "#111827",
+    "surface": "#242A38",
+    "accent": "#FFB02E",
+    "accentDeep": "#A6721E",
+    "text": "#FFFFFF",
+    "glow": "#FFB02E",
+    "particle": "#FFB02E"
+  },
+  "mood": {
+    "tone": "neutral",
+    "pacing": "medium"
+  },
+  "motif": {
+    "type": "orbit",
+    "scene": 0
+  },
+  "scenes": [
+    {
+      "words": [
+        "Run",
+        "the",
+        "Pearls",
+        "Phase",
+        "3",
+        "work",
+        "order",
+        "(Antigravity)"
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.08,
+        "fromX": 0,
+        "toX": -26
+      },
+      "transitionOut": "wipe"
+    },
+    {
+      "words": [
+        "Sepolia",
+        "rehearsal"
+      ],
+      "camera": {
+        "fromScale": 1.08,
+        "toScale": 1.0,
+        "fromX": -26,
+        "toX": 22
+      },
+      "transitionOut": "none"
+    }
+  ],
+  "variant": "sweep",
+  "notes": [
+    "motif 'orbit' in scene 1",
+    "variant 'sweep' (rotation by task id)",
+    "story: 4 beats"
+  ],
+  "skills": [
+    "motion-design-skills"
+  ],
+  "format": "landscape",
+  "craft_notes": "- motion-design-skills: Base craft: easing curves, safe areas, seamless loops, on-brand type/color.\n- Format: 1280x720 landscape (Harness composition)."
+}

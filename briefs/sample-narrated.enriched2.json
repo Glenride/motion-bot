@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "narrated": true,
+  "hook": "Glenride studies supply chains \u2014 a shortage starts long before the shelf is empty, and the work is to make the chain visible.",
+  "lengthSeconds": 15,
+  "scenes": [
+    {
+      "voiceoverText": "Glenride studies supply chains",
+      "visualKeywords": [
+        "glenride",
+        "studies",
+        "supply",
+        "chains"
+      ],
+      "prefetchedVisual": {
+        "type": "video",
+        "localPath": "narrated/sample/scene_1_trim.mp4",
+        "width": 3840,
+        "height": 2160,
+        "videoDuration": 10.01,
+        "source": "pixabay",
+        "query": "glenride studies supply chains"
+      }
+    },
+    {
+      "voiceoverText": "a shortage starts long before the shelf is empty,",
+      "visualKeywords": [
+        "shortage",
+        "starts",
+        "long",
+        "shelf"
+      ],
+      "prefetchedVisual": {
+        "type": "video",
+        "localPath": "narrated/sample/scene_2_trim.mp4",
+        "width": 1920,
+        "height": 1080,
+        "videoDuration": 13.013,
+        "source": "pixabay",
+        "query": "shortage"
+      }
+    },
+    {
+      "voiceoverText": "and the work is to make the chain visible.",
+      "visualKeywords": [
+        "work",
+        "make",
+        "chain",
+        "visible"
+      ],
+      "prefetchedVisual": {
+        "type": "video",
+        "localPath": "narrated/sample/scene_3_trim.mp4",
+        "width": 3840,
+        "height": 2160,
+        "videoDuration": 13.0,
+        "source": "pixabay",
+        "query": "work make chain visible"
+      }
+    }
+  ],
+  "notes": []
+}

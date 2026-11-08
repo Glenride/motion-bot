@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "narrated": true,
+  "hook": "Glenride studies supply chains \u2014 a shortage starts long before the shelf is empty, and the work is to make the chain visible.",
+  "lengthSeconds": 15,
+  "scenes": [
+    {
+      "voiceoverText": "Glenride studies supply chains",
+      "visualKeywords": [
+        "freight truck",
+        "shipping port",
+        "warehouse",
+        "cargo containers",
+        "delivery van",
+        "glenride",
+        "studies"
+      ],
+      "concepts": [
+        "supply chains"
+      ],
+      "prefetchedVisual": {
+        "type": "video",
+        "localPath": "narrated/proof-v21/scene_1_trim.mp4",
+        "width": 3840,
+        "height": 2160,
+        "videoDuration": 10.01,
+        "source": "pixabay",
+        "query": "warehouse"
+      }
+    },
+    {
+      "voiceoverText": "a shortage starts long before the shelf is empty,",
+      "visualKeywords": [
+        "empty shelf",
+        "pharmacy counter",
+        "warehouse aisle",
+        "medicine bottles",
+        "shelf",
+        "empty"
+      ],
+      "concepts": [
+        "shortage"
+      ],
+      "prefetchedVisual": {
+        "type": "video",
+        "localPath": "narrated/proof-v21/scene_2.mp4",
+        "width": 1920,
+        "height": 1080,
+        "videoDuration": 10.066566,
+        "source": "pixabay",
+        "query": "pharmacy counter"
+      }
+    },
+    {
+      "voiceoverText": "and the work is to make the chain visible.",
+      "visualKeywords": [
+        "freight truck",
+        "shipping port",
+        "warehouse",
+        "cargo containers",
+        "delivery van"
+      ],
+      "concepts": [
+        "supply chains"
+      ],
+      "prefetchedVisual": {
+        "type": "video",
+        "localPath": "narrated/proof-v21/scene_3.mp4",
+        "width": 1920,
+        "height": 1080,
+        "videoDuration": 10.416667,
+        "source": "pixabay",
+        "query": "warehouse"
+      }
+    }
+  ],
+  "notes": [
+    "concept 'supply chains' -> freight truck, shipping port, warehouse, cargo containers, delivery van",
+    "concept 'shortage' -> empty shelf, pharmacy counter, warehouse aisle, medicine bottles, shelf",
+    "abstract words dropped from search: starts, long",
+    "concept 'supply chains' -> freight truck, shipping port, warehouse, cargo containers, delivery van",
+    "abstract words dropped from search: work, make, visible"
+  ]
+}

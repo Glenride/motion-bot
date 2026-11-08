@@ -1,0 +1,10 @@
+{
+  "hook": "Motion Bot is live \u2014 brief in, MP4 out.",
+  "project": "Motion Bot",
+  "subtitle": "The watcher renders this itself.",
+  "lengthSeconds": 9,
+  "colors": {
+    "background": "#0F2A43",
+    "accent": "#4FC3F7"
+  }
+}
