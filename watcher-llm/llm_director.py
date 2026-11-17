@@ -42,7 +42,7 @@ Strict output rules, enforced in code, not just in the prompt:
 Env:
   LLM_DIRECTOR — "1" (default) tries the LLM first, "0" forces
     the deterministic Director. Read by the watcher, not here.
-  MOTION_BOT_LLM_MODEL — default "meta/muse-glimmer" (fast,
+  MOTION_BOT_LLM_MODEL — default "qwen3.8-flash-next-q2_0" (fast,
     JSON-friendly). Set to a 35B model id for harder tasks.
   MOTION_BOT_LLM_BASE_URLS — comma-separated OpenAI-compatible
     base URLs. Default: the iMac proxy, then the direct tailnet URL.
@@ -67,10 +67,9 @@ from harness_director import (  # noqa: E402
     LENGTH_RE,
 )
 
-DEFAULT_MODEL = "meta/muse-glimmer"
+DEFAULT_MODEL = "qwen3.8-flash-next-q2_0"
 DEFAULT_BASE_URLS = [
-    "http://100.81.149.115:12345/v1",
-    "http://mac-studio.tail22a20c.ts.net:1234/v1",
+    "http://192.168.1.187:8081/v1",
 ]
 DEFAULT_TIMEOUT = 120
 
