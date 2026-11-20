@@ -69,6 +69,19 @@ export type HarnessProps = {
    *  language itself (background + type treatment), not just the
    *  palette — so a run of clips no longer looks identical. */
   variant?: string;
+  /** Panel layout (v2.6, Vertical only for now): centered | split |
+   *  card | lower-third | word-stack. Changes the composition of the
+   *  scene's words, not the background. Defaults to centered. */
+  panel?: string;
+  /** Typeface (v2.6): serif | sans | mono. Each stack resolves on the
+   *  render host (see FONTS in harness/primitives). Defaults to
+   *  serif. */
+  font?: string;
+  /** Word motion (v2.6): kinetic | slide | scale | rise. Kinetic is
+   *  the word-by-word spring; slide moves whole lines; scale punches
+   *  words in place; rise lifts words from below. Defaults to
+   *  kinetic. */
+  motion?: string;
 };
 
 export const HARNESS_DEFAULTS: Required<
@@ -109,6 +122,9 @@ export const HARNESS_DEFAULTS: Required<
   subtitle: "",
   notes: [],
   variant: "orbit",
+  panel: "centered",
+  font: "serif",
+  motion: "kinetic",
 };
 
 const VARIANTS = ["orbit", "kinetic", "sweep", "rise"] as const;

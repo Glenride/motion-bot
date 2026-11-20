@@ -25,6 +25,30 @@ export type HarnessPalette = {
 
 export const SERIF = "Georgia, 'Times New Roman', serif";
 
+/**
+ * Font families that actually resolve on the render host (the iMac,
+ * Arch Linux, fontconfig). Verified 2026-11-20 with fc-list:
+ * Georgia, EB Garamond, Arial, Helvetica, Menlo and Courier New are
+ * NOT installed there, so a bare "Georgia" stack silently falls back
+ * to generic serif — which is why every clip's letterforms looked
+ * identical even when a brief asked for a different feel. Each stack
+ * below starts with the named family for hosts that have it, then a
+ * family that is installed on the iMac, so the letterforms really
+ * change: serif -> Liberation Serif, sans -> Liberation Sans,
+ * mono -> Liberation Mono.
+ */
+export const FONTS = {
+  serif: "Georgia, 'Times New Roman', 'Liberation Serif', serif",
+  sans: "'Liberation Sans', Arial, 'Helvetica Neue', sans-serif",
+  mono: "'Liberation Mono', 'JetBrainsMono Nerd Font', monospace",
+} as const;
+
+export type FontName = keyof typeof FONTS;
+export const FONT_NAMES = ["serif", "sans", "mono"] as const;
+
+export const resolveFont = (name?: string): string =>
+  FONTS[(name ?? "") as FontName] ?? FONTS.serif;
+
 /** Deterministic pseudo-random from a seed — stable across frames. */
 export const rand = (seed: number) => {
   const x = Math.sin(seed * 127.1 + 311.7) * 43758.5453;
@@ -170,7 +194,8 @@ export const KineticWord: React.FC<{
 
 /** A line of kinetic words, staggered, wrapping naturally.
  *  rise: words rise from below (no sideways slide, no rotation) —
- *  the "rise" variant's type motion. */
+ *  the "rise" variant's type motion. fontFamily defaults to SERIF
+ *  so existing callers render exactly as before. */
 export const KineticLine: React.FC<{
   words: string[];
   firstFrame: number;
@@ -180,16 +205,18 @@ export const KineticLine: React.FC<{
   color?: string;
   gapFrames?: number;
   rise?: boolean;
-}> = ({ words, firstFrame, frame, fps, fontSize, color = "#FFFFFF", gapFrames = 7, rise = false }) => (
+  fontFamily?: string;
+  align?: "center" | "left";
+}> = ({ words, firstFrame, frame, fps, fontSize, color = "#FFFFFF", gapFrames = 7, rise = false, fontFamily = SERIF, align = "center" }) => (
   <div
     style={{
       display: "flex",
       flexWrap: "wrap",
-      justifyContent: "center",
+      justifyContent: align === "left" ? "flex-start" : "center",
       alignItems: "center",
-      fontFamily: SERIF,
+      fontFamily,
       lineHeight: 1.25,
-      textAlign: "center",
+      textAlign: align,
       padding: "0 70px",
     }}
   >
@@ -207,6 +234,179 @@ export const KineticLine: React.FC<{
         fromY={rise ? 110 : 0}
       />
     ))}
+  </div>
+);
+
+/**
+ * SlideLines — a second motion language. The words are split into two
+ * lines; each line slides in as a whole unit from alternating sides
+ * (left, then right), fading in over ~12 frames. No per-word stagger,
+ * no rotation, no scale: the line is the unit that moves.
+ */
+export const SlideLines: React.FC<{
+  words: string[];
+  firstFrame: number;
+  frame: number;
+  fontSize: number;
+  color?: string;
+  fontFamily?: string;
+  align?: "center" | "left";
+}> = ({ words, firstFrame, frame, fontSize, color = "#FFFFFF", fontFamily = SERIF, align = "center" }) => {
+  const mid = Math.max(1, Math.ceil(words.length / 2));
+  const lines = [words.slice(0, mid), words.slice(mid)].filter((l) => l.length > 0);
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 12,
+        fontFamily,
+        lineHeight: 1.2,
+        textAlign: align,
+        alignItems: align === "left" ? "flex-start" : "center",
+        padding: "0 48px",
+      }}
+    >
+      {lines.map((line, li) => {
+        const start = firstFrame + li * 14;
+        const p = interpolate(frame - start, [0, 12], [0, 1], {
+          extrapolateLeft: "clamp",
+          extrapolateRight: "clamp",
+        });
+        const x = interpolate(p, [0, 1], [li % 2 === 0 ? -720 : 720, 0]);
+        return (
+          <div
+            key={li}
+            style={{
+              opacity: p,
+              transform: `translateX(${x}px)`,
+              fontSize,
+              fontWeight: 700,
+              color,
+              textShadow: "0 4px 28px rgba(0,0,0,0.35)",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {line.join(" ")}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+/**
+ * ScaleLine — a third motion language. Words punch in one at a time by
+ * scaling from 0.5 to 1 with a fade, staggered, in place: no slide, no
+ * rise, no rotation. The word stays where it lands.
+ */
+export const ScaleLine: React.FC<{
+  words: string[];
+  firstFrame: number;
+  frame: number;
+  fontSize: number;
+  color?: string;
+  gapFrames?: number;
+  fontFamily?: string;
+  align?: "center" | "left";
+}> = ({ words, firstFrame, frame, fontSize, color = "#FFFFFF", gapFrames = 6, fontFamily = SERIF, align = "center" }) => (
+  <div
+    style={{
+      display: "flex",
+      flexWrap: "wrap",
+      justifyContent: align === "left" ? "flex-start" : "center",
+      alignItems: "center",
+      fontFamily,
+      lineHeight: 1.25,
+      textAlign: align,
+      padding: "0 70px",
+    }}
+  >
+    {words.map((w, i) => {
+      const start = firstFrame + i * gapFrames;
+      const p = interpolate(frame - start, [0, 10], [0, 1], {
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+      });
+      const scale = interpolate(p, [0, 1], [0.5, 1]);
+      return (
+        <span
+          key={`${w}-${i}`}
+          style={{
+            display: "inline-block",
+            opacity: p,
+            transform: `scale(${scale})`,
+            fontSize,
+            fontWeight: 700,
+            color,
+            textShadow: "0 4px 28px rgba(0,0,0,0.35)",
+            margin: "0 10px",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {w}
+        </span>
+      );
+    })}
+  </div>
+);
+
+/**
+ * StackLine — the word-stack panel's motion. One word per line, huge,
+ * left-aligned, each word rising from below on a spring, staggered.
+ * The stack IS the layout: words never share a line, so a scene reads
+ * as a vertical column instead of a centered paragraph.
+ */
+export const StackLine: React.FC<{
+  words: string[];
+  firstFrame: number;
+  frame: number;
+  fps: number;
+  fontSize: number;
+  color?: string;
+  gapFrames?: number;
+  fontFamily?: string;
+}> = ({ words, firstFrame, frame, fps, fontSize, color = "#FFFFFF", gapFrames = 8, fontFamily = SERIF }) => (
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "flex-start",
+      fontFamily,
+      lineHeight: 1.08,
+      textAlign: "left",
+    }}
+  >
+    {words.map((w, i) => {
+      const progress = spring({
+        frame: frame - (firstFrame + i * gapFrames),
+        fps,
+        config: { damping: 16, stiffness: 160 },
+      });
+      const opacity = interpolate(frame - (firstFrame + i * gapFrames), [0, 8], [0, 1], {
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+      });
+      const y = interpolate(progress, [0, 1], [130, 0]);
+      const scale = interpolate(progress, [0, 1], [0.92, 1]);
+      return (
+        <span
+          key={`${w}-${i}`}
+          style={{
+            display: "block",
+            opacity,
+            transform: `translateY(${y}px) scale(${scale})`,
+            fontSize,
+            fontWeight: 800,
+            color,
+            textShadow: "0 4px 28px rgba(0,0,0,0.35)",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {w}
+        </span>
+      );
+    })}
   </div>
 );
 

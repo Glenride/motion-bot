@@ -256,3 +256,94 @@ explicitly asks for it — there is no new default behavior.
   the critic's structural_ok decision are untouched. No live
   Mission Control task was claimed, rendered, or marked done in
   this wiring; proofs only, local briefs only.
+
+## Viral Claude Code formats (2026-11-10)
+
+Source: Theo @theoxmotion's Oct 31 thread, "how to make viral videos
+with Claude Code for $0". Checked live Nov 10: his whatif-3d-studio
+and explainer-reel-studio repos 404 (account also 404 — deleted,
+renamed, or private; do not build on those links). Three formats
+from other creators verified live and wired here, all MIT, all as
+craft guidance only — same pattern as Everest: router matches brief
+text with narrow multi-word triggers, matched packs add skills /
+format / craft_notes to the storyboard, narrated LLM prompts get the
+matched skill text as craft guidance only. No new renderer, no
+upstream engine, studio, rig, or Canvas code imported. Motion Bot
+recreates the patterns code-drawn in Remotion with the brief's own
+words and numbers.
+
+| Pack | Source | What it adds |
+|---|---|---|
+| what-if-animation | kelano86/what-if-animation (300 stars) | 15–25 s "What If" cartoons: 7-beat formula, cold open with three escalating demos, premise title card, one real fact with a number in the turn, end on a question. 27+ cuts/min opening, one hero who never changes, storyboard self-check before animating. |
+| animate-canvas | cth9191/animate (1,729 stars) | Procedural canvas animation: 7 styles (cut paper, crosshatch ink, riso, sketchbook, math, pixel, isometric), story → look → storyboard approvals before animating, shape-morph bridges, silence before the payoff / loudest on it, one constant the eye can hold, colour means one thing. |
+| motion-prompt | showheyohtaki/motion-prompt (1,899 stars) | A naming dictionary: 192 named moves in 8 packs × 24 (motion, camera, UI, landing-page, photo, motion2, lp2, camera2). Name the move with its duration, strength, and what moves; keep the spec's timings and easing, replace only words, colours, and content. |
+
+### Router entries (watcher/skill_router.py)
+
+| Router entry | Triggers |
+|---|---|
+| what-if-animation | what if episode, what-if episode, what if cartoon, dusk stick figure, stick figure episode |
+| animate-canvas | cut paper, crosshatch ink, riso print, sketchbook style, pixel animation, isometric animation, canvas animation, procedural animation |
+| motion-prompt | motion prompt, motion-prompt, motion dictionary, mask reveal, slow dolly in, dolly in, shape morph, count-up, mask transition, jump cut, match cut, rack focus, impact shake, light sweep |
+
+All three pack ids equal their `skills/` dir names, so
+`load_skill_text` resolves them by direct lookup — no Everest-style
+shared-file mapping was needed. Router test
+`watcher/test_viral_formats.py`: 26 checks pass (each pack fires on
+its triggers, vague briefs match base craft only, vertical + what-if
+keeps the vertical format, skill text loads for all three,
+single-word near-misses like "what if" / "dolly" / "motion" alone do
+not fire).
+
+### Limits (honest)
+
+- **ElevenLabs is NOT wired.** Both what-if and animate voice with
+  ElevenLabs upstream (what-if free plan ~10,000 credits/month,
+  about 40 episodes, non-commercial use with credit). No
+  ElevenLabs key is on file and none was provisioned. Motion Bot's
+  voiceover stays on its existing path; the -14 LUFS master target
+  is guidance for the mix, not a new step.
+- The what-if 15–25 s pace is guidance, not a new composition:
+  briefs still render through the existing Harness / Vertical /
+  Narrated routes at their own lengths.
+- motion-prompt is a naming dictionary, not a renderer: the catalog
+  only covers individual moves. The watcher has no gallery picker
+  — moves come from the brief's own words or the director naming
+  them in the storyboard, never invented IDs. Never write a move
+  from its name alone; the numbers live in the element's spec.
+- Upstream formats F2 (chronology / morph chain) and F4 (mission)
+  are the proven animate formats; the others are documented from
+  study but unproven. Isometric has only its demo so far.
+- Never claim the viral channels are made with Claude or any other
+  tool. Nobody has said how they're made.
+- No fake real things, no invented figures: facts and numbers only
+  from the brief. Voiceover words and scene text still come only
+  from the hook; the story gate, title-is-hook, and palette
+  (parchment/gold, never purple/magenta/pink) rules are untouched.
+
+## Panel / font / motion variety (v2.6, 2026-11-20)
+
+The sameness correction: variants (orbit / kinetic / sweep / rise)
+changed background + type size, but every clip still read as the
+same centered serif paragraph. v2.6 adds three independent axes to
+the Vertical composition, wired through the Director
+(watcher/harness_director.py) and the storyboard JSON — not through
+skill text. Skills stay text guidance; they do not render.
+
+- **Panel** (`Panel:` label, else rotation by task id): centered |
+  split | card | lower-third | word-stack. Each is a different
+  composition of the same scene words.
+- **Font** (`Font:` label, else rotation): serif | sans | mono.
+  Stacks resolve on the iMac render host (Georgia / EB Garamond /
+  Arial are NOT installed there; serif falls back to Liberation
+  Serif, sans to Liberation Sans, mono to Liberation Mono).
+- **Motion** (`Motion:` / `Move:` label, else rotation): kinetic |
+  slide | scale | rise. `Motion:` stays the variant label; when its
+  value is also a motion name it sets the motion too. `Move:` sets
+  the motion only.
+
+Defaults (centered / serif / kinetic) render exactly the pre-v2.6
+look. Rotation strides differ per axis, so adjacent tasks differ in
+all three. No axis changes the palette — the field follows the
+brief, as always. Proof renders: briefs/proof-panel-*.json, critic
+PASS each, 2026-11-20.

@@ -100,7 +100,7 @@ HEX_RE = re.compile(r"#(?:[0-9a-fA-F]{6}|[0-9a-fA-F]{3})\b")
 LENGTH_RE = re.compile(r"(\d+(?:\.\d+)?)\s*(?:s|sec|secs|second|seconds)\b", re.I)
 LABEL_RE = re.compile(
     r"(?im)^\s*(project|subtitle|tagline|end card|background|accent|text|name|role|"
-    r"image|images|length|duration|mood|tone|motif)\s*[:\-=]\s*(.+?)\s*$"
+    r"image|images|length|duration|mood|tone|motif|panel|font|motion|move)\s*[:\-=]\s*(.+?)\s*$"
 )
 
 # ------------------------------------------------------------------ mood
@@ -448,6 +448,68 @@ def pick_variant(task, notes):
     return "orbit"
 
 
+# ------------------------------------------------------------ panels / fonts / motions (v2.6)
+# The 2026-11-20 correction: variants changed background + type size,
+# but every clip still read as the same centered serif paragraph.
+# Panel changes the composition of the words, font changes the
+# typeface, motion changes how words enter. Each rotates by task id
+# on a different stride so adjacent tasks differ in all three;
+# explicit labels override rotation. Defaults (centered / serif /
+# kinetic) render exactly the pre-v2.6 look.
+PANELS = ["centered", "split", "card", "lower-third", "word-stack"]
+FONTS = ["serif", "sans", "mono"]
+MOTIONS = ["kinetic", "slide", "scale", "rise"]
+PANEL_RE = re.compile(r"(?im)^\s*panel\s*[:\-=]\s*([A-Za-z\-]+)\s*$")
+FONT_RE = re.compile(r"(?im)^\s*font\s*[:\-=]\s*([A-Za-z]+)\s*$")
+MOVE_RE = re.compile(r"(?im)^\s*move\s*[:\-=]\s*([A-Za-z]+)\s*$")
+
+
+def _pick_rotating(task, notes, name, values, regex, stride, offset):
+    """Explicit `Name:` label wins, else rotation by task id."""
+    details = task.get("details") or ""
+    m = regex.search(details)
+    if m and m.group(1).lower() in values:
+        notes.append(f"{name} '{m.group(1).lower()}' (explicit label)")
+        return m.group(1).lower()
+    tid = task.get("id")
+    if isinstance(tid, int):
+        value = values[(tid * stride + offset) % len(values)]
+        notes.append(f"{name} '{value}' (rotation by task id)")
+        return value
+    return values[0]
+
+
+def pick_panel(task, notes):
+    return _pick_rotating(task, notes, "panel", PANELS, PANEL_RE, 1, 0)
+
+
+def pick_font(task, notes):
+    return _pick_rotating(task, notes, "font", FONTS, FONT_RE, 2, 1)
+
+
+def pick_motion(task, notes):
+    """Task -> motion name. `Move:` wins; a `Motion:` / `Variant:`
+    line whose value is also a motion name sets the motion too
+    (kinetic/rise mean the same motion language in both vocabularies;
+    slide/scale are motions only, orbit/sweep are variants only).
+    `Motion:` stays the variant label — this does not change that."""
+    details = task.get("details") or ""
+    m = MOVE_RE.search(details)
+    if m and m.group(1).lower() in MOTIONS:
+        notes.append(f"motion '{m.group(1).lower()}' (explicit Move: label)")
+        return m.group(1).lower()
+    m = VARIANT_RE.search(details)
+    if m and m.group(2).lower() in MOTIONS:
+        notes.append(f"motion '{m.group(2).lower()}' (explicit Motion: label)")
+        return m.group(2).lower()
+    tid = task.get("id")
+    if isinstance(tid, int):
+        value = MOTIONS[(tid * 3 + 2) % len(MOTIONS)]
+        notes.append(f"motion '{value}' (rotation by task id)")
+        return value
+    return "kinetic"
+
+
 # ------------------------------------------------------------ story parsing
 # Remake (2026-11-03): a task's story IS its scenes. The v2.4 rule
 # (beats are gate material, not scene text) belonged to the hook-clip
@@ -488,6 +550,12 @@ def parse_story(details):
         if LABEL_RE.match(line.strip()):
             continue
         if VARIANT_RE.match(line.strip()):
+            continue
+        if PANEL_RE.match(line.strip()):
+            continue
+        if FONT_RE.match(line.strip()):
+            continue
+        if MOVE_RE.match(line.strip()):
             continue
         words = [w.strip(",") for w in line.strip().split()]
         real = [w for w in words
@@ -586,6 +654,9 @@ def build_storyboard(task):
         })
 
     variant = pick_variant(task, notes)
+    panel = pick_panel(task, notes)
+    font = pick_font(task, notes)
+    motion = pick_motion(task, notes)
     legacy_story = parse_story(details)
     if legacy_story and not story_beats:
         notes.append(f"story: {len(legacy_story)} beats")
@@ -608,6 +679,9 @@ def build_storyboard(task):
         "motif": motif,
         "scenes": scenes,
         "variant": variant,
+        "panel": panel,
+        "font": font,
+        "motion": motion,
         "notes": notes,
     }
     if story_beats:

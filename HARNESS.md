@@ -43,6 +43,12 @@ model, no keys: it works when the Mac Studio is down.
   contrasts below 3.0 the Director picks whichever of ink/white
   contrasts better and notes it. A light third color on a dark
   background becomes the text color.
+- **No colors named (explicit fallback).** When the details name no
+  color at all, the palette is dark slate background `#111827` with
+  amber accent `#FFB02E` and derived text — the Director's
+  deterministic fallback, not a house look. Briefs SHOULD name
+  colors: the look follows the brief, and no single palette is the
+  default for briefs. Never copy one palette into every brief.
 - **Color map** (every mapping, also in the module's `COLOR_NAMES`):
   white `#FFFFFF` · parchment/paper `#F4EEDC` (Signalwood paper, locked)
   · cream `#FFF8E7` · ivory `#FFFFF0` · sand `#D9C7A7` · gold `#D4AF37`
@@ -72,6 +78,41 @@ model, no keys: it works when the Mac Studio is down.
   `-ing` word as its flipped reflection (e.g. SMILING) and a tears
   flag when the hook mentions cry/tear. The motif belongs to the first
   scene naming its keyword, else scene 2 of 3+, else scene 1.
+- **Variant.** One of orbit / kinetic / sweep / rise, from an explicit
+  `Variant:` / `Motion:` label (exact single-word line), else rotation
+  by task id. Variants change the motion language — background
+  treatment + type treatment + accent-carrier geometry — in BOTH
+  compositions (Harness and Vertical). They never change the palette:
+  the field follows the brief's colors, the variant changes how it
+  moves. Vertical honors `variant` since v2.5 (before that it
+  rendered one fixed recipe for every variant).
+- **Panel / font / motion (v2.6, Vertical only).** The 2026-11-20
+  correction: variants changed background + type size, but every
+  clip still read as the same centered serif paragraph. `Panel:`
+  changes the composition of the words — centered (the pre-v2.6
+  layout) | split (hook huge in accent on top, support line below,
+  accent rule between) | card (words inside a bordered surface card
+  offset up-left, first word as a small-caps kicker) | lower-third
+  (headline + subhead anchored low, top ~60% negative space) |
+  word-stack (one word per line, huge, staggered rise). `Font:`
+  changes the typeface — serif | sans | mono. Each stack resolves
+  on the render host: Georgia / EB Garamond / Arial are NOT
+  installed on the iMac, so serif falls back to Liberation Serif,
+  sans to Liberation Sans, mono to Liberation Mono (verified with
+  fc-list 2026-11-20). `Motion:` / `Move:` changes how words enter
+  — kinetic (word-by-word spring) | slide (whole lines slide in
+  from alternating sides) | scale (words punch in place) | rise
+  (words lift from below). `Motion:` stays the variant label: when
+  its value is also a motion name it sets the motion too
+  (kinetic/rise mean the same in both vocabularies); `Move:` sets
+  the motion only and wins when both are present. Each of panel /
+  font / motion rotates by task id on a different stride, so
+  adjacent tasks differ in all three. Defaults (centered / serif /
+  kinetic) render exactly the pre-v2.6 look. The word-stack panel
+  always uses its stacked-rise entry whatever the motion prop says.
+  The end card renders only on centered and card panels, where
+  there is room below the words. No panel, font, or motion changes
+  the palette: the field follows the brief, as always.
 - **Camera + transitions.** Scenes alternate push-in / pull-back /
   push-in-closer / lateral drift; transitions alternate diagonal wipe
   / zoom-cut. Never plain fades only.
@@ -113,6 +154,23 @@ by the storyboard; shared engine in `src/harness/`:
   end-card line (project in accent + subtitle) fading in over its last
   30% when labelled. A project of "Motion Bot" / "Untitled Project"
   is treated as no project, same as Generic.
+
+`src/Vertical.tsx` (composition `Vertical`, 720x1280) renders the same
+storyboard for 9:16 — hook big and centered, 120px top / 160px
+bottom safe areas, wipe / zoom-cut between scenes. It honors
+`variant` (v2.5): orbit keeps the drifting-dot field, kinetic is a
+flat surface field with bigger/faster type, sweep gets swaying
+accent bands, rise drops the dots and lifts the words from below.
+Since v2.6 it also honors `panel` / `font` / `motion` (see Director
+above): five panel layouts, three typefaces that resolve on the
+iMac, four word-entry motions. New primitives in
+`src/harness/primitives.tsx`: `SlideLines`, `ScaleLine`, `StackLine`,
+plus the `FONTS` map and `resolveFont`. The clip-level accent
+carrier (`AccentMark`, outside the scene cameras) follows
+`palette.accent` and varies by variant — top bar for orbit/kinetic,
+bottom bar for sweep, left rail for rise. Motifs do not render in
+Vertical (the motif library is sized for
+landscape); the palette still follows the brief.
 
 `Generic.tsx` and `Signalwood.tsx` are untouched. The Harness is one
 more composition, not a replacement.
@@ -189,6 +247,28 @@ every frame; accent family in 4/4 frames; text 0.59–1.05% every frame;
 contrast 17.3; OCR reads the hook words ("every mirror in your
 house", "except when you turn your back", "that's when it starts to
 cry.") with no banned strings.
+
+## Proof — panel / font / motion variety (v2.6, 2026-11-20)
+
+Same story + palette as task 391 (sand `#D9C7A7`, surface `#4FC3F7`,
+accent teal `#0F766E`, ink `#1F1A14`, 3 scenes, 12s, 720x1280), one
+render per new panel, each a different font + motion — so the only
+differences are panel / font / motion. All rendered on the iMac,
+critic **PASS** each, exit 0:
+- centered / serif / kinetic (control): `out/proof-panel-centered.mp4`,
+  521,495 B, diffs 2.90 / 5.09 / 2.99.
+- split / sans / slide: `out/proof-panel-split.mp4`, 649,545 B,
+  diffs 3.47 / 4.37 / 5.51.
+- card / mono / scale: `out/proof-panel-card.mp4`, 565,189 B,
+  diffs 2.52 / 3.45 / 3.64.
+- lower-third / serif / rise: `out/proof-panel-lower-third.mp4`,
+  529,581 B, diffs 2.17 / 4.64 / 3.65.
+- word-stack / sans / kinetic: `out/proof-panel-word-stack.mp4`,
+  653,105 B, diffs 6.74 / 6.05 / 7.24.
+Contrast 10.42 on all five. Frame grabs in
+`out/proof-panel-frames/` (2s + 6s per panel) show the layouts,
+letterforms, and entries are visibly different. Briefs:
+`briefs/proof-panel-*.json`.
 
 ## Narrated mode (v2, built 2026-10-26)
 
