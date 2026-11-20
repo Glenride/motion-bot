@@ -48,8 +48,9 @@ PACKS = {
         "vertical",
     ),
     "data-animation-skills": (
-        [r"\b(chart|graph|dataset|percent|growth|statistic|bar chart|line chart)\b"],
-        "Data: frame-accurate numbers, count-up on the value, never animate the axis away from the data.",
+        [r"\b(chart|graph|dataset|percent|growth|statistic|bar chart|line chart)\b",
+         r"\bdata\s*:"],
+        "Data: frame-accurate numbers, count-up on the value (easeOutCubic, tabular-nums), never animate the axis away from the data; build-and-hold pacing (1s intro hold, one bar at a time, final hold >=2s); Chart renders on data rows alone (Data: rows or Label: number lines), no trigger words needed. Stats mode renders the same rows as infographic stat cards.",
         None,
     ),
     "lower-thirds-skills": (
@@ -74,7 +75,7 @@ PACKS = {
     ),
     "ecommerce-video-skills": (
         [r"\b(shop|store|product demo|unboxing|buy)\b"],
-        "E-commerce: product demo beats, feature callouts, end card, no invented claims.",
+        "E-commerce: ProductDemo comp — product-first frame, feature callouts with cursor + click ripple, end card with the offer; was→now computed from was, never typed twice; no invented product, price, or claim. A Product: label routes even without trigger words.",
         None,
     ),
     # Everest components (everestchris.com/components, wired 2026-11-01).
@@ -86,57 +87,57 @@ PACKS = {
     # logo, or invented figure.
     "everest-product-ui": (
         [r"\b(agent cli|tool call|chat window|permission prompt|step chips|done card|desktop agent|messaging app|prompt input)\b"],
-        "Everest Product UI: typed prompt, ticking tool calls, stacking step chips, done line — brief's own words only.",
+        "Everest Product UI (EverestPanels): typed prompt, ticking tool calls, stacking step chips, done line — brief's own words only.",
         None,
     ),
     "everest-prompts-results": (
         [r"\b(prompt card|elapsed timer|failure call-out|failure callout|output builds|key phrases light|local preview|creator handle)\b"],
-        "Everest Prompts & results: prompt card to staged output, elapsed timer, quiet time stamp, honest failure call-outs.",
+        "Everest Prompts & results (EverestPanels): prompt card to staged output, elapsed timer, quiet time stamp, honest failure call-outs.",
         None,
     ),
     "everest-agents-workflows": (
         [r"\b(coordinator agent|parallel sub-agents|sub-agents|connectors|memory surface|inbox sorts|week strip|cloud task card|skill\.md card)\b"],
-        "Everest Agents & workflows: real surfaces, not node diagrams — coordinator task rows ticking done, connectors switching on, memory saved then recalled.",
+        "Everest Agents & workflows (EverestPanels): real surfaces, not node diagrams — coordinator task rows ticking done, connectors switching on, memory saved then recalled.",
         None,
     ),
     "everest-models-benchmarks": (
         [r"\b(model lineup|spec picker|spec card|token chips|model versions|benchmark bars|old score|new score|delta counts)\b"],
-        "Everest Models & benchmarks: bars grow, old to new score with delta counting up, spec picker with one recommended tier — numbers only from the brief.",
+        "Everest Models & benchmarks (EverestPanels): bars grow, old to new score with delta counting up, spec picker with one recommended tier — numbers only from the brief.",
         None,
     ),
     "everest-comparisons": (
         [r"\b(side by side|two results|recommendation table|finish order|checklist collapses|two real app windows)\b"],
-        "Everest Comparisons: two windows side by side, timers run, winner ticks and loser dims, one recommendation chip per row.",
+        "Everest Comparisons (EverestPanels): two windows side by side, timers run, winner ticks and loser dims, one recommendation chip per row.",
         None,
     ),
     "everest-launch-news": (
         [r"\b(launch post|version number ticks|who gets it|official post|system card scrolls)\b"],
-        "Everest Launch & news: mark, name, and version tick into place, one sentence highlighted, tiers/regions/platforms light up.",
+        "Everest Launch & news (EverestPanels): mark, name, and version tick into place, one sentence highlighted, tiers/regions/platforms light up.",
         None,
     ),
     "everest-pricing-limits": (
         [r"\b(subscription tiers|per 1m tokens|price in/out|receipt prints|token cost|old price struck)\b"],
-        "Everest Pricing & limits: the tier you need lifts, old price struck through, receipt prints tokens/minutes/tool calls/total — costs only from the brief.",
+        "Everest Pricing & limits (EverestPanels): the tier you need lifts, old price struck through, receipt prints tokens/minutes/tool calls/total — costs only from the brief.",
         None,
     ),
     "everest-lower-thirds": (
         [r"\b(keyword pills|corner badge|corner credit|source chip|guest name|speaker name|floating keyword)\b"],
-        "Everest Lower thirds & labels: name and role slide in and settle, keyword pills near the gesture, corner source credit, inside safe areas.",
+        "Everest Lower thirds & labels (EverestPanels): name and role slide in and settle, keyword pills near the gesture, corner source credit, inside safe areas.",
         None,
     ),
     "everest-broll-frames": (
         [r"\b(presenter inset|phone capture|punch-in|watch-page card|b-roll frame)\b"],
-        "Everest B-roll frames: clean frame with a source line, presenter inset kept on screen, punch-in with a ring on the target.",
+        "Everest B-roll frames: DROPPED — every pattern needs real footage or a real app screenshot; Motion Bot has no footage source, so the router never selects it.",
         None,
     ),
     "everest-evidence-quotes": (
         [r"\b(key phrase|reaction post|rest dims|slow push-in|key line highlighted)\b"],
-        "Everest Evidence & quotes: rest dims, one line highlights with a slow push-in; posts and emails as styled cards, never fake real screenshots.",
+        "Everest Evidence & quotes (EverestPanels): rest dims, one line highlights with a slow push-in; posts and emails as styled cards, never fake real screenshots.",
         None,
     ),
     "everest-usage-cost": (
         [r"\b(usage bar|usage panel|limit banner|reset countdown|hits the cap)\b"],
-        "Everest AI usage & cost: usage bar fills to the cap, limit banner slides in with a reset countdown — caps only from the brief.",
+        "Everest AI usage & cost (EverestPanels): usage bar fills to the cap, limit banner slides in with a reset countdown — caps only from the brief.",
         None,
     ),
     "animate-canvas": (

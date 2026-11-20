@@ -330,6 +330,139 @@ iMac, critic **PASS** each, exit 0):
 Regression: `out/proof-panel-centered.mp4` re-rendered after the
 v2.7 sync — byte-identical md5 to the v2.6 file, critic PASS.
 
+## Packs 4–6 as Remotion code (v2.8, 2026-11-20)
+
+data-animation-skills, ecommerce-video-skills, and
+everest-components are no longer craft notes only — each has a
+composition (or a code path into one) in `src/`, registered in
+`src/Root.tsx`, and a rung in the watcher's Harness route.
+Defaults are unchanged when no pack is selected (centered / serif
+/ kinetic, Harness or Vertical).
+
+- **Pack 4 — Chart / D3Chart** (`src/Chart.tsx`,
+  `src/D3Chart.tsx`, 1280×720, 12s) — data-animation-skills:
+  count-up on the value (`countUp` in `Chart.tsx`, easeOutCubic,
+  interpolates then rounds before formatting, lands exactly on the
+  final value, `tabular-nums`), frame-accurate numbers, build-and-
+  hold pacing (1s intro hold with the axis readable first, bars
+  build one at a time, final hold ≥2s). The axis never animates
+  away from the data: the max tick + unit label are static from
+  frame 0. `mode: "bars" | "stats"` — stats mode is the
+  animated-infographic half (stat cards in a row, icon pop, one
+  number counting at a time, draw-on connectors). The watcher
+  chart rung fires on `Data:` rows ALONE — a task carrying data
+  rows is a data task, no trigger words needed
+  (`watcher/harness_director.py: parse_data_rows`, also parses
+  `Label: number` pairs on one line; bare numbers without a label
+  are rejected). `Unit:` / `Mode:` labels pass through; `Chart:
+  d3` opts into the D3Chart rung (same count-up, same holds).
+- **Pack 5 — ProductDemo** (`src/ProductDemo.tsx`, 1280×720,
+  15s default) — ecommerce-video-skills: product-first frame
+  (0–15%), one feature beat per feature (15–78%, cursor glides
+  on smoothstep then a click at 45% of the beat → ripple +
+  chip highlight + the browser-frame state line changes on the
+  click frame), end card (78–100%, hold ≥2s) with the offer and
+  a CTA button with a shine sweep. Props come only from the task
+  (`watcher/harness_director.py: build_product_demo`): product
+  from a `Product:` label (else the title when the ecommerce
+  trigger matched), features from `Features:` / `Feature:` lines
+  (else story beats 2+, capped at 4), offer text/code/deadline
+  only from labels, was→now only when both parse and now < was
+  — the strike draws first, then the price counts down from
+  was, `% OFF` is computed from was/now, never typed twice.
+  No product, no demo: the builder returns None and the task
+  keeps the default route. The browser frame is code-drawn
+  (traffic-light dots + product name as the window title, never
+  a fake URL); a deadline renders only when supplied, never a
+  fake timer. The watcher rung fires on the ecommerce trigger
+  OR a `Product:` label.
+- **Pack 6 — EverestPanels** (`src/EverestPanels.tsx`,
+  1280×720, 12s default) — everest-components: 10 of 11
+  categories as code-drawn panels, one `category` prop:
+  product-ui (typed prompt, step chips ticking done, done line),
+  prompts-results (prompt card + staged output + elapsed timer),
+  agents-workflows (coordinator rows with per-row progress +
+  merged summary), models-benchmarks (bars grow old→new, delta
+  counts up via `countUp`, winner takes accent), comparisons
+  (two windows, running timers, winner ticks / loser dims),
+  launch-news (mark + name + version tick in, tiers light up),
+  pricing-limits (recommended tier lifts, old price struck,
+  receipt prints line by line), lower-thirds (name + role settle,
+  keyword pills, corner credit only when a project is named),
+  usage-cost (usage bar to the cap, limit banner only at the
+  cap, reset countdown only when supplied), evidence-quotes
+  (styled card, slow push-in, rest dims as the highlight lands).
+  Every panel is built from the brief's own words and numbers
+  only (`watcher/harness_director.py: build_everest_panel` —
+  per-category requirements, returns None with a note when the
+  numbers are absent, never an invented figure). **DROPPED —
+  everest-broll-frames**: every pattern needs real footage or a
+  real app screenshot; Motion Bot has no footage source of its
+  own and a code-drawn fake of a real app is what the skill
+  forbids (recorded in `EverestPanels.tsx` header and
+  `harness_director.py: EVEREST_DROPPED`). The watcher rung
+  fires on any `everest-*` route match OR an `Everest:` label —
+  the label alone is a trigger, because the router's everest
+  triggers are narrow multi-word phrases that a bare label
+  would never match (v2.8 routing fix, found by a simulation
+  test: `Everest: models-benchmarks` + `Benchmark:` lines
+  routed to the default before the fix).
+- **Shared motion — DriftBlobs** (`src/harness/primitives.tsx`):
+  three large surface-color circles drifting on sine/cosine
+  paths, behind every v2.8 composition, so a settled hold frame
+  still differs from the next by more than the critic's 2.0
+  mean diff. Two lessons, both measured: (1) small slow blobs
+  (first pass) moved too little between samples and failed every
+  hold pair — the edge has to travel ~20px at the critic's 320px
+  sample scale between samples 1.5s apart; (2) translucent blobs
+  (second pass) fixed the diffs but dropped the light field to
+  45–49% and failed palette_present — a 0.5-opacity blend sits
+  within tolerance of neither background nor surface, so it
+  counts toward neither. The blobs are SOLID surface color, so
+  they count as surface and help the light field. Same rule
+  inside EverestPanels: cards use `palette.surface`, never
+  white — a white card is neither background nor surface within
+  tolerance and held the light field at 46%.
+- **Watcher LABEL_RE fix (v2.8)**: the watcher's local
+  `parse_labels()` shadowed the director import and its old
+  LABEL_RE listed only translate_to_brief keys — the Harness
+  route's `Name:` (lower-thirds rung) and `Chart: d3` (D3 rung)
+  labels could never parse, so both rungs were dead through the
+  watcher. The watcher's LABEL_RE now carries name, role, chart,
+  unit, mode, product, everest (comment at the LABEL_RE).
+
+Proof (task-391 palette; data from `briefs/proof-v23-chart.json`
+— ASHP quarterly count Q2 2026: 227, Q3 2026: 225; product/offer
+from the record — The First Build $75/hr founding rate, Early
+Fox bundle $79 → $22.50, code EARLYFOX26, ends Fri Nov 27 2pm
+ET; all rendered on the iMac, critic **PASS** each, exit 0):
+- chart: `out/proof-v28-chart.mp4`, 334,622 B, 12s, diffs
+  12.36 / 19.38 / 5.08.
+- chart-stats: `out/proof-v28-chart-stats.mp4`, 347,922 B, 12s,
+  diffs 19.58 / 18.37 / 4.89.
+- d3chart: `out/proof-v28-d3chart.mp4`, 307,292 B, 12s, diffs
+  10.74 / 13.29 / 4.14.
+- product: `out/proof-v28-product.mp4`, 615,994 B, 15s, diffs
+  15.22 / 13.59 / 10.52 / 38.73 / 7.15.
+- promo: `out/proof-v28-promo.mp4`, 602,994 B, 15s, diffs
+  24.67 / 40.16.
+- everest-product-ui: `out/proof-v28-everest-product-ui.mp4`,
+  330,013 B, 12s, diffs 15.38 / 15.54 / 3.34.
+- everest-benchmarks: `out/proof-v28-everest-benchmarks.mp4`,
+  323,297 B, 12s, diffs 16.82 / 23.24 / 5.32.
+Routing simulation (replicates the watcher elif chain with the
+real `route()` / builder functions): 8/8 — data rows alone →
+Chart, `Chart: d3` → D3Chart, `Product:` label → ProductDemo,
+`Everest:` label and trigger phrase → EverestPanels,
+broll-frames and number-less benchmarks → default route.
+Regression: `out/proof-panel-centered.mp4` re-rendered after the
+v2.8 sync, critic PASS (diffs 2.90 / 5.09 / 2.99). No
+byte-identical md5 check this time: the pre-render file was
+overwritten in place before the comparison was taken (v2.7's
+byte-identical check compared against the on-disk file first);
+`src/Vertical.tsx` is untouched and `primitives.tsx` only
+gains the DriftBlobs export, so the render path is unchanged.
+
 ## Narrated mode (v2, built 2026-10-26)
 
 Ported from Automated Video Generator (MIT, v5.0.0) — only its

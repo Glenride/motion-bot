@@ -92,6 +92,8 @@ from harness_director import parse_data_rows, parse_labels  # noqa: E402
 from harness_director import (  # noqa: E402
     ad_beat_scenes,
     build_ad_variant,
+    build_everest_panel,
+    build_product_demo,
     pick_canvas_style,
 )
 from broll_timing import build_segments as build_broll_segments  # noqa: E402
@@ -143,8 +145,13 @@ BRIEF_DEFAULTS = {
 HEX_RE = re.compile(r"#(?:[0-9a-fA-F]{6}|[0-9a-fA-F]{3})\b")
 LENGTH_RE = re.compile(r"(\d+(?:\.\d+)?)\s*(?:s|sec|secs|second|seconds)\b", re.I)
 LABEL_RE = re.compile(
-    r"(?im)^\s*(project|subtitle|tagline|end card|background|accent|text|image|images|length|duration)\s*[:\-=]\s*(.+?)\s*$"
+    r"(?im)^\s*(project|subtitle|tagline|end card|background|accent|text|image|images|length|duration|name|role|chart|unit|mode|product|everest)\s*[:\-=]\s*(.+?)\s*$"
 )
+# NOTE (v2.8 fix): this LABEL_RE used to list only the translate_to_brief
+# keys, so the Harness route's `Name:` (lower-thirds rung) and `Chart:
+# d3` (D3 rung) labels could never parse — both rungs were dead
+# through the watcher. The keys above are the rung-relevant labels;
+# the director's own LABEL_RE (harness_director.py) stays the full set.
 
 
 # ---------------------------------------------------------------- helpers
@@ -1044,8 +1051,13 @@ def main():
                     _codec = None
                     _labels = parse_labels(task.get("details") or "")
                     _rows = parse_data_rows(task.get("details") or "")
-                    if "data-animation-skills" in _route["skills"] and _rows:
-                        # Chart rung (v2.3): numbers from the task, nothing invented.
+                    if _rows:
+                        # Chart rung (v2.3, v2.8): data rows ALONE fire
+                        # the chart — a task carrying Data: rows is a
+                        # data task, no chart trigger words needed.
+                        # Numbers from the task, nothing invented.
+                        # Count-up / build-and-hold live in Chart.tsx
+                        # (v2.8); Unit:/Mode: labels pass through.
                         _composition = "Chart"
                         if _labels.get("chart", "").lower() == "d3":
                             # D3 rung (Nov 3 2026, opt-in only): d3 scales
@@ -1053,6 +1065,29 @@ def main():
                             _composition = "D3Chart"
                         storyboard["bars"] = _rows
                         storyboard["chartTitle"] = storyboard.get("hook", "")
+                        if _labels.get("unit"):
+                            storyboard["unit"] = _labels["unit"]
+                        if _labels.get("mode", "").lower() in ("bars", "stats"):
+                            storyboard["mode"] = _labels["mode"].lower()
+                    elif "ecommerce-video-skills" in _route["skills"] or _labels.get("product"):
+                        # Product-demo rung (v2.8): ProductDemo comp.
+                        # build_product_demo returns None without a
+                        # product (Product: label, else the title when
+                        # the ecommerce trigger matched) — no invented
+                        # product, and money only from labels.
+                        _demo = build_product_demo(
+                            task, storyboard,
+                            ecommerce_matched=("ecommerce-video-skills" in _route["skills"]))
+                        if _demo:
+                            _composition = "ProductDemo"
+                            storyboard["product"] = _demo["product"]
+                            storyboard["features"] = _demo["features"]
+                            storyboard["offer"] = _demo["offer"]
+                            storyboard["cta"] = _demo["cta"]
+                            storyboard["scenes"] = _demo["scenes"]
+                            _demo_len = storyboard.get("lengthSeconds") or 15
+                            storyboard["lengthSeconds"] = (
+                                _demo_len if 12 <= _demo_len <= 30 else 15)
                     elif "ad-video-skills" in _route["skills"]:
                         # Ad rung (v2.7): data-driven AdTemplate. The
                         # variant comes only from the task (labels or
@@ -1093,6 +1128,31 @@ def main():
                             storyboard["lengthSeconds"] = _total
                             storyboard["notes"].extend(_bnotes)
                             storyboard.pop("palette", None)
+                    elif any(p.startswith("everest-") for p in _route["skills"]) or _labels.get("everest"):
+                        # Everest rung (v2.8): EverestPanels comp, one
+                        # category prop. build_everest_panel returns
+                        # None when the category's numbers are absent
+                        # (or for broll-frames, which is DROPPED) —
+                        # those tasks keep the default route, craft
+                        # notes only, never an invented figure. The
+                        # Everest: label fires the rung on its own —
+                        # the router's everest triggers are narrow
+                        # multi-word phrases, so a bare label would
+                        # otherwise never reach the panel code.
+                        _everest = build_everest_panel(
+                            task, storyboard, _route["skills"])
+                        if _everest:
+                            _composition = "EverestPanels"
+                            storyboard["category"] = _everest["category"]
+                            for _k in ("prompt", "steps", "outputLines",
+                                       "bars", "tiers", "usage", "name",
+                                       "role", "pills", "quote",
+                                       "highlight", "comparison",
+                                       "version", "receipt", "wasPrice",
+                                       "nowPrice", "project"):
+                                if _k in _everest:
+                                    storyboard[_k] = _everest[_k]
+                            storyboard["scenes"] = _everest["scenes"]
                     elif "synthwave-style" in _route["skills"] and _route["format"] != "vertical":
                         # Synthwave rung (v2.3): purple-free style preset.
                         _composition = "Synthwave"

@@ -13,6 +13,8 @@ import { Synthwave, SYNTHWAVE_DEFAULTS } from "./Synthwave";
 import { AdTemplate, AD_DEFAULTS } from "./AdTemplate";
 import { CanvasStyles, CANVAS_DEFAULTS } from "./CanvasStyles";
 import { BRoll, BROLL_DEFAULTS } from "./BRoll";
+import { ProductDemo, PRODUCT_DEMO_DEFAULTS } from "./ProductDemo";
+import { EverestPanels, EVEREST_DEFAULTS } from "./EverestPanels";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -184,6 +186,49 @@ export const RemotionRoot: React.FC = () => {
         defaultProps={BROLL_DEFAULTS as any}
         calculateMetadata={async ({ props }) => {
           const lengthSeconds = props.lengthSeconds ?? BROLL_DEFAULTS.lengthSeconds;
+          return {
+            durationInFrames: Math.max(
+              90,
+              Math.round(lengthSeconds * 30),
+            ),
+          };
+        }}
+      />
+      {/* v2.8: packs 4–6 translated to code. ProductDemo is the
+          ecommerce-video-skills template (product frame, cursor +
+          click ripple per feature, end card with the offer);
+          EverestPanels is everest-components (ten code-drawn
+          panels, one category prop; broll-frames dropped — it
+          needs real footage). Chart/D3Chart carry the
+          data-animation count-up / build-and-hold rules. */}
+      <Composition
+        id="ProductDemo"
+        component={ProductDemo}
+        durationInFrames={PRODUCT_DEMO_DEFAULTS.lengthSeconds * 30}
+        fps={30}
+        width={1280}
+        height={720}
+        defaultProps={PRODUCT_DEMO_DEFAULTS as any}
+        calculateMetadata={async ({ props }) => {
+          const lengthSeconds = props.lengthSeconds ?? PRODUCT_DEMO_DEFAULTS.lengthSeconds;
+          return {
+            durationInFrames: Math.max(
+              90,
+              Math.round(lengthSeconds * 30),
+            ),
+          };
+        }}
+      />
+      <Composition
+        id="EverestPanels"
+        component={EverestPanels}
+        durationInFrames={EVEREST_DEFAULTS.lengthSeconds * 30}
+        fps={30}
+        width={1280}
+        height={720}
+        defaultProps={EVEREST_DEFAULTS as any}
+        calculateMetadata={async ({ props }) => {
+          const lengthSeconds = props.lengthSeconds ?? EVEREST_DEFAULTS.lengthSeconds;
           return {
             durationInFrames: Math.max(
               90,

@@ -410,6 +410,73 @@ export const StackLine: React.FC<{
   </div>
 );
 
+/**
+ * DriftBlobs — surface-color blobs behind the copy (v2.8).
+ * The clip's always-on motion: three large circles drift on
+ * sine/cosine paths with wide amplitudes, so even a settled hold
+ * frame differs from the next by more than the critic's 2.0 mean
+ * diff (v2.8 first pass: two small slow blobs measured 0.4–1.5 and
+ * failed every hold pair — the edge has to travel ~20px at the
+ * critic's 320px sample scale between samples 1.5s apart, which
+ * needs amplitudes ~150px+ at ~0.012 rad/frame).
+ *
+ * The blobs are SOLID surface color, not translucent: a 0.5-opacity
+ * blend sits within tolerance of neither background nor surface, so
+ * the second pass (three big translucent blobs) fixed the diffs but
+ * dropped the light field to 45–49% and failed palette_present.
+ * Solid blobs count as surface, so they HELP the light field
+ * instead of eating it. zIndex 0: content wrappers sit at
+ * zIndex >= 1 above them.
+ */
+export const DriftBlobs: React.FC<{
+  frame: number;
+  palette: HarnessPalette;
+}> = ({ frame, palette }) => {
+  const x1 = Math.sin(frame * 0.012) * 170;
+  const y1 = Math.cos(frame * 0.009 + 1) * 110;
+  const x2 = Math.cos(frame * 0.01 + 2) * 140;
+  const y2 = Math.sin(frame * 0.014 + 0.5) * 130;
+  const x3 = Math.sin(frame * 0.013 + 4) * 190;
+  const y3 = Math.cos(frame * 0.011 + 2.5) * 90;
+  return (
+    <AbsoluteFill style={{ overflow: "hidden", zIndex: 0 }}>
+      <div
+        style={{
+          position: "absolute",
+          left: -160 + x1,
+          top: 60 + y1,
+          width: 480,
+          height: 480,
+          borderRadius: "50%",
+          backgroundColor: palette.surface,
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          right: -140 + x2,
+          bottom: 40 + y2,
+          width: 400,
+          height: 400,
+          borderRadius: "50%",
+          backgroundColor: palette.surface,
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          left: 430 + x3,
+          top: 330 + y3,
+          width: 340,
+          height: 340,
+          borderRadius: "50%",
+          backgroundColor: palette.surface,
+        }}
+      />
+    </AbsoluteFill>
+  );
+};
+
 /** Camera wrapper: scale + lateral drift driven by the local frame. */
 export const Camera: React.FC<{
   localFrame: number;

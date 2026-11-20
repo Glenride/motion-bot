@@ -101,7 +101,10 @@ LENGTH_RE = re.compile(r"(\d+(?:\.\d+)?)\s*(?:s|sec|secs|second|seconds)\b", re.
 LABEL_RE = re.compile(
     r"(?im)^\s*(project|subtitle|tagline|end card|background|accent|text|name|role|"
     r"image|images|length|duration|mood|tone|motif|panel|font|motion|move|"
-    r"hook|benefit|proof|cta|style|test|ad)\s*[:\-=]\s*(.+?)\s*$"
+    r"hook|benefit|proof|cta|style|test|ad|"
+    r"product|features|feature|offer|was|now|code|deadline|everest|data|unit|mode|"
+    r"chart|prompt|steps|step|output|benchmark|tier|usage|reset|quote|highlight|"
+    r"compare|row|version|receipt|pills)\s*[:\-=]\s*(.+?)\s*$"
 )
 
 # ------------------------------------------------------------------ mood
@@ -1013,21 +1016,426 @@ if __name__ == "__main__":
 # the details (e.g. "2024: 192"). Known label keys are excluded, and
 # fewer than 2 rows is not a chart — it is prose that happens to
 # contain a number, and the Harness route stays the default.
+# v2.8: a `Data:` line also carries rows — comma/semicolon-separated
+# `Label: number` pairs ("Data: Q2 2026: 227, Q3 2026: 225"). A task
+# carrying Data: rows IS a data task: the watcher routes to Chart
+# on rows alone, without requiring the chart trigger words too.
 DATA_ROW_RE = re.compile(
     r"(?im)^\s*([\w][\w\s&'.\-]{0,40}?)\s*[:=]\s*(\d+(?:\.\d+)?)\s*$")
+DATA_LINE_RE = re.compile(r"(?im)^\s*data\s*[:\-=]\s*(.+?)\s*$")
+# A pair is `<label> <number>` or `<label>: <number>`, anchored on the
+# number at the END of the part — so "Q2 2026: 227" reads label
+# "Q2 2026", value 227, never label "Q" value 2.
+DATA_PAIR_RE = re.compile(
+    r"([\w][\w\s&'.\-]{0,40}?)\s*[:=]?\s*(\d+(?:\.\d+)?)\s*$")
 _DATA_LABEL_KEYS = {
     "project", "subtitle", "tagline", "end card", "background",
     "accent", "text", "image", "images", "length", "duration",
-    "mood", "tone", "motif", "name", "role",
+    "mood", "tone", "motif", "name", "role", "panel", "font",
+    "motion", "move", "hook", "benefit", "proof", "cta", "style",
+    "test", "ad", "product", "features", "feature", "offer", "was",
+    "now", "code", "deadline", "everest", "data", "unit", "mode",
+    "chart", "prompt", "steps", "step", "output", "benchmark",
+    "tier", "usage", "reset", "quote", "highlight", "compare",
+    "row", "version", "receipt", "pills",
 }
 
 
 def parse_data_rows(details):
-    """Details text -> [{label, value}] or [] (needs >= 2 rows)."""
+    """Details text -> [{label, value}] or [] (needs >= 2 rows).
+
+    Plain `Label: number` lines, plus `Data:` lines carrying
+    comma/semicolon-separated `Label: number` pairs. A row whose
+    label is a known label key (Length:, Product:, ...) is not data.
+    """
     rows = []
     for m in DATA_ROW_RE.finditer(details or ""):
         label = m.group(1).strip()
         if label.lower() in _DATA_LABEL_KEYS:
             continue
         rows.append({"label": label, "value": float(m.group(2))})
+    for m in DATA_LINE_RE.finditer(details or ""):
+        for part in re.split(r"[;,]", m.group(1)):
+            pm = DATA_PAIR_RE.search(part.strip())
+            if not pm:
+                continue
+            label = pm.group(1).strip()
+            # The label must carry a letter or an explicit `:`/`=`
+            # separator: a bare "227" part is a number without a
+            # label, not a row — but "2024: 192" is a year row.
+            if (label.lower() in _DATA_LABEL_KEYS or not label
+                    or (not re.search(r"[A-Za-z]", label)
+                        and ":" not in part and "=" not in part)):
+                continue
+            rows.append({"label": label, "value": float(pm.group(2))})
     return rows if len(rows) >= 2 else []
+
+
+def _split_list(value):
+    """A `Features:` / `Steps:` / `Pills:` value -> [items]."""
+    return [p.strip() for p in re.split(r"[;,]", value or "") if p.strip()]
+
+
+def _repeated_lines(details, key):
+    """All `Key: value` lines (parse_labels keeps only the last)."""
+    return [m.group(1).strip() for m in re.finditer(
+        r"(?im)^\s*" + re.escape(key) + r"\s*[:\-=]\s*(.+?)\s*$",
+        details or "")]
+
+
+def _money(value):
+    """'$1,605' / '1605.50' -> float, or None when unparseable."""
+    if value is None:
+        return None
+    m = re.search(r"(\d[\d,]*(?:\.\d+)?)", str(value).replace("$", ""))
+    if not m:
+        return None
+    try:
+        return float(m.group(1).replace(",", ""))
+    except ValueError:
+        return None
+
+
+# ------------------------------------------------- product demo (v2.8)
+# ecommerce-video-skills: ProductDemo needs a product name (a
+# `Product:` label, else the task title when the ecommerce trigger
+# matched — the title IS the brief's own words, never invented).
+# Features come from `Features:` / repeated `Feature:` lines, else
+# the story beats after the first (the demo's own content, same
+# pattern as the ad variant). Money NEVER comes from beats: offer
+# text, was/now, code, and deadline only from explicit labels. A
+# was/now pair renders only when now < was — a bad row shows no
+# price drop at all. Returns None when there is no product to demo.
+def build_product_demo(task, storyboard, ecommerce_matched=False):
+    """Task + storyboard -> ProductDemo props dict, or None."""
+    title = (task.get("title") or "").strip()
+    details = task.get("details") or ""
+    labels = parse_labels(details)
+    notes = storyboard.setdefault("notes", [])
+    product = (labels.get("product") or "").strip()
+    if not product and ecommerce_matched and title:
+        product = title
+        notes.append("product demo: product name from the task title "
+                     "(ecommerce trigger matched, no Product: label)")
+    if not product:
+        return None
+    features = _split_list(labels.get("features") or "")
+    if not features:
+        features = _repeated_lines(details, "feature")
+    if not features:
+        beats = [(b.get("text") or "") for b in
+                 (storyboard.get("story") or {}).get("beats") or []]
+        features = [b for b in beats[1:] if b.strip()][:4]
+        if features:
+            notes.append("product demo: features from story beats 2+ "
+                         "(no Features:/Feature: label)")
+    features = features[:4]
+    offer = {}
+    was = _money(labels.get("was"))
+    now = _money(labels.get("now"))
+    if was is not None and now is not None:
+        if now < was:
+            offer["was"] = was
+            offer["now"] = now
+        else:
+            notes.append(f"product demo: was/now ${was:g}/${now:g} "
+                         f"ignored — now must be below was (no price "
+                         f"drop renders)")
+    if (labels.get("offer") or "").strip():
+        offer["text"] = labels["offer"].strip()
+    if (labels.get("code") or "").strip():
+        offer["code"] = labels["code"].strip()
+    if (labels.get("deadline") or "").strip():
+        offer["deadline"] = labels["deadline"].strip()
+    cta = (labels.get("cta") or "").strip() or title
+    demo = {"product": product, "features": features, "offer": offer,
+            "cta": cta, "hook": title}
+    notes.append(f"product demo: '{product}'"
+                 + (f", {len(features)} feature(s)" if features else
+                    ", no features")
+                 + (", offer" if offer else ", no offer"))
+    # Critic scenes: product frame, one per feature, end card.
+    scenes = [{"words": (product + " " + title).split(),
+               "camera": CAMERA_MOVES[0], "transitionOut": "none"}]
+    for f in features:
+        scenes.append({"words": f.split(), "camera": CAMERA_MOVES[1],
+                       "transitionOut": "none"})
+    scenes.append({"words": (product + " " + cta).split(),
+                   "camera": CAMERA_MOVES[2], "transitionOut": "none"})
+    demo["scenes"] = scenes
+    return demo
+
+
+# ------------------------------------------------- everest panels (v2.8)
+# everest-components: one category prop selects the panel in
+# src/EverestPanels.tsx. The category comes from an explicit
+# `Everest:` label ("Everest: benchmarks" or the full pack id)
+# else the first matched everest-* pack in route order. Each
+# category lists what it needs from the task; a category whose
+# numbers are absent returns None and the watcher falls back to
+# the default route with a note — never an invented figure, never
+# a fake real surface.
+EVEREST_PACK_TO_CATEGORY = {
+    "everest-product-ui": "product-ui",
+    "everest-prompts-results": "prompts-results",
+    "everest-agents-workflows": "agents-workflows",
+    "everest-models-benchmarks": "models-benchmarks",
+    "everest-comparisons": "comparisons",
+    "everest-launch-news": "launch-news",
+    "everest-pricing-limits": "pricing-limits",
+    "everest-lower-thirds": "lower-thirds",
+    "everest-broll-frames": "broll-frames",
+    "everest-evidence-quotes": "evidence-quotes",
+    "everest-usage-cost": "usage-cost",
+}
+EVEREST_CATEGORY_ALIASES = {
+    "product-ui": "product-ui", "product ui": "product-ui",
+    "prompts-results": "prompts-results", "prompts": "prompts-results",
+    "agents-workflows": "agents-workflows", "agents": "agents-workflows",
+    "models-benchmarks": "models-benchmarks", "benchmarks": "models-benchmarks",
+    "comparisons": "comparisons", "comparison": "comparisons",
+    "launch-news": "launch-news", "launch": "launch-news",
+    "pricing-limits": "pricing-limits", "pricing": "pricing-limits",
+    "lower-thirds": "lower-thirds", "lower thirds": "lower-thirds",
+    "broll-frames": "broll-frames", "b-roll frames": "broll-frames",
+    "evidence-quotes": "evidence-quotes", "evidence": "evidence-quotes",
+    "usage-cost": "usage-cost", "usage": "usage-cost",
+}
+# broll-frames is DROPPED (see EverestPanels.tsx header): every
+# pattern in it needs real footage or a real app screenshot, and
+# Motion Bot has no footage source of its own.
+EVEREST_DROPPED = {
+    "broll-frames": ("everest b-roll-frames has no Remotion "
+                     "implementation — every pattern needs real "
+                     "footage or a real app screenshot, and Motion "
+                     "Bot has no footage source"),
+}
+
+BENCHMARK_RE = re.compile(
+    r"(?im)^\s*benchmark\s*[:\-=]\s*(.+?)\s+(\d+(?:\.\d+)?)\s*->\s*(\d+(?:\.\d+)?)\s*$")
+TIER_RE = re.compile(
+    r"(?im)^\s*tier\s*[:\-=]\s*(.+?)\s*$")
+COMPARE_RE = re.compile(
+    r"(?im)^\s*compare\s*[:\-=]\s*(.+?)\s+vs\.?\s+(.+?)\s*$")
+ROW_RE = re.compile(
+    r"(?im)^\s*row\s*[:\-=]\s*(.+?)\s*\|\s*(.+?)\s*\|\s*(.+?)\s*(?:\|\s*(left|right)\s*)?$")
+USAGE_RE = re.compile(
+    r"(?im)^\s*usage\s*[:\-=]\s*(\d+(?:\.\d+)?)\s*(?:/|of)\s*(\d+(?:\.\d+)?)")
+
+
+def _parse_tiers(details):
+    """`Tier: Name $price — note (recommended)` lines -> [tiers]."""
+    tiers = []
+    for raw in _repeated_lines(details, "tier"):
+        recommended = "(recommended)" in raw.lower()
+        raw = re.sub(r"\(recommended\)", "", raw, flags=re.I).strip()
+        price_m = re.search(r"\$[\d,]+(?:\.\d+)?(?:\s*/\s*\w+)?", raw)
+        price = price_m.group(0).replace(" ", "") if price_m else ""
+        head = raw[:price_m.start()].strip() if price_m else raw
+        tail = raw[price_m.end():].strip() if price_m else ""
+        note = re.sub(r"^[\-–—:]\s*", "", tail).strip()
+        name = re.sub(r"[\-–—:]\s*$", "", head).strip()
+        if name:
+            tiers.append({"name": name, "price": price, "note": note,
+                          "recommended": recommended})
+    return tiers
+
+
+def _parse_receipt(details):
+    """`Receipt: tokens 1200, minutes 4, calls 18, total $0.42`."""
+    labels = parse_labels(details)
+    raw = labels.get("receipt") or ""
+    receipt = {}
+    for key, pat in (("tokens", r"tokens?\s*[:=]?\s*([\d,]+)"),
+                     ("minutes", r"minutes?\s*[:=]?\s*([\d,]+)"),
+                     ("calls", r"(?:tool\s*)?calls?\s*[:=]?\s*([\d,]+)")):
+        m = re.search(pat, raw, re.I)
+        if m:
+            receipt[key] = int(m.group(1).replace(",", ""))
+    m = re.search(r"total\s*[:=]?\s*(\$[\d,]+(?:\.\d+)?)", raw, re.I)
+    if m:
+        receipt["total"] = m.group(1)
+    return receipt
+
+
+def build_everest_panel(task, storyboard, matched_packs):
+    """Task + storyboard + matched everest-* packs -> panel props.
+
+    Returns None when the selected category cannot be rendered
+    without inventing data (reason in storyboard['notes']) — the
+    watcher then falls back to the default route.
+    """
+    title = (task.get("title") or "").strip()
+    details = task.get("details") or ""
+    labels = parse_labels(details)
+    notes = storyboard.setdefault("notes", [])
+    category = None
+    everest_label = (labels.get("everest") or "").strip().lower()
+    if everest_label:
+        if everest_label in EVEREST_PACK_TO_CATEGORY:
+            category = EVEREST_PACK_TO_CATEGORY[everest_label]
+        elif everest_label in EVEREST_CATEGORY_ALIASES:
+            category = EVEREST_CATEGORY_ALIASES[everest_label]
+        if category:
+            notes.append(f"everest panel '{category}' (explicit "
+                         f"Everest: label)")
+    if category is None:
+        for pack in matched_packs or []:
+            if pack in EVEREST_PACK_TO_CATEGORY:
+                category = EVEREST_PACK_TO_CATEGORY[pack]
+                notes.append(f"everest panel '{category}' (matched "
+                             f"'{pack}')")
+                break
+    if category is None:
+        return None
+    if category in EVEREST_DROPPED:
+        notes.append("everest DROPPED: " + EVEREST_DROPPED[category])
+        return None
+    beats = [(b.get("text") or "") for b in
+             (storyboard.get("story") or {}).get("beats") or []]
+    beats = [b for b in beats if b.strip()]
+    panel = {"category": category, "hook": title}
+    if category in ("product-ui", "prompts-results", "agents-workflows"):
+        panel["prompt"] = (labels.get("prompt") or "").strip() or title
+        steps = _split_list(labels.get("steps") or "")
+        if not steps:
+            steps = _repeated_lines(details, "step")
+        if not steps:
+            steps = beats
+        if not steps:
+            steps = [title]
+        panel["steps"] = steps
+        if category == "prompts-results":
+            panel["outputLines"] = steps
+        notes.append(f"everest '{category}': prompt + "
+                     f"{len(steps)} step(s) from "
+                     f"{'Steps:/Step: label' if labels.get('steps') or _repeated_lines(details, 'step') else 'story beats'}")
+    elif category == "models-benchmarks":
+        bars = []
+        for m in BENCHMARK_RE.finditer(details):
+            bars.append({"label": m.group(1).strip(),
+                         "old": float(m.group(2)),
+                         "new": float(m.group(3))})
+        if not bars:
+            notes.append("everest DROPPED: models-benchmarks needs "
+                         "`Benchmark: <label> <old> -> <new>` lines — "
+                         "no numbers in the task, none invented")
+            return None
+        panel["bars"] = bars
+        notes.append(f"everest 'models-benchmarks': {len(bars)} bar(s)")
+    elif category == "comparisons":
+        m = COMPARE_RE.search(details)
+        rows = []
+        for rm in ROW_RE.finditer(details):
+            rows.append({"label": rm.group(1).strip(),
+                         "left": rm.group(2).strip(),
+                         "right": rm.group(3).strip(),
+                         "winner": (rm.group(4) or "right").strip().lower()})
+        if not m or not rows:
+            notes.append("everest DROPPED: comparisons needs "
+                         "`Compare: <A> vs <B>` plus `Row: <label> | "
+                         "<left> | <right> | <left|right>` lines")
+            return None
+        panel["comparison"] = {"left": m.group(1).strip(),
+                               "right": m.group(2).strip(), "rows": rows}
+        notes.append(f"everest 'comparisons': {m.group(1).strip()} vs "
+                     f"{m.group(2).strip()}, {len(rows)} row(s)")
+    elif category == "launch-news":
+        name = ((labels.get("name") or "").strip()
+                or (labels.get("product") or "").strip()
+                or (labels.get("project") or "").strip())
+        if not name:
+            notes.append("everest DROPPED: launch-news needs a "
+                         "`Name:` / `Product:` / `Project:` label — "
+                         "no name to launch")
+            return None
+        panel["name"] = name
+        if (labels.get("version") or "").strip():
+            panel["version"] = labels["version"].strip()
+        tiers = _parse_tiers(details)
+        if tiers:
+            panel["tiers"] = tiers
+        notes.append(f"everest 'launch-news': '{name}'"
+                     + (f" v{panel.get('version')}" if panel.get("version") else "")
+                     + (f", {len(tiers)} tier(s)" if tiers else ""))
+    elif category == "pricing-limits":
+        tiers = _parse_tiers(details)
+        was = _money(labels.get("was"))
+        now = _money(labels.get("now"))
+        receipt = _parse_receipt(details)
+        if not tiers and not (was is not None and now is not None) and not receipt:
+            notes.append("everest DROPPED: pricing-limits needs "
+                         "`Tier:` lines, a `Was:`/`Now:` pair, or a "
+                         "`Receipt:` line — no prices in the task")
+            return None
+        if tiers:
+            panel["tiers"] = tiers
+        if was is not None and now is not None and now < was:
+            panel["wasPrice"] = f"${was:g}"
+            panel["nowPrice"] = f"${now:g}"
+        if receipt:
+            panel["receipt"] = receipt
+        notes.append(f"everest 'pricing-limits': {len(tiers)} tier(s)"
+                     + (", was/now" if panel.get("wasPrice") else "")
+                     + (", receipt" if receipt else ""))
+    elif category == "lower-thirds":
+        name = (labels.get("name") or "").strip()
+        if not name:
+            notes.append("everest DROPPED: lower-thirds needs a "
+                         "`Name:` label")
+            return None
+        panel["name"] = name
+        if (labels.get("role") or "").strip():
+            panel["role"] = labels["role"].strip()
+        pills = _split_list(labels.get("pills") or "")
+        if pills:
+            panel["pills"] = pills
+        if (labels.get("project") or "").strip():
+            panel["project"] = labels["project"].strip()
+        notes.append(f"everest 'lower-thirds': '{name}'")
+    elif category == "usage-cost":
+        m = USAGE_RE.search(details)
+        if not m:
+            notes.append("everest DROPPED: usage-cost needs a "
+                         "`Usage: <used>/<cap>` line — no cap in the "
+                         "task")
+            return None
+        usage = {"used": float(m.group(1)), "cap": float(m.group(2))}
+        reset = (labels.get("reset") or "").strip()
+        if reset:
+            rm = re.match(r"^(\d+):(\d\d)$", reset)
+            if rm:
+                usage["resetSeconds"] = int(rm.group(1)) * 60 + int(rm.group(2))
+            elif reset.isdigit():
+                usage["resetSeconds"] = int(reset)
+        panel["usage"] = usage
+        notes.append(f"everest 'usage-cost': {usage['used']:g}/"
+                     f"{usage['cap']:g}")
+    elif category == "evidence-quotes":
+        quote = (labels.get("quote") or "").strip()
+        if not quote:
+            notes.append("everest DROPPED: evidence-quotes needs a "
+                         "`Quote:` label — no supplied quote to card")
+            return None
+        panel["quote"] = quote
+        if (labels.get("highlight") or "").strip():
+            panel["highlight"] = labels["highlight"].strip()
+        if (labels.get("project") or "").strip():
+            panel["project"] = labels["project"].strip()
+        notes.append("everest 'evidence-quotes': supplied quote card")
+    # Critic scenes: the hook header is on screen the whole clip,
+    # plus one scene per step / bar / row so samples land mid-panel.
+    scene_words = [title]
+    if panel.get("steps"):
+        scene_words = panel["steps"][:4]
+    elif panel.get("bars"):
+        scene_words = [f"{b['label']} {b['old']:g} {b['new']:g}"
+                       for b in panel["bars"][:4]]
+    elif panel.get("comparison"):
+        scene_words = [r["label"] for r in
+                       panel["comparison"]["rows"][:4]]
+    panel["scenes"] = [
+        {"words": w.split(), "camera": CAMERA_MOVES[i % len(CAMERA_MOVES)],
+         "transitionOut": "none"}
+        for i, w in enumerate(scene_words)]
+    return panel
