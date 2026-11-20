@@ -100,7 +100,8 @@ HEX_RE = re.compile(r"#(?:[0-9a-fA-F]{6}|[0-9a-fA-F]{3})\b")
 LENGTH_RE = re.compile(r"(\d+(?:\.\d+)?)\s*(?:s|sec|secs|second|seconds)\b", re.I)
 LABEL_RE = re.compile(
     r"(?im)^\s*(project|subtitle|tagline|end card|background|accent|text|name|role|"
-    r"image|images|length|duration|mood|tone|motif|panel|font|motion|move)\s*[:\-=]\s*(.+?)\s*$"
+    r"image|images|length|duration|mood|tone|motif|panel|font|motion|move|"
+    r"hook|benefit|proof|cta|style|test|ad)\s*[:\-=]\s*(.+?)\s*$"
 )
 
 # ------------------------------------------------------------------ mood
@@ -508,6 +509,139 @@ def pick_motion(task, notes):
         notes.append(f"motion '{value}' (rotation by task id)")
         return value
     return "kinetic"
+
+
+# ------------------------------------------------- ad template (v2.7)
+# ad-video-skills: ONE data-driven template, variant {hook, benefit,
+# proof, cta}, 5-beat hook -> CTA, CTA hold >= 2s, one variable per
+# variant. The variant is built ONLY from the task: explicit
+# Hook:/Benefit:/Proof:/CTA: labels win, else the story beats
+# (beat 1 = hook, beat 2 = benefit, beat 3 = proof). The CTA defaults
+# to the hook text itself — message-matched by construction, and no
+# product, price, or claim is ever invented. A task with fewer than
+# 3 beats still renders: missing fields fall back to the hook.
+AD_BEAT_SCENES = [
+    ("hook", 0.12), ("context", 0.20), ("payoff", 0.32),
+    ("proof", 0.24), ("cta", 0.12),
+]
+
+
+def build_ad_variant(task, storyboard):
+    """Task + its storyboard -> variant dict for AdTemplate.
+
+    Returns None only when there is no text at all (the watcher
+    blocks empty titles upstream, so this is defensive). Appends
+    notes to storyboard['notes'] about where each field came from.
+    """
+    title = (task.get("title") or "").strip()
+    details = task.get("details") or ""
+    labels = parse_labels(details)
+    notes = storyboard.setdefault("notes", [])
+    story_beats = [(b.get("text") or "") for b in
+                   (storyboard.get("story") or {}).get("beats") or []]
+    if not story_beats:
+        story_beats = split_scenes(title)
+    story_beats = [b for b in story_beats if b.strip()]
+    if not story_beats and not title:
+        return None
+    hook = (labels.get("hook") or "").strip() or (
+        story_beats[0] if story_beats else title)
+    benefit = (labels.get("benefit") or "").strip() or (
+        story_beats[1] if len(story_beats) > 1 else hook)
+    proof = (labels.get("proof") or "").strip() or (
+        story_beats[2] if len(story_beats) > 2 else benefit)
+    # CTA: explicit label, else the hook itself — the promise the
+    # hook made, paid off by the button. Never invented copy.
+    cta = (labels.get("cta") or "").strip() or hook
+    test_field = (labels.get("test") or "hook").strip().lower()
+    if test_field not in ("hook", "benefit", "proof", "cta"):
+        test_field = "hook"
+    variant = {"hook": hook, "benefit": benefit, "proof": proof,
+               "cta": cta}
+    notes.append(f"ad variant (test field: {test_field}): hook from "
+                 f"{'Hook: label' if labels.get('hook') else 'story beat 1'}, "
+                 f"benefit from "
+                 f"{'Benefit: label' if labels.get('benefit') else 'story beat 2'}, "
+                 f"proof from "
+                 f"{'Proof: label' if labels.get('proof') else 'story beat 3'}, "
+                 f"cta {'CTA: label' if labels.get('cta') else 'message-matched to hook'}")
+    return {"variant": variant, "testField": test_field}
+
+
+def ad_beat_scenes(variant):
+    """Variant -> 5 critic scenes (one per ad beat) with the words
+    each beat shows, so the critic samples every beat's midpoint."""
+    texts = [
+        variant["hook"],
+        variant["benefit"],
+        variant["benefit"],
+        variant["proof"],
+        variant["cta"],
+    ]
+    scenes = []
+    for i, (name, frac) in enumerate(AD_BEAT_SCENES):
+        scenes.append({
+            "words": texts[i].split(),
+            "camera": CAMERA_MOVES[i % len(CAMERA_MOVES)],
+            "transitionOut": "none",
+            "beat": name,
+        })
+    return scenes
+
+
+# ------------------------------------------------- canvas styles (v2.7)
+# animate-canvas: only cut-paper and crosshatch exist as Remotion
+# code (src/CanvasStyles.tsx). The other five upstream styles (riso,
+# sketchbook, math, pixel, isometric) stay craft notes only — a
+# Style: label naming one of them returns None and the task renders
+# the default Vertical/Harness route unchanged.
+CANVAS_STYLE_ALIASES = {
+    "cut-paper": "cut-paper",
+    "cut paper": "cut-paper",
+    "cutpaper": "cut-paper",
+    "crosshatch": "crosshatch",
+    "crosshatch-ink": "crosshatch",
+    "crosshatch ink": "crosshatch",
+}
+CANVAS_STYLE_RE = re.compile(r"(?im)^\s*style\s*[:\-=]\s*(.+?)\s*$")
+CANVAS_UNIMPLEMENTED = {"riso", "riso print", "sketchbook",
+                        "sketchbook style", "math", "pixel",
+                        "pixel animation", "isometric",
+                        "isometric animation"}
+
+
+def pick_canvas_style(task, notes):
+    """Task -> 'cut-paper' | 'crosshatch' | None.
+
+    An explicit `Style:` label wins; otherwise the style words in
+    the text ("cut paper", "crosshatch ink") pick it. An
+    unimplemented style is noted and returns None — never a wrong
+    style, never a crash.
+    """
+    details = task.get("details") or ""
+    text = ((task.get("title") or "") + "\n" + details)
+    m = CANVAS_STYLE_RE.search(details)
+    if m:
+        raw = m.group(1).strip().lower()
+        if raw in CANVAS_STYLE_ALIASES:
+            style = CANVAS_STYLE_ALIASES[raw]
+            notes.append(f"canvas style '{style}' (explicit Style: label)")
+            return style
+        if raw in CANVAS_UNIMPLEMENTED or any(
+                raw.startswith(u) for u in CANVAS_UNIMPLEMENTED):
+            notes.append(f"canvas style '{raw}' has no Remotion "
+                         f"implementation yet — craft notes only")
+            return None
+        notes.append(f"canvas style '{raw}' unknown — default route")
+        return None
+    low = text.lower()
+    for phrase, style in (("cut paper", "cut-paper"),
+                          ("crosshatch ink", "crosshatch"),
+                          ("crosshatch", "crosshatch")):
+        if phrase in low:
+            notes.append(f"canvas style '{style}' (matched '{phrase}')")
+            return style
+    return None
 
 
 # ------------------------------------------------------------ story parsing

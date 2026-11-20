@@ -1,0 +1,140 @@
+{
+  "version": 1,
+  "hook": "Panels turn to face the morning",
+  "lengthSeconds": 25,
+  "palette": {
+    "background": "#D9C7A7",
+    "surface": "#4FC3F7",
+    "accent": "#0F766E",
+    "accentDeep": "#0A4D48",
+    "text": "#1F1A14",
+    "glow": "#0F766E",
+    "particle": "#0F766E"
+  },
+  "variant": {
+    "hook": "Panels turn to face the morning",
+    "benefit": "The grid wakes row by row",
+    "proof": "Power reaches the town by noon",
+    "cta": "Panels turn to face the morning"
+  },
+  "testField": "hook",
+  "variantId": "v27-ad-v1",
+  "scenes": [
+    {
+      "words": [
+        "Panels",
+        "turn",
+        "to",
+        "face",
+        "the",
+        "morning"
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.08,
+        "fromX": 0,
+        "toX": -26
+      },
+      "transitionOut": "none",
+      "beat": "hook"
+    },
+    {
+      "words": [
+        "The",
+        "grid",
+        "wakes",
+        "row",
+        "by",
+        "row"
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.08,
+        "fromX": 0,
+        "toX": -26
+      },
+      "transitionOut": "none",
+      "beat": "context"
+    },
+    {
+      "words": [
+        "The",
+        "grid",
+        "wakes",
+        "row",
+        "by",
+        "row"
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.08,
+        "fromX": 0,
+        "toX": -26
+      },
+      "transitionOut": "none",
+      "beat": "payoff"
+    },
+    {
+      "words": [
+        "Power",
+        "reaches",
+        "the",
+        "town",
+        "by",
+        "noon"
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.08,
+        "fromX": 0,
+        "toX": -26
+      },
+      "transitionOut": "none",
+      "beat": "proof"
+    },
+    {
+      "words": [
+        "Panels",
+        "turn",
+        "to",
+        "face",
+        "the",
+        "morning"
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.08,
+        "fromX": 0,
+        "toX": -26
+      },
+      "transitionOut": "none",
+      "beat": "cta"
+    }
+  ],
+  "story": {
+    "source": "task-391",
+    "beats": [
+      {
+        "title": "",
+        "start": null,
+        "end": null,
+        "text": "Panels turn to face the morning"
+      },
+      {
+        "title": "",
+        "start": null,
+        "end": null,
+        "text": "The grid wakes row by row"
+      },
+      {
+        "title": "",
+        "start": null,
+        "end": null,
+        "text": "Power reaches the town by noon"
+      }
+    ]
+  },
+  "notes": [
+    "v2.7 proof: AdTemplate, variant from task-391 beats; CTA message-matched to hook (same text, no invented copy); one variable under test: hook"
+  ]
+}

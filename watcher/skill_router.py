@@ -64,12 +64,12 @@ PACKS = {
     ),
     "b-roll-skills": (
         [r"\b(b-roll|broll|talking head|presenter)\b"],
-        "B-roll: visuals timed to the spoken words, cut on the noun, never a still.",
+        "B-roll: cuts on the noun from local pool clips (BRoll comp), code-drawn panel fallback when no clip matches; no new footage source.",
         None,
     ),
     "ad-video-skills": (
         [r"\b(ad|advert|promo|product launch|sell|offer)\b"],
-        "Ad: product first frame, one claim, end card with the offer, no price promises.",
+        "Ad: data-driven AdTemplate (variant hook/benefit/proof/cta, 5-beat hook->CTA, CTA hold >=2s, one variable per variant).",
         None,
     ),
     "ecommerce-video-skills": (
@@ -137,6 +137,11 @@ PACKS = {
     "everest-usage-cost": (
         [r"\b(usage bar|usage panel|limit banner|reset countdown|hits the cap)\b"],
         "Everest AI usage & cost: usage bar fills to the cap, limit banner slides in with a reset countdown — caps only from the brief.",
+        None,
+    ),
+    "animate-canvas": (
+        [r"\b(cut paper|cut-paper|crosshatch ink|crosshatch-ink|riso print|sketchbook style|pixel animation|isometric animation|canvas animation|procedural animation)\b"],
+        "Procedural canvas style: story, look, and storyboard approved before animating; one style per piece; shape-morph bridges between eras; silence before the payoff, loudest on it. Cut-paper and crosshatch render as Remotion code (CanvasStyles); riso/sketchbook/math/pixel/isometric are craft notes only.",
         None,
     ),
 }

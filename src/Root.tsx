@@ -10,6 +10,9 @@ import { Chart, CHART_DEFAULTS } from "./Chart";
 import { D3Chart, D3CHART_DEFAULTS } from "./D3Chart";
 import { LowerThird, LOWER_THIRD_DEFAULTS } from "./LowerThird";
 import { Synthwave, SYNTHWAVE_DEFAULTS } from "./Synthwave";
+import { AdTemplate, AD_DEFAULTS } from "./AdTemplate";
+import { CanvasStyles, CANVAS_DEFAULTS } from "./CanvasStyles";
+import { BRoll, BROLL_DEFAULTS } from "./BRoll";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -128,6 +131,65 @@ export const RemotionRoot: React.FC = () => {
         calculateMetadata={async ({ props }) => {
           const lengthSeconds = props.lengthSeconds ?? SYNTHWAVE_DEFAULTS.lengthSeconds;
           return { durationInFrames: Math.max(90, Math.round(lengthSeconds * 30)) };
+        }}
+      />
+      {/* v2.7: packs 1–3 translated to code. AdTemplate is the
+          ad-video-skills data-driven template (variant prop, 5-beat
+          hook→CTA); CanvasStyles is animate-canvas (cut-paper /
+          crosshatch, shape-morph bridges); BRoll is b-roll-skills
+          (cuts on the noun from local pool clips, panel fallback). */}
+      <Composition
+        id="AdTemplate"
+        component={AdTemplate}
+        durationInFrames={AD_DEFAULTS.lengthSeconds * 30}
+        fps={30}
+        width={720}
+        height={1280}
+        defaultProps={AD_DEFAULTS as any}
+        calculateMetadata={async ({ props }) => {
+          const lengthSeconds = props.lengthSeconds ?? AD_DEFAULTS.lengthSeconds;
+          return {
+            durationInFrames: Math.max(
+              450,
+              Math.round(lengthSeconds * 30),
+            ),
+          };
+        }}
+      />
+      <Composition
+        id="CanvasStyles"
+        component={CanvasStyles}
+        durationInFrames={CANVAS_DEFAULTS.lengthSeconds * 30}
+        fps={30}
+        width={720}
+        height={1280}
+        defaultProps={CANVAS_DEFAULTS as any}
+        calculateMetadata={async ({ props }) => {
+          const lengthSeconds = props.lengthSeconds ?? CANVAS_DEFAULTS.lengthSeconds;
+          return {
+            durationInFrames: Math.max(
+              90,
+              Math.round(lengthSeconds * 30),
+            ),
+          };
+        }}
+      />
+      <Composition
+        id="BRoll"
+        component={BRoll}
+        durationInFrames={BROLL_DEFAULTS.lengthSeconds * 30}
+        fps={30}
+        width={1280}
+        height={720}
+        defaultProps={BROLL_DEFAULTS as any}
+        calculateMetadata={async ({ props }) => {
+          const lengthSeconds = props.lengthSeconds ?? BROLL_DEFAULTS.lengthSeconds;
+          return {
+            durationInFrames: Math.max(
+              90,
+              Math.round(lengthSeconds * 30),
+            ),
+          };
         }}
       />
       <Composition

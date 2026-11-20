@@ -89,6 +89,12 @@ from llm_director import run_llm_via_imac  # noqa: E402
 from skill_router import route as skill_route, craft_notes, load_skill_text  # noqa: E402
 from skill_verify import verify as skill_verify, has_alpha  # noqa: E402
 from harness_director import parse_data_rows, parse_labels  # noqa: E402
+from harness_director import (  # noqa: E402
+    ad_beat_scenes,
+    build_ad_variant,
+    pick_canvas_style,
+)
+from broll_timing import build_segments as build_broll_segments  # noqa: E402
 from question_gate import (  # noqa: E402
     ASKED_PATH,
     check_question,
@@ -1047,6 +1053,46 @@ def main():
                             _composition = "D3Chart"
                         storyboard["bars"] = _rows
                         storyboard["chartTitle"] = storyboard.get("hook", "")
+                    elif "ad-video-skills" in _route["skills"]:
+                        # Ad rung (v2.7): data-driven AdTemplate. The
+                        # variant comes only from the task (labels or
+                        # story beats) — never invented copy. Length is
+                        # the task's own when it fits the 15–30s ad
+                        # anatomy, else 25s (CTA hold >= 2s needs it).
+                        _ad = build_ad_variant(task, storyboard)
+                        if _ad:
+                            _composition = "AdTemplate"
+                            storyboard["variant"] = _ad["variant"]
+                            storyboard["testField"] = _ad["testField"]
+                            storyboard["scenes"] = ad_beat_scenes(_ad["variant"])
+                            _ad_len = storyboard.get("lengthSeconds") or 25
+                            storyboard["lengthSeconds"] = (
+                                _ad_len if 15 <= _ad_len <= 30 else 25)
+                    elif "animate-canvas" in _route["skills"]:
+                        # Canvas rung (v2.7): cut-paper / crosshatch as
+                        # Remotion code. pick_canvas_style returns None
+                        # for the five unimplemented styles — those
+                        # tasks keep the default route, craft notes only.
+                        _style = pick_canvas_style(task, storyboard["notes"])
+                        if _style:
+                            _composition = "CanvasStyles"
+                            storyboard["canvasStyle"] = _style
+                    elif "b-roll-skills" in _route["skills"]:
+                        # B-roll rung (v2.7): cuts on the noun from the
+                        # local pool, panel fallback when no clip
+                        # matches. The storyboard drops its palette:
+                        # footage has no palette, and the critic SKIPs
+                        # palette/contrast when none is present.
+                        _beats = [list(s["words"]) for s in storyboard["scenes"]]
+                        _segments, _total, _bnotes = build_broll_segments(
+                            _beats,
+                            length_seconds=storyboard.get("lengthSeconds"))
+                        if _segments:
+                            _composition = "BRoll"
+                            storyboard["segments"] = _segments
+                            storyboard["lengthSeconds"] = _total
+                            storyboard["notes"].extend(_bnotes)
+                            storyboard.pop("palette", None)
                     elif "synthwave-style" in _route["skills"] and _route["format"] != "vertical":
                         # Synthwave rung (v2.3): purple-free style preset.
                         _composition = "Synthwave"
@@ -1073,6 +1119,20 @@ def main():
                     entry["format"] = _route["format"]
                     rsync_dir_to_imac(REPO / "src", "src")
                     rsync_to_imac(sb_path, f"briefs/{sb_name}")
+                    if _composition == "BRoll":
+                        # Pool clips live outside git (gitignored *.mp4)
+                        # in public/broll/; ship each used clip to the
+                        # iMac's public/ so staticFile() resolves it.
+                        for _seg in storyboard.get("segments", []):
+                            _clip = _seg.get("clip") or ""
+                            if not _clip.startswith("broll/"):
+                                continue
+                            _local = REPO / "public" / _clip
+                            if _local.exists():
+                                rsync_to_imac(_local, f"public/{_clip}")
+                            else:
+                                log(f"task {tid}: b-roll clip missing "
+                                    f"locally, segment falls back: {_clip}")
                     render_on_imac(f"briefs/{sb_name}", _composition,
                                    f"out/{mp4_name}", codec=_codec)
                     rsync_from_imac(f"out/{mp4_name}", mp4_path)

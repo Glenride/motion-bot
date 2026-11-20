@@ -1,0 +1,139 @@
+{
+  "version": 1,
+  "hook": "Panels turn to face the morning",
+  "lengthSeconds": 12,
+  "segments": [
+    {
+      "from": 0.0,
+      "to": 3.68,
+      "kind": "panel",
+      "nounAt": 0.0,
+      "keyword": "Panels turn",
+      "words": [
+        "Panels",
+        "turn",
+        "to",
+        "face",
+        "the",
+        "morning"
+      ]
+    },
+    {
+      "from": 3.68,
+      "to": 6.45,
+      "kind": "clip",
+      "clip": "broll/pixabay-21118.mp4",
+      "clipDurationSeconds": 6,
+      "nounAt": 3.68,
+      "keyword": "grid wakes",
+      "words": [
+        "The",
+        "grid",
+        "wakes",
+        "row",
+        "by",
+        "row"
+      ]
+    },
+    {
+      "from": 6.45,
+      "to": 12,
+      "kind": "clip",
+      "clip": "broll/pixabay-1044.mp4",
+      "clipDurationSeconds": 14,
+      "nounAt": 6.45,
+      "keyword": "Power reaches",
+      "words": [
+        "Power",
+        "reaches",
+        "the",
+        "town",
+        "by",
+        "noon"
+      ]
+    }
+  ],
+  "scenes": [
+    {
+      "words": [
+        "Panels",
+        "turn",
+        "to",
+        "face",
+        "the",
+        "morning"
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.08,
+        "fromX": 0,
+        "toX": -26
+      },
+      "transitionOut": "wipe"
+    },
+    {
+      "words": [
+        "The",
+        "grid",
+        "wakes",
+        "row",
+        "by",
+        "row"
+      ],
+      "camera": {
+        "fromScale": 1.08,
+        "toScale": 1.0,
+        "fromX": -26,
+        "toX": 22
+      },
+      "transitionOut": "zoom-cut"
+    },
+    {
+      "words": [
+        "Power",
+        "reaches",
+        "the",
+        "town",
+        "by",
+        "noon"
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.14,
+        "fromX": 22,
+        "toX": 0
+      },
+      "transitionOut": "none"
+    }
+  ],
+  "story": {
+    "source": "task-391",
+    "beats": [
+      {
+        "title": "",
+        "start": null,
+        "end": null,
+        "text": "Panels turn to face the morning"
+      },
+      {
+        "title": "",
+        "start": null,
+        "end": null,
+        "text": "The grid wakes row by row"
+      },
+      {
+        "title": "",
+        "start": null,
+        "end": null,
+        "text": "Power reaches the town by noon"
+      }
+    ]
+  },
+  "notes": [
+    "v2.7 proof: BRoll, task-391 story; no palette key (footage: critic skips palette/contrast)",
+    "b-roll: 'Panels' has no pool clip \u2014 code-drawn panel (0.0s\u20133.68s)",
+    "b-roll: 'grid' -> clip pixabay-21118.mp4 (concept match, 3.68s\u20136.45s)",
+    "b-roll: 'Power' -> clip pixabay-1044.mp4 (tag match, 6.45s\u201312s)",
+    "footage limit: no solar-panel clip exists in the local pool; 'Panels' segment is a code-drawn panel; Pixabay search HTTP 400 since Nov 20 16:34 ET, Pexels out by rule, no new keys"
+  ]
+}

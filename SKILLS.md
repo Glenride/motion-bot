@@ -11,8 +11,8 @@ Installed packs live in `skills/` (9 packs, 30 skills, cloned 2026-10-29):
 | tiktok-video-skills | 4 | Short-form vertical: 9:16, hook in 1s, caption animation, countdowns |
 | data-animation-skills | 3 | Data: chart animation, infographic reveals, key-number counters |
 | lower-thirds-skills | 1 | Transparent lower thirds / overlays |
-| b-roll-skills | 1 | B-roll timed to spoken words (Narrated route) |
-| ad-video-skills | 3 | Ad arcs: hook → CTA, launch films, testimonial cards |
+| b-roll-skills | 1 | B-roll timed to spoken words: BRoll comp, cuts on the noun from local pool clips, code-drawn panel fallback (v2.7) |
+| ad-video-skills | 3 | Ad arcs: hook → CTA, launch films, testimonial cards — AdTemplate, one data-driven variant prop, one variable per test (v2.7) |
 | ecommerce-video-skills | 3 | Product demos, promos (was→now price), photo slideshows |
 
 ## How they wire in (watcher/skill_router.py)
@@ -275,7 +275,7 @@ words and numbers.
 | Pack | Source | What it adds |
 |---|---|---|
 | what-if-animation | kelano86/what-if-animation (300 stars) | 15–25 s "What If" cartoons: 7-beat formula, cold open with three escalating demos, premise title card, one real fact with a number in the turn, end on a question. 27+ cuts/min opening, one hero who never changes, storyboard self-check before animating. |
-| animate-canvas | cth9191/animate (1,729 stars) | Procedural canvas animation: 7 styles (cut paper, crosshatch ink, riso, sketchbook, math, pixel, isometric), story → look → storyboard approvals before animating, shape-morph bridges, silence before the payoff / loudest on it, one constant the eye can hold, colour means one thing. |
+| animate-canvas | cth9191/animate (1,729 stars) | Procedural canvas animation: 7 styles (cut paper, crosshatch ink, riso, sketchbook, math, pixel, isometric), story → look → storyboard approvals before animating, shape-morph bridges, silence before the payoff / loudest on it, one constant the eye can hold, colour means one thing. Cut-paper and crosshatch render as Remotion code since v2.7 (CanvasStyles); the other five stay craft notes only. |
 | motion-prompt | showheyohtaki/motion-prompt (1,899 stars) | A naming dictionary: 192 named moves in 8 packs × 24 (motion, camera, UI, landing-page, photo, motion2, lp2, camera2). Name the move with its duration, strength, and what moves; keep the spec's timings and easing, replace only words, colours, and content. |
 
 ### Router entries (watcher/skill_router.py)
@@ -283,7 +283,7 @@ words and numbers.
 | Router entry | Triggers |
 |---|---|
 | what-if-animation | what if episode, what-if episode, what if cartoon, dusk stick figure, stick figure episode |
-| animate-canvas | cut paper, crosshatch ink, riso print, sketchbook style, pixel animation, isometric animation, canvas animation, procedural animation |
+| animate-canvas | cut paper, cut-paper, crosshatch ink, crosshatch-ink, riso print, sketchbook style, pixel animation, isometric animation, canvas animation, procedural animation |
 | motion-prompt | motion prompt, motion-prompt, motion dictionary, mask reveal, slow dolly in, dolly in, shape morph, count-up, mask transition, jump cut, match cut, rack focus, impact shake, light sweep |
 
 All three pack ids equal their `skills/` dir names, so
@@ -347,3 +347,37 @@ look. Rotation strides differ per axis, so adjacent tasks differ in
 all three. No axis changes the palette — the field follows the
 brief, as always. Proof renders: briefs/proof-panel-*.json, critic
 PASS each, 2026-11-20.
+
+## Packs 1–3 as Remotion code (v2.7, 2026-11-20)
+
+ad-video-skills, animate-canvas, and b-roll-skills each gained a
+composition — craft notes alone do not count as translated. Wiring
+lives in `watcher/harness_director.py` (`build_ad_variant`,
+`ad_beat_scenes`, `pick_canvas_style`), `watcher/broll_timing.py`
+(cut-on-the-noun timing + pool matching), and the Harness route in
+`watcher/watch_motion_bot.py` (rungs after chart, before synthwave).
+
+- **AdTemplate** (`src/AdTemplate.tsx`): variant {hook, benefit,
+  proof, cta} prop, 5-beat hook → CTA, CTA hold ≥2s, `testField`
+  names the one variable per variant. Variant from `Hook:` /
+  `Benefit:` / `Proof:` / `CTA:` labels, else story beats; CTA
+  defaults to the hook (message-matched, nothing invented).
+- **CanvasStyles** (`src/CanvasStyles.tsx`,
+  `src/harness/canvasStyles.tsx`): cut-paper (torn-edge layered
+  sheets, offset shadows) and crosshatch (SVG hatch, boil on 2s),
+  with shape-morph bridges at scene boundaries. `Style:` label
+  picks the style; riso / sketchbook / math / pixel / isometric
+  have no Remotion implementation and stay craft notes only.
+- **BRoll** (`src/BRoll.tsx`, `watcher/broll_timing.py`): cuts on
+  the noun from word timings, keyword overlay at the noun, panel
+  fallback when no local pool clip matches. Pool is the Pixabay
+  stock under `public/broll/` (gitignored mp4s, rsynced to the
+  iMac per render); no new footage source, Pixabay search HTTP 400
+  since Nov 20 16:34 ET, Pexels out by rule. Proof clips:
+  `pixabay-21118.mp4` (concept match: city lights for the grid),
+  `pixabay-1044.mp4` (tag match: town); 'Panels' had no clip and
+  rendered as a panel.
+
+Proof renders: `briefs/proof-v27-*.json`, critic PASS each
+(ad 25s, both canvas styles 12s, b-roll 12s), 2026-11-20. The v2.6
+centered proof re-rendered byte-identical after the v2.7 sync.

@@ -270,6 +270,66 @@ Contrast 10.42 on all five. Frame grabs in
 letterforms, and entries are visibly different. Briefs:
 `briefs/proof-panel-*.json`.
 
+## Packs 1–3 as Remotion code (v2.7, 2026-11-20)
+
+ad-video-skills, animate-canvas, and b-roll-skills are no longer
+craft notes only — each has a composition in `src/`, registered in
+`src/Root.tsx`, and a rung in the watcher's Harness route (after the
+chart rung, before synthwave). Defaults are unchanged when no pack
+is selected (centered / serif / kinetic, Harness or Vertical).
+
+- **AdTemplate** (`src/AdTemplate.tsx`, 720×1280, 25s default) — the
+  ad-video-skills template: one `variant` prop {hook, benefit,
+  proof, cta} drives the 5-beat anatomy (hook 0–12%, context
+  12–32%, payoff 32–64%, proof 64–88%, CTA 88–100%, hold ≥2s at
+  25s). Layout/motion/timing are identical across rows; `testField`
+  (default `hook`, from a `Test:` label) names the one variable
+  under test. The watcher builds the variant from explicit
+  `Hook:` / `Benefit:` / `Proof:` / `CTA:` labels, else the story
+  beats (beat 1 = hook, beat 2 = benefit, beat 3 = proof); the CTA
+  defaults to the hook text — message-matched by construction, and
+  no product, price, or claim is ever invented. Length is the
+  task's own when it fits the 15–30s anatomy, else 25s.
+- **CanvasStyles** (`src/CanvasStyles.tsx` + `src/harness/
+  canvasStyles.tsx`, 720×1280, 12s) — animate-canvas, two styles as
+  real code: **cut-paper** (torn-edge layered sheets with offset
+  shadows, words on a torn surface card) and **crosshatch**
+  (SVG hatch strokes that boil on 2s, one accent sun, sketchy
+  underline). Shape-morph bridges (`MorphBridge`, ~1.2s, a circle
+  window growing to cover the frame and shrinking open as a rounded
+  square) sit at each scene boundary. A `Style:` label picks the
+  style; riso / sketchbook / math / pixel / isometric have no
+  Remotion implementation and stay craft notes only (the router
+  returns None for them — never a wrong style).
+- **BRoll** (`src/BRoll.tsx`, 1280×720, 12s) — b-roll-skills timing:
+  segments cut on the noun (boundaries at noun timestamps from
+  `watcher/broll_timing.py`), keyword overlay revealing exactly at
+  the noun, code-drawn panel fallback when no pool clip matches.
+  Clips come only from the local pool (`public/broll/`, Pixabay
+  stock downloaded 2026-11-20); the watcher rsyncs each used clip
+  to the iMac's `public/broll/` before rendering. The BRoll
+  storyboard carries **no palette key**, so the critic SKIPs
+  palette/contrast (footage has no palette) — same rule as
+  narrated clips. Footage limit: Motion Bot has no footage source
+  of its own; Pixabay search is HTTP 400 since Nov 20 16:34 ET,
+  Pexels is out by his rule, no new keys.
+
+Proof (same task-391 story + palette as v2.6, all rendered on the
+iMac, critic **PASS** each, exit 0):
+- ad: `out/proof-v27-ad.mp4`, 675,652 B, 25s, diffs
+  9.28 / 19.96 / 21.25 / 14.64 / 2.70.
+- cut-paper: `out/proof-v27-canvas-cut-paper.mp4`, 564,495 B,
+  diffs 6.63 / 7.91 / 3.20.
+- crosshatch: `out/proof-v27-canvas-crosshatch.mp4`, 2,048,414 B,
+  diffs 11.91 / 7.88 / 3.02.
+- b-roll: `out/proof-v27-broll.mp4`, 4,276,111 B — segment 1 panel
+  (no solar-panel clip in the pool), segment 2 clip
+  `pixabay-21118.mp4` (concept match: city lights stand in for the
+  grid), segment 3 clip `pixabay-1044.mp4` (tag match: town);
+  diffs 128.04 / 62.68 / 11.65.
+Regression: `out/proof-panel-centered.mp4` re-rendered after the
+v2.7 sync — byte-identical md5 to the v2.6 file, critic PASS.
+
 ## Narrated mode (v2, built 2026-10-26)
 
 Ported from Automated Video Generator (MIT, v5.0.0) — only its
