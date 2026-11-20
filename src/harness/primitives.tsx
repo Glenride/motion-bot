@@ -106,10 +106,34 @@ export const Particle: React.FC<{
   );
 };
 
+/** Euclidean RGB distance between two hex colors (0-441). */
+export const hexDistance = (a: string, b: string): number => {
+  const rgb = (h: string): [number, number, number] => {
+    const s = h.replace("#", "");
+    return [
+      parseInt(s.slice(0, 2), 16),
+      parseInt(s.slice(2, 4), 16),
+      parseInt(s.slice(4, 6), 16),
+    ];
+  };
+  const [r1, g1, b1] = rgb(a);
+  const [r2, g2, b2] = rgb(b);
+  return Math.sqrt((r1 - r2) ** 2 + (g1 - g2) ** 2 + (b1 - b2) ** 2);
+};
+
 /** Background that changes every frame: rotating gradient + particles.
  *  On light backgrounds (white / parchment) the glow and particles run
  *  stronger — at dark-background strengths they wash out to nothing
- *  and the scene reads flat. */
+ *  and the scene reads flat.
+ *  Flat field when bg/surface are far apart (v2.12): a linear
+ *  gradient between two colors more than 2x the critic's 30-unit
+ *  palette tolerance apart has its midpoint >30 from both colors,
+ *  so most gradient pixels count toward neither and palette_present
+ *  fails (task-391: sand #D9C7A7 vs sky #4FC3F7, ~160 apart, light
+ *  field 18-23%). A solid background keeps the whole field inside
+ *  tolerance; the glow + particles + wash still move. At distance
+ *  <= 60 the gradient's midpoint is within 30 of both colors, so
+ *  the gradient stays — close pairs render exactly as before. */
 export const MovingBackground: React.FC<{
   frame: number;
   palette: HarnessPalette;
@@ -130,11 +154,16 @@ export const MovingBackground: React.FC<{
   // (blended gold-on-white is ~120 RGB away from gold). The deeper gold
   // reads as gold on white; on dark backgrounds the bright gold is right.
   const particleColor = light ? palette.accentDeep : palette.particle;
+  const flatField = hexDistance(palette.background, palette.surface) > 60;
   return (
     <AbsoluteFill
-      style={{
-        background: `linear-gradient(${angle}deg, ${palette.background} 0%, ${palette.surface} 55%, ${palette.background} 100%)`,
-      }}
+      style={
+        flatField
+          ? { backgroundColor: palette.background }
+          : {
+              background: `linear-gradient(${angle}deg, ${palette.background} 0%, ${palette.surface} 55%, ${palette.background} 100%)`,
+            }
+      }
     >
       {/* Soft accent glow that breathes with the gradient. */}
       <div

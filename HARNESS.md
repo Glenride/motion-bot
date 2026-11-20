@@ -749,9 +749,10 @@ MovingBackground gradient between far-apart colors (sand
 Explainer lesson. Control render with the wash disabled
 measures 19–24% — the wash moves the field by <1pt.
 Harness was never proven with this palette (prior Harness
-proofs used close bg/surface pairs). Fix owed, out of
-scope here: a solid/flat field when bg/surface are far
-apart, as v2.9 did for Explainer.
+proofs used close bg/surface pairs). **FIXED in v2.12:**
+MovingBackground now renders a solid background field when
+bg/surface are more than 60 RGB units apart (2x the
+critic's 30-unit tolerance) — see the v2.12 section.
 
 ## Packs 13–15 as Remotion code (v2.11, 2026-11-20)
 
@@ -901,6 +902,7 @@ identical to v2.10, so the Vertical changes did not move the
 default path. **Known limitation, NOT a v2.11 regression:**
 Harness + the task-391 palette still fails palette_present
 (light field 18–23%) — recorded in v2.10, untouched here.
+**FIXED in v2.12** — see the v2.12 section below.
 **iMac note (pre-existing, fixed in this run):** renders were
 blocked on arrival — `node_modules/@remotion/cli/
 remotion-cli.js`, `@esbuild/linux-x64/bin/esbuild`, and the
@@ -908,6 +910,36 @@ headless-Chrome binary under `node_modules/.remotion/` had all
 lost their exec bits (644, dated Oct 24). Fixed with `chmod +x`
 on those binaries only — no install, no new packages — and the
 bundle then listed all 17 compositions including WhatIf.
+
+## Flat field for far-apart palettes (v2.12, 2026-11-20)
+
+The v2.10 limitation is closed. `MovingBackground`
+(`src/harness/primitives.tsx`) now measures the Euclidean RGB
+distance between `palette.background` and `palette.surface`
+(new export `hexDistance`) and renders a solid background field
+when they are more than 60 units apart — 2x the critic's 30-unit
+palette tolerance, the exact point where a linear gradient's
+midpoint falls outside tolerance of both colors. At distance
+<= 60 the rotating gradient stays, so close pairs (task-161:
+white vs parchment, 40.4) render exactly as before. The glow,
+particles, wash, camera, and kinetic words still move, so the
+field is flat, not frozen. Vertical is untouched — it never
+uses MovingBackground (its frame background is the capped
+`tintedBackground` drift). The task-391 palette and story are
+unchanged; the renderer changed, not the test data.
+
+Proof (task-391 story + palette, Harness composition, rendered
+on the iMac, critic **PASS**, exit 0):
+- `out/proof-v212-harness-391.mp4`, 903,123 B, 12s, 1280x720,
+  diffs 4.40 / 5.20 / 4.87; light field 70.86% / 71.39% /
+  68.30% / 68.27% (was 18–23%); text 0.91–1.48% every frame;
+  accent family 4/4 frames; contrast 10.42. OCR checks SKIP
+  (tesseract unavailable locally and on the iMac — pre-existing).
+Regression: `out/proof-panel-centered.mp4` re-rendered after
+the v2.12 sync, critic PASS with diffs 5.89 / 8.20 / 4.17 —
+identical to v2.10/v2.11, so the Vertical default is unmoved.
+Modes: the synced `primitives.tsx` and brief arrived on the
+iMac at 660 via rsync and were set to 644 after syncing.
 
 ## Narrated mode (v2, built 2026-10-26)
 
