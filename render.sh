@@ -17,6 +17,12 @@
 #       Composition defaults to Generic when a brief is given; output
 #       defaults to out/<brief-basename>.mp4.
 #
+#   ./render.sh <brief.json> <composition> <output.mp4> "" finish
+#       Optional 5th arg "finish" (v2.9): after the render, run
+#       watcher/finishing.py on the clip (fade in/out, thumbnail;
+#       loudness only when the clip has audio) -> <stem>-finished.mp4.
+#       The source render is kept. iMac only.
+#
 # The brief's props are passed to Remotion as --props JSON. A brief may
 # omit any field — see briefs/README.md for the schema and defaults.
 set -euo pipefail
@@ -31,11 +37,23 @@ BRIEF="$1"
 COMPOSITION="${2:-Generic}"
 OUTPUT="${3:-out/$(basename "${BRIEF%.json}").mp4}"
 CODEC="${4:-}"
+FINISH="${5:-}"
 
 if [ ! -f "$BRIEF" ]; then
   echo "Brief not found: $BRIEF" >&2
   exit 1
 fi
+
+# Finishing pass (v2.9, ffmpeg-finishing): optional 5th arg "finish".
+# Runs watcher/finishing.py on the rendered clip (fade in/out,
+# thumbnail; loudness only when the clip has audio) and writes
+# <stem>-finished.mp4 next to it — the source render is kept.
+# iMac only: finishing lives where the render lives.
+run_finish() {
+  if [ "$FINISH" = "finish" ]; then
+    python3 watcher/finishing.py "$1"
+  fi
+}
 
 PROPS="$(cat "$BRIEF")"
 mkdir -p "$(dirname "$OUTPUT")"
@@ -54,3 +72,4 @@ if [ -n "$CODEC" ]; then
 else
   npx remotion render "$COMPOSITION" "$OUTPUT" --props="$PROPS"
 fi
+run_finish "$OUTPUT"

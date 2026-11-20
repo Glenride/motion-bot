@@ -104,7 +104,7 @@ LABEL_RE = re.compile(
     r"hook|benefit|proof|cta|style|test|ad|"
     r"product|features|feature|offer|was|now|code|deadline|everest|data|unit|mode|"
     r"chart|prompt|steps|step|output|benchmark|tier|usage|reset|quote|highlight|"
-    r"compare|row|version|receipt|pills)\s*[:\-=]\s*(.+?)\s*$"
+    r"compare|row|version|receipt|pills|idea)\s*[:\-=]\s*(.+?)\s*$"
 )
 
 # ------------------------------------------------------------------ mood
@@ -1439,3 +1439,89 @@ def build_everest_panel(task, storyboard, matched_packs):
          "transitionOut": "none"}
         for i, w in enumerate(scene_words)]
     return panel
+
+
+# ------------------------------------------------- explainer (v2.9)
+# explainer-video-skills: one idea per scene, build-and-hold
+# pacing, end-card recap. The Explainer composition renders three
+# code-drawn styles (diagram / whiteboard / isometric) from the
+# same ideas prop. Ideas come only from the task: Idea:/Step:
+# labels, else the story beats — never invented. The diagram IS
+# the brief's beats in order; no figure is drawn from nothing.
+# wrapped-video is not a separate composition: its grammar is the
+# same build-and-hold + end-card shape and its count-up already
+# lives in Chart/D3Chart (v2.8) — a Wrapped-style brief (a data
+# row with a hero number) routes to Chart stats mode instead.
+EXPLAINER_STYLES = {
+    "diagram": "diagram",
+    "whiteboard": "whiteboard",
+    "white board": "whiteboard",
+    "white-board": "whiteboard",
+    "scribe": "whiteboard",
+    "isometric": "isometric",
+    "iso": "isometric",
+    "isometric-animation": "isometric",
+}
+
+
+def build_explainer(task, storyboard):
+    """Task + storyboard -> Explainer props dict, or None.
+
+    Returns None only when the task carries no ideas at all (no
+    story beats, no Idea:/Step: labels) — the watcher then falls
+    back to the default route.
+    """
+    title = (task.get("title") or "").strip()
+    details = task.get("details") or ""
+    labels = parse_labels(details)
+    notes = storyboard.setdefault("notes", [])
+    style = None
+    style_label = (labels.get("style") or "").strip().lower()
+    if style_label in EXPLAINER_STYLES:
+        style = EXPLAINER_STYLES[style_label]
+        notes.append(f"explainer style '{style}' (explicit Style: label)")
+    if style is None:
+        low = ((task.get("title") or "") + "\n" + details).lower()
+        if "whiteboard" in low or "scribe" in low:
+            style = "whiteboard"
+        elif "isometric" in low or re.search(r"\biso\b", low):
+            style = "isometric"
+        else:
+            style = "diagram"
+        notes.append(f"explainer style '{style}' (default)")
+    lines = _split_list(labels.get("idea") or "")
+    if not lines:
+        lines = _repeated_lines(details, "idea")
+    if not lines:
+        lines = _split_list(labels.get("step") or "")
+    if not lines:
+        lines = _repeated_lines(details, "step")
+    if not lines:
+        lines = [(b.get("text") or "") for b in
+                 (storyboard.get("story") or {}).get("beats") or []]
+        lines = [b for b in lines if b.strip()]
+        if lines:
+            notes.append("explainer ideas from story beats "
+                         "(no Idea:/Step: label)")
+    if not lines:
+        notes.append("explainer DROPPED: no ideas — no story beats "
+                     "and no Idea:/Step: label, nothing to explain")
+        return None
+    lines = lines[:4]
+    ideas = [{"title": " ".join(l.split()[:2]),
+              "line": l.strip()} for l in lines]
+    cta = (labels.get("cta") or "").strip() or title
+    explainer = {"hook": title, "ideas": ideas, "style": style,
+                 "cta": cta}
+    notes.append(f"explainer: {len(ideas)} idea(s), style '{style}'")
+    # Critic scenes: one per idea plus the end-card recap.
+    scenes = [{"words": i["line"].split(),
+               "camera": CAMERA_MOVES[k % len(CAMERA_MOVES)],
+               "transitionOut": "none"}
+              for k, i in enumerate(ideas)]
+    scenes.append({"words": (title + " " + cta).split(),
+                   "camera": CAMERA_MOVES[len(ideas) % len(CAMERA_MOVES)],
+                   "transitionOut": "none"})
+    explainer["scenes"] = scenes
+    explainer["lengthSeconds"] = len(ideas) * 4 + 3
+    return explainer

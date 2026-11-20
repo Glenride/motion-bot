@@ -93,6 +93,7 @@ from harness_director import (  # noqa: E402
     ad_beat_scenes,
     build_ad_variant,
     build_everest_panel,
+    build_explainer,
     build_product_demo,
     pick_canvas_style,
 )
@@ -145,7 +146,7 @@ BRIEF_DEFAULTS = {
 HEX_RE = re.compile(r"#(?:[0-9a-fA-F]{6}|[0-9a-fA-F]{3})\b")
 LENGTH_RE = re.compile(r"(\d+(?:\.\d+)?)\s*(?:s|sec|secs|second|seconds)\b", re.I)
 LABEL_RE = re.compile(
-    r"(?im)^\s*(project|subtitle|tagline|end card|background|accent|text|image|images|length|duration|name|role|chart|unit|mode|product|everest)\s*[:\-=]\s*(.+?)\s*$"
+    r"(?im)^\s*(project|subtitle|tagline|end card|background|accent|text|image|images|length|duration|name|role|chart|unit|mode|product|everest|style|finish)\s*[:\-=]\s*(.+?)\s*$"
 )
 # NOTE (v2.8 fix): this LABEL_RE used to list only the translate_to_brief
 # keys, so the Harness route's `Name:` (lower-thirds rung) and `Chart:
@@ -1156,6 +1157,22 @@ def main():
                     elif "synthwave-style" in _route["skills"] and _route["format"] != "vertical":
                         # Synthwave rung (v2.3): purple-free style preset.
                         _composition = "Synthwave"
+                    elif "explainer-video-skills" in _route["skills"]:
+                        # Explainer rung (v2.9): one idea per scene,
+                        # build-and-hold, end-card recap. build_explainer
+                        # returns None when the task carries no ideas —
+                        # those tasks keep the default route, craft
+                        # notes only, never an invented diagram.
+                        _explainer = build_explainer(task, storyboard)
+                        if _explainer:
+                            _composition = "Explainer"
+                            # Top-level keys: the brief IS the props.
+                            storyboard["ideas"] = _explainer["ideas"]
+                            storyboard["style"] = _explainer["style"]
+                            storyboard["cta"] = _explainer["cta"]
+                            storyboard["scenes"] = _explainer["scenes"]
+                            storyboard["lengthSeconds"] = _explainer[
+                                "lengthSeconds"]
                     elif "lower-thirds-skills" in _route["skills"] and _labels.get("name"):
                         # Lower-third rung (v2.3): transparent overlay export.
                         _composition = "LowerThird"
@@ -1269,6 +1286,48 @@ def main():
                                 entry["silence_cut"] = {"ok": False, "reason": "auto-editor exited non-zero"}
                         except Exception as _ae_e:
                             entry["silence_cut"] = {"ok": False, "reason": str(_ae_e)[:300]}
+                    # Opt-in finishing pass (v2.9, ffmpeg-finishing):
+                    # ONLY when details carry `Finish:` (e.g.
+                    # `Finish: fade+loudness+thumbnail` or
+                    # `Finish: preset reels`). Runs on the iMac
+                    # (watcher/finishing.py), never overwrites the
+                    # source; any failure keeps the original clip and
+                    # is recorded, never blocks. The critic already
+                    # ran on the pre-finish clip; the finished file
+                    # is probe-verified (same duration/dims) before
+                    # the delivered file swaps.
+                    _fin_note = ""
+                    _finish = (_labels.get("finish") or "").strip().lower()
+                    if _finish and _finish not in ("off", "no", "none"):
+                        try:
+                            _preset = ""
+                            for _p in ("reels", "shorts", "youtube", "x",
+                                       "linkedin", "facebook"):
+                                if _p in _finish:
+                                    _preset = f" --preset {_p}"
+                                    break
+                            _fin_name = f"{slug}-finished.mp4"
+                            _fin_rel = f"out/{_fin_name}"
+                            _r = run([IMAC_SSH,
+                                      f"cd {IMAC_REPO} && python3 watcher/finishing.py "
+                                      f"out/{mp4_name} --out {_fin_rel}{_preset} --json"],
+                                     timeout=600)
+                            if _r.returncode == 0:
+                                _fin_path = REPO / "out" / _fin_name
+                                rsync_from_imac(_fin_rel, _fin_path)
+                                _fin_detail = json.loads(_r.stdout or "{}")
+                                entry["finishing"] = _fin_detail
+                                mp4_name, mp4_path = _fin_name, _fin_path
+                                entry["mp4"] = str(mp4_path)
+                                _fin_note = " (finishing pass applied)"
+                            else:
+                                entry["finishing"] = {
+                                    "ok": False,
+                                    "reason": ((_r.stderr or _r.stdout or "")
+                                               .strip()[-300:])}
+                        except Exception as _fin_e:
+                            entry["finishing"] = {"ok": False,
+                                                  "reason": str(_fin_e)[:300]}
                     _done = mark_done(password, tid, (
                         f"Motion Bot rendered ({_composition}, "
                         f"{storyboard.get('lengthSeconds', 12)}s): "
@@ -1276,6 +1335,7 @@ def main():
                         f"~/workspace/repos/motion-bot/out/{mp4_name} — "
                         + critic_summary(critic)
                         + _sc_note
+                        + _fin_note
                     ))
                     entry["outcome"] = ("rendered" if _done
                                         else "held-by-race (done skipped)")

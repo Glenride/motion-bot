@@ -15,6 +15,7 @@ import { CanvasStyles, CANVAS_DEFAULTS } from "./CanvasStyles";
 import { BRoll, BROLL_DEFAULTS } from "./BRoll";
 import { ProductDemo, PRODUCT_DEMO_DEFAULTS } from "./ProductDemo";
 import { EverestPanels, EVEREST_DEFAULTS } from "./EverestPanels";
+import { Explainer, EXPLAINER_DEFAULTS } from "./Explainer";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -229,6 +230,29 @@ export const RemotionRoot: React.FC = () => {
         defaultProps={EVEREST_DEFAULTS as any}
         calculateMetadata={async ({ props }) => {
           const lengthSeconds = props.lengthSeconds ?? EVEREST_DEFAULTS.lengthSeconds;
+          return {
+            durationInFrames: Math.max(
+              90,
+              Math.round(lengthSeconds * 30),
+            ),
+          };
+        }}
+      />
+      {/* v2.9: pack 7 translated to code. Explainer is the
+          explainer-video-skills composition (one idea per scene,
+          build-and-hold, diagram / whiteboard / isometric styles,
+          end-card recap); wrapped-video routes to Chart stats mode
+          (same grammar, count-up already in Chart/D3Chart). */}
+      <Composition
+        id="Explainer"
+        component={Explainer}
+        durationInFrames={EXPLAINER_DEFAULTS.lengthSeconds * 30}
+        fps={30}
+        width={1280}
+        height={720}
+        defaultProps={EXPLAINER_DEFAULTS as any}
+        calculateMetadata={async ({ props }) => {
+          const lengthSeconds = props.lengthSeconds ?? EXPLAINER_DEFAULTS.lengthSeconds;
           return {
             durationInFrames: Math.max(
               90,

@@ -7,7 +7,7 @@ Installed packs live in `skills/` (9 packs, 30 skills, cloned 2026-10-29):
 |---|---|---|
 | motion-design-skills | 9 | Base craft, always on: easing, safe areas, loops, color, shot composition, Remotion technique |
 | kinetic-typography-skills | 1 | Kinetic type: word/character stagger, title cards |
-| explainer-video-skills | 5 | Explainer grammar: one idea per scene, diagram reveal, whiteboard, wrapped-style data recaps |
+| explainer-video-skills | 5 | Explainer grammar: one idea per scene, diagram reveal, whiteboard, wrapped-style data recaps — Explainer comp, 3 code-drawn styles + end-card recap (v2.9) |
 | tiktok-video-skills | 4 | Short-form vertical: 9:16, hook in 1s, caption animation, countdowns |
 | data-animation-skills | 3 | Data: chart animation, infographic reveals, key-number counters |
 | lower-thirds-skills | 1 | Transparent lower thirds / overlays |
@@ -161,10 +161,19 @@ says.
 See `skills/ffmpeg-finishing/SKILL.md`: fit to duration /
 aspect, platform export templates (tiktok, reels, shorts,
 youtube, x, linkedin, facebook), silence removal, karaoke
-captions, loudness. No router entry auto-applies them —
-the watcher has no finishing execution step — and no live
-task's loudness target, caption wording, or render path
-changes in this pass.
+captions, loudness. **v2.9 update:** the finishing steps Motion
+Bot actually runs are now wired as `watcher/finishing.py`
+(fade, loudness, thumbnail, presets — opt-in via a `Finish:`
+label or `./render.sh … "" finish`) and `watcher/ffmpeg_tools.py`
+(the shipped subset: probe/trim/scale/concat/loudness/
+burn-subs/thumbnail/export). The upstream `fit.py` / `export.py`
+/ `silence.py` / `caption.py` / `loudness.py` scripts remain the
+reference for anything not yet wired; no live task's loudness
+target, caption wording, or render path changes except through
+the opt-in `Finish:` step. The iMac doctor's
+`missing_optional` (parakeet, whisper) is why silence/filler
+removal and transcribe stay out of scope — no engine installed,
+no installs without his tap.
 
 ### Deliberately NOT wired or replaced
 
@@ -443,3 +452,85 @@ after the v2.8 sync, critic PASS (no byte-identical md5 check:
 the pre-render file was overwritten in place first;
 `src/Vertical.tsx` untouched, `primitives.tsx` only gains the
 DriftBlobs export).
+
+## Packs 7–9 as Remotion code (v2.9, 2026-11-20)
+
+explainer-video-skills gained a composition; ffmpeg-finishing and
+ffmpeg-skill gained real post-render code (a finishing pass + a
+named-subcommand ffmpeg subset). Craft notes alone do not count as
+translated. Wiring lives in `watcher/harness_director.py`
+(`build_explainer`), the Harness route in
+`watcher/watch_motion_bot.py` (explainer rung + opt-in `Finish:`
+handling), `watcher/finishing.py`, and `watcher/ffmpeg_tools.py`.
+
+- **Explainer** (`src/Explainer.tsx`): one idea per scene, each
+  builds step by step then holds >= 1s; end-card recap restates
+  every idea + one CTA, hold >= 2s. Three code-drawn styles, one
+  `Style:` label: diagram (nodes appear, then edges draw on via
+  stroke-dashoffset, then labels — nodes → edges → labels, one
+  node per idea); whiteboard (one open stroke per idea — circle,
+  swoosh, arrow — drawn via stroke-dashoffset with a code-drawn
+  marker nib riding the exact tip, computed from the same
+  progress value; the nib lifts between strokes and during
+  holds); isometric (2:1 dimetric blocks stacked bottom-up, one
+  per idea, top-light / left-mid / right-dark from one fixed
+  light, no perspective shrink). Ideas come only from the task
+  (Idea:/Step: labels, else story beats); the diagram IS the
+  brief's beats in order — no figure drawn from nothing.
+  wrapped-video is NOT a separate composition: its grammar is
+  the same build-and-hold + end-card shape and its count-up
+  already lives in Chart/D3Chart (v2.8), so a Wrapped-style
+  brief routes to Chart stats mode. **Measured lesson:** the
+  first v2.9 renders used a bg→surface gradient background and
+  failed palette_present (light field 42–52% — gradient blends
+  count toward neither color); a solid background (the v2.8
+  Chart/ProductDemo pattern) holds it at 90–96%.
+- **finishing.py** (`watcher/finishing.py`): fade in/out 0.5s
+  (video + audio when audio exists), -14 LUFS loudness
+  (single-pass loudnorm, video copied), midpoint thumbnail,
+  platform presets (reels/shorts pad to 1080x1920, the rest keep
+  1280x720). Runs on the iMac only, after a render, only when a
+  brief explicitly requests it (`Finish:` label, or
+  `./render.sh … "" finish` by hand). Never overwrites the
+  source (`<stem>-finished.mp4`); refuses alpha-channel inputs
+  so the ProRes lower-third mux is never finished over; the
+  output is probe-verified (duration/dims) before it swaps in.
+  Loudness is SKIPPED with a note on audio-less clips (most
+  Motion Bot renders) — never faked.
+- **ffmpeg_tools.py** (`watcher/ffmpeg_tools.py`): the shipped
+  ffmpeg-skill subset — probe, trim (frame-accurate re-encode;
+  --copy is keyframe-limited), scale (pad/crop/stretch),
+  concat (stream copy when codecs match), loudness, burn-subs
+  (libass, Liberation Sans, wording exactly as in the SRT, or
+  --mode mux for toggleable subs), thumbnail, export presets
+  (youtube/reels/shorts/x/linkedin/facebook/gif/proxy). Every
+  command has --dry-run + --json; `scope` prints shipped vs
+  out-of-scope. **Out of scope:** silence/filler removal and
+  transcribe (no speech engine installed on the iMac, no
+  installs without his tap); stabilize/denoise/deinterlace,
+  color/LUT grading (camera-footage/taste tools, not a render
+  path); multicam/sync, HDR/Dolby/360, redact,
+  waveform/audiogram (no such source material); scenes/
+  highlights ranking (loudness, not meaning); batch/report
+  (the watcher/critic already do those); raw ffmpeg
+  passthrough (forbidden by the upstream skill). **Measured
+  fix:** trim first shipped with -ss before -i, which made
+  --end count from the seek point (2–8 cut 8s, not 6s); -ss/-to
+  are output options now (2–8 cuts exactly 6.0s).
+
+Proof renders: `briefs/proof-v29-explainer-*.json` (task-391
+story + palette), critic PASS each (diagram, whiteboard,
+isometric — all 15s, light field 90–96%, diffs 11–28);
+`out/proof-v29-explainer-diagram-finished.mp4` (finishing pass:
+fade in/out + thumbnail, loudness skipped — no audio; critic
+PASS) + `.jpg` thumbnail; `out/proof-v29-export-reels.mp4`
+(1080x1920, 15s); `out/proof-v29-trimmed.mp4` (6.0s);
+`out/proof-v29-concat.mp4` (30.0s, stream copy);
+`out/proof-v29-captioned.mp4` (SRT burned in, critic PASS);
+loudness proven on a tone clip: -21.8 → -14.0 LUFS, and
+refused cleanly (exit 1) on an audio-less clip. Routing
+simulation 4/4 (explainer task → Explainer/whiteboard,
+no-ideas → None, task-391 text matches no ffmpeg pack,
+`Finish:` → ffmpeg-finishing). The v2.6 centered proof
+re-rendered after the v2.9 sync, critic PASS (diffs 2.90 /
+5.09 / 2.99 — identical to v2.8).

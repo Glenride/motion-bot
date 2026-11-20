@@ -39,7 +39,7 @@ PACKS = {
     ),
     "explainer-video-skills": (
         [r"\b(explain|explainer|how it works|tutorial|step by step|guide)\b"],
-        "Explainer: one idea per scene, build-and-hold pacing, end-card recap.",
+        "Explainer: one idea per scene, build-and-hold pacing, end-card recap — Explainer comp (diagram / whiteboard / isometric styles, Style: label); wrapped-video routes to Chart stats mode.",
         None,
     ),
     "tiktok-video-skills": (
@@ -143,6 +143,20 @@ PACKS = {
     "animate-canvas": (
         [r"\b(cut paper|cut-paper|crosshatch ink|crosshatch-ink|riso print|sketchbook style|pixel animation|isometric animation|canvas animation|procedural animation)\b"],
         "Procedural canvas style: story, look, and storyboard approved before animating; one style per piece; shape-morph bridges between eras; silence before the payoff, loudest on it. Cut-paper and crosshatch render as Remotion code (CanvasStyles); riso/sketchbook/math/pixel/isometric are craft notes only.",
+        None,
+    ),
+    # ffmpeg packs (v2.9) — post-render steps, not compositions.
+    # Narrow triggers only: a bare "export" or "trim" in prose
+    # must not reroute a clip. The Finish: label is the opt-in:
+    # finishing runs only when the brief explicitly requests it.
+    "ffmpeg-finishing": (
+        [r"\bfinish\s*:", r"\bloudness\b", r"\bfade (in|out)\b"],
+        "Finishing: fade in/out, -14 LUFS loudness, thumbnail, platform preset — finishing.py runs after the render on the iMac, never overwrites the source.",
+        None,
+    ),
+    "ffmpeg-skill": (
+        [r"\btrim\s*:", r"\bexport\s*:", r"\bburn (in )?(captions|subtitles)\b"],
+        "ffmpeg subset: trim/scale/concat/loudness/burn-subs/export presets via watcher/ffmpeg_tools.py; silence/transcribe/stabilize/color out of scope (see scope).",
         None,
     ),
 }

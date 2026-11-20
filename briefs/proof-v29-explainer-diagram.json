@@ -1,0 +1,131 @@
+{
+  "version": 1,
+  "hook": "Panels turn to face the morning",
+  "lengthSeconds": 15,
+  "palette": {
+    "background": "#D9C7A7",
+    "surface": "#4FC3F7",
+    "accent": "#0F766E",
+    "accentDeep": "#0A4D48",
+    "text": "#1F1A14",
+    "glow": "#0F766E",
+    "particle": "#0F766E"
+  },
+  "ideas": [
+    {
+      "title": "Panels turn",
+      "line": "Panels turn to face the morning"
+    },
+    {
+      "title": "Grid wakes",
+      "line": "The grid wakes row by row"
+    },
+    {
+      "title": "Power reaches",
+      "line": "Power reaches the town by noon"
+    }
+  ],
+  "style": "diagram",
+  "cta": "Panels turn to face the morning",
+  "scenes": [
+    {
+      "words": [
+        "Panels",
+        "turn",
+        "to",
+        "face",
+        "the",
+        "morning"
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.08,
+        "fromX": 0,
+        "toX": -26
+      },
+      "transitionOut": "none"
+    },
+    {
+      "words": [
+        "The",
+        "grid",
+        "wakes",
+        "row",
+        "by",
+        "row"
+      ],
+      "camera": {
+        "fromScale": 1.08,
+        "toScale": 1.0,
+        "fromX": -26,
+        "toX": 22
+      },
+      "transitionOut": "none"
+    },
+    {
+      "words": [
+        "Power",
+        "reaches",
+        "the",
+        "town",
+        "by",
+        "noon"
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.14,
+        "fromX": 22,
+        "toX": 0
+      },
+      "transitionOut": "none"
+    },
+    {
+      "words": [
+        "Panels",
+        "turn",
+        "to",
+        "face",
+        "the",
+        "morning"
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.08,
+        "fromX": 0,
+        "toX": -26
+      },
+      "transitionOut": "none"
+    }
+  ],
+  "story": {
+    "source": "story_block",
+    "beats": [
+      {
+        "title": "",
+        "start": null,
+        "end": null,
+        "text": "Panels turn to face the morning"
+      },
+      {
+        "title": "",
+        "start": null,
+        "end": null,
+        "text": "The grid wakes row by row"
+      },
+      {
+        "title": "",
+        "start": null,
+        "end": null,
+        "text": "Power reaches the town by noon"
+      }
+    ]
+  },
+  "skills": [
+    "motion-design-skills",
+    "explainer-video-skills"
+  ],
+  "format": "landscape",
+  "notes": [
+    "v2.9 proof: explainer style diagram, task-391 story + palette"
+  ]
+}

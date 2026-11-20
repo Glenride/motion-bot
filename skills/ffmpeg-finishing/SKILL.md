@@ -6,19 +6,32 @@ notes; full clone lives on the VM). Python standard library
 only, no cloud, no API keys. Workflow: probe → edit → verify,
 structured JSON output.
 
-## Status in Motion Bot (2026-11-01)
+## Status in Motion Bot (2026-11-20, v2.9: WIRED)
 
 - WIRED (verification lane): `watcher/ffmpeg_skill_verify.py` +
   `watcher/skill_verify.py` `verify()` attaches an advisory
   `ffmpeg_skill` result (upstream probe + youtube platform
   check, look sheet on demand). Advisory only — it never
   changes `structural_ok`.
-- DOCUMENTED HERE, NOT AUTO-RUN: the finishing tools below.
-  The watcher has NO finishing execution step, so no router
-  entry auto-applies them and no live task changes because
-  of this file. A finishing step runs only when a brief
-  explicitly requests it AND a human runs it (or a future
-  watcher step is built and proven for it).
+- WIRED (finishing execution, v2.9): `watcher/finishing.py`
+  (fade in/out, -14 LUFS loudness when audio exists,
+  thumbnail, platform presets) runs on the iMac after a
+  render when a brief explicitly requests it — `Finish:`
+  label in the task details (watcher), or `./render.sh …
+  "" finish` by hand. Never overwrites the source (writes
+  `<stem>-finished.mp4`); refuses alpha-channel inputs so
+  the ProRes lower-third mux is never finished over; the
+  output is probe-verified (duration/dims) before it swaps
+  in. The subset commands it shares live in
+  `watcher/ffmpeg_tools.py` (pack 9).
+- DOCUMENTED HERE, NOT AUTO-RUN: the upstream `fit.py` /
+  `export.py` / `silence.py` / `caption.py` / `loudness.py`
+  scripts below. They are superseded in the watcher by
+  `finishing.py` / `ffmpeg_tools.py` for the steps Motion Bot
+  actually runs; the upstream scripts remain the reference
+  for anything not yet wired. A finishing step still runs
+  only when a brief explicitly requests it AND a human runs
+  it (or the watcher step above, proven for it).
 
 ## Available finishing tools (upstream script → use)
 
