@@ -10,14 +10,27 @@ import {
   Camera,
   DiagonalWipe,
   KineticLine,
+  KineticReveal,
   ScaleLine,
   SlideLines,
   StackLine,
   ZoomCut,
   rand,
   resolveFont,
+  resolveKinetic,
   type HarnessPalette,
 } from "./harness/primitives";
+import {
+  ColorMotionWash,
+  ConstellationLines,
+  LogoReveal,
+  MeshGradient,
+  ParallaxChip,
+  personalityForTone,
+  sceneStarts,
+  tintedBackground,
+} from "./harness/motionDesign";
+import { LowerThirdOverlay } from "./LowerThird";
 import {
   HARNESS_DEFAULTS,
   type HarnessProps,
@@ -226,9 +239,12 @@ const VScene: React.FC<{
   panel: string;
   fontFamily: string;
   motion: string;
-}> = ({ scene, sceneFrames, frame, fps, palette, isLastScene, project, subtitle, pacing, variant, panel, fontFamily, motion }) => {
+  kinetic: string;
+  easing: string;
+  logo: string;
+}> = ({ scene, sceneFrames, frame, fps, palette, isLastScene, project, subtitle, pacing, variant, panel, fontFamily, motion, kinetic, easing, logo }) => {
   const endOpacity =
-    isLastScene && (project || subtitle)
+    isLastScene && (logo || project || subtitle)
       ? interpolate(frame, [sceneFrames * 0.7, sceneFrames * 0.85], [0, 1], {
           extrapolateLeft: "clamp",
           extrapolateRight: "clamp",
@@ -243,13 +259,34 @@ const VScene: React.FC<{
   // the rise motion; every other motion keeps its own entry.
   const rise = motion === "rise" || variant === "rise";
 
-  /** Render words with the clip's motion language. */
+  /** Render words with the clip's motion language. A Kinetic:
+   *  reveal (v2.10) IS the entry — it replaces the v2.6 motion
+   *  choice for that clip; `word` keeps the motion dispatch below
+   *  exactly as before. */
   const renderWords = (
     ws: string[],
     size: number,
     color: string,
     align: "center" | "left" = "center",
   ) => {
+    if (kinetic !== "word") {
+      return (
+        <KineticReveal
+          reveal={kinetic}
+          words={ws}
+          firstFrame={8}
+          frame={frame}
+          fps={fps}
+          fontSize={size}
+          color={color}
+          gapFrames={gap}
+          rise={rise}
+          fontFamily={fontFamily}
+          align={align}
+          easing={easing}
+        />
+      );
+    }
     if (motion === "slide") {
       return (
         <SlideLines
@@ -295,11 +332,15 @@ const VScene: React.FC<{
 
   /** End card — only on panels with room below the words (centered,
    *  card). Split / lower-third / word-stack leave it off rather
-   *  than colliding with the layout. */
+   *  than colliding with the layout. With a Logo: label (v2.10) the
+   *  end card is the code-drawn mark + wordmark, with the subtitle
+   *  below it; otherwise the plain project / subtitle lines. */
   const endCard =
-    isLastScene && (project || subtitle) && (panel === "centered" || panel === "card") ? (
+    isLastScene && (logo || project || subtitle) && (panel === "centered" || panel === "card") ? (
       <div style={{ opacity: endOpacity, textAlign: "center", marginTop: 40 }}>
-        {project ? (
+        {logo ? (
+          <LogoReveal wordmark={logo} palette={palette} frame={frame} fps={fps} fontFamily={fontFamily} size={360} />
+        ) : project ? (
           <div
             style={{
               fontFamily,
@@ -335,7 +376,7 @@ const VScene: React.FC<{
         style={{
           flexDirection: "column",
           justifyContent: "space-between",
-          padding: "150px 48px 210px 48px",
+          padding: "154px 48px 230px 48px",
         }}
       >
         <div>{renderWords(hook, baseSize + 26, palette.accent, "left")}</div>
@@ -357,7 +398,7 @@ const VScene: React.FC<{
         style={{
           justifyContent: "center",
           alignItems: "center",
-          padding: "120px 48px 160px 48px",
+          padding: "154px 48px 230px 48px",
         }}
       >
         <div
@@ -432,7 +473,7 @@ const VScene: React.FC<{
         style={{
           justifyContent: "center",
           alignItems: "flex-start",
-          padding: "120px 48px 160px 64px",
+          padding: "154px 48px 230px 64px",
         }}
       >
         <StackLine
@@ -447,13 +488,15 @@ const VScene: React.FC<{
       </AbsoluteFill>
     );
   } else {
-    // centered — the pre-v2.6 layout, unchanged.
+    // centered — the pre-v2.6 layout, unchanged (v2.10: padding is
+    // the 9:16 safe area — top 12% / bottom 18% / sides 6% — per the
+    // shot-composition skill, not the old 120/160px).
     body = (
       <AbsoluteFill
         style={{
           justifyContent: "center",
           alignItems: "center",
-          padding: "120px 48px 160px 48px",
+          padding: "154px 48px 230px 48px",
         }}
       >
         {renderWords(words, baseSize, palette.text)}
@@ -493,6 +536,7 @@ export const Vertical: React.FC<HarnessProps> = (props) => {
       ? props.scenes
       : VERTICAL_DEFAULTS.scenes;
   const pacing = props.mood?.pacing ?? "medium";
+  const tone = props.mood?.tone ?? "neutral";
   const variant = resolveVariant(props.variant);
   // Defaults reproduce the pre-v2.6 look exactly: centered panel,
   // serif type, kinetic words. A storyboard that sets none of these
@@ -500,27 +544,41 @@ export const Vertical: React.FC<HarnessProps> = (props) => {
   const panel = resolvePanel(props.panel);
   const fontFamily = resolveFont(props.font);
   const motion = resolveMotion(props.motion);
+  // v2.10: kinetic reveal (default `word` = the v2.6 line), beat
+  // grid BPM (0 = even split), lower-third strap, logo wordmark.
+  const kinetic = resolveKinetic(props.kinetic);
+  const bpm = props.bpm ?? 0;
+  const name = (props.name ?? "").trim();
+  const role = (props.role ?? "").trim();
+  const pills = props.pills ?? [];
+  const source = (props.source ?? "").trim();
+  const logo = (props.logo ?? "").trim();
+  // The motion personality for this clip's tone picks the easing
+  // the kinetic reveals settle with (premium -> easeOut, playful /
+  // energetic -> overshoot, corporate -> easeInOut).
+  const easing = personalityForTone(tone).easing;
 
   const n = scenes.length;
-  const base = Math.floor(durationInFrames / n);
-  const starts: number[] = [];
-  let at = 0;
-  for (let i = 0; i < n; i++) {
-    starts.push(at);
-    at += i === n - 1 ? durationInFrames - at : base;
-  }
-  const lengths = starts.map((s, i) =>
-    i === n - 1 ? durationInFrames - s : starts[i + 1] - s,
-  );
+  const { starts, lengths } = sceneStarts(durationInFrames, n, bpm > 0 ? bpm : undefined, fps);
+  // Color-motion (v2.10): the frame background drifts in OKLab from
+  // background toward surface across the clip (capped inside the
+  // critic's palette tolerance — see tintedBackground).
+  const backgroundColor = tintedBackground(palette, durationInFrames > 1 ? frame / (durationInFrames - 1) : 0);
 
   return (
-    <AbsoluteFill style={{ backgroundColor: palette.background }}>
+    <AbsoluteFill style={{ backgroundColor }}>
+      {/* Foreground parallax chip (v2.10, shot-composition): one
+          out-of-focus chip drifting past at 1.2x, below the text. */}
+      <ParallaxChip frame={frame} durationInFrames={durationInFrames} palette={palette} width={720} />
       {variant === "sweep" ? (
         <PortraitBands frame={frame} palette={palette} />
       ) : variant === "kinetic" ? (
-        <AbsoluteFill style={{ backgroundColor: palette.surface }} />
+        <MeshGradient frame={frame} palette={palette} width={720} height={1280} />
       ) : variant === "rise" ? null : (
-        <PortraitDots frame={frame} palette={palette} />
+        <>
+          <PortraitDots frame={frame} palette={palette} />
+          <ConstellationLines frame={frame} palette={palette} width={720} height={1280} />
+        </>
       )}
       {scenes.map((scene, i) => (
         <Sequence
@@ -543,6 +601,9 @@ export const Vertical: React.FC<HarnessProps> = (props) => {
             panel={panel}
             fontFamily={fontFamily}
             motion={motion}
+            kinetic={kinetic}
+            easing={easing}
+            logo={logo}
           />
         </Sequence>
       ))}
@@ -561,6 +622,22 @@ export const Vertical: React.FC<HarnessProps> = (props) => {
           </Sequence>
         );
       })}
+      {/* Color-motion wash (v2.10): the OKLab grade over the scenes. */}
+      <ColorMotionWash frame={frame} durationInFrames={durationInFrames} palette={palette} />
+      {/* Lower-third overlay (v2.10): a Name: label straps the short. */}
+      {name ? (
+        <LowerThirdOverlay
+          name={name}
+          role={role}
+          pills={pills}
+          source={source}
+          palette={palette}
+          frame={frame}
+          durationInFrames={durationInFrames}
+          fontFamily={fontFamily}
+          layout="vertical"
+        />
+      ) : null}
       <AccentMark variant={variant} palette={palette} />
     </AbsoluteFill>
   );

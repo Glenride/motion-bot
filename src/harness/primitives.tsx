@@ -1,5 +1,6 @@
 import React from "react";
 import { AbsoluteFill, interpolate, spring } from "remotion";
+import { applyEasing } from "./motionDesign";
 
 /**
  * Harness primitives — the shared motion engine.
@@ -21,6 +22,21 @@ export type HarnessPalette = {
   text: string;
   glow: string;
   particle: string;
+};
+
+/** The default palette (v2.10: lives here, not in Harness.tsx, so
+ *  LowerThird can use it without importing Harness — Harness
+ *  imports LowerThirdOverlay, and the reverse import was a cycle
+ *  that crashed the bundle: "Cannot access HARNESS_DEFAULTS before
+ *  initialization"). */
+export const DEFAULT_PALETTE: HarnessPalette = {
+  background: "#FFFFFF",
+  surface: "#F4EEDC",
+  accent: "#D4AF37",
+  accentDeep: "#8A7224",
+  text: "#1F1A14",
+  glow: "#D4AF37",
+  particle: "#D4AF37",
 };
 
 export const SERIF = "Georgia, 'Times New Roman', serif";
@@ -477,7 +493,391 @@ export const DriftBlobs: React.FC<{
   );
 };
 
-/** Camera wrapper: scale + lateral drift driven by the local frame. */
+/**
+ * Kinetic reveals (v2.10, kinetic-typography-skills). The v2.6
+ * KineticLine is word-by-word; these are the pack's other workhorse
+ * reveals, each a real primitive selectable via the `Kinetic:` label
+ * (Director) / `kinetic` prop — not a craft note. Timings are the
+ * skill's own: per-fragment 400-600ms, stagger lines 60-100ms,
+ * words 40-70ms, characters 20-40ms (1 frame at 30fps = 33ms),
+ * total reveal capped near ~800ms, ease-out entries
+ * (cubic-bezier 0.16, 1, 0.3, 1 — applyEasing("easeOut")).
+ * Splits carry aria-label on the container + aria-hidden on the
+ * fragments, so screen readers and copy-paste still see the words.
+ */
+
+export type KineticRevealName = "word" | "char" | "mask" | "blur" | "wipe" | "path";
+export const KINETIC_REVEALS: KineticRevealName[] = ["word", "char", "mask", "blur", "wipe", "path"];
+
+export const resolveKinetic = (k?: string): KineticRevealName =>
+  (KINETIC_REVEALS as string[]).includes(k ?? "") ? (k as KineticRevealName) : "word";
+
+/** Per-character stagger: split to chars, fade + rise each with a
+ *  1-frame (33ms) offset. Reserved for short strings — on long copy
+ *  it feels busy, so the dispatcher falls back to mask above 60
+ *  characters. */
+export const CharStaggerLine: React.FC<{
+  words: string[];
+  firstFrame: number;
+  frame: number;
+  fontSize: number;
+  color?: string;
+  fontFamily?: string;
+  align?: "center" | "left";
+  easing?: string;
+}> = ({ words, firstFrame, frame, fontSize, color = "#FFFFFF", fontFamily = SERIF, align = "center", easing }) => {
+  const full = words.join(" ");
+  let charIndex = 0;
+  return (
+    <div
+      aria-label={full}
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        justifyContent: align === "left" ? "flex-start" : "center",
+        alignItems: "center",
+        fontFamily,
+        lineHeight: 1.25,
+        textAlign: align,
+        padding: "0 70px",
+      }}
+    >
+      {words.map((w, wi) => {
+        const chars = w.split("").map((ch) => {
+          const idx = charIndex++;
+          const start = firstFrame + idx;
+          const p = applyEasing(
+            easing ?? "easeOut",
+            interpolate(frame, [start, start + 12], [0, 1], {
+              extrapolateLeft: "clamp",
+              extrapolateRight: "clamp",
+            }),
+          );
+          return (
+            <span
+              key={idx}
+              aria-hidden="true"
+              style={{
+                display: "inline-block",
+                opacity: p,
+                transform: `translateY(${interpolate(p, [0, 1], [16, 0])}px)`,
+                fontSize,
+                fontWeight: 700,
+                color,
+                textShadow: "0 4px 28px rgba(0,0,0,0.35)",
+                whiteSpace: "pre",
+              }}
+            >
+              {ch}
+            </span>
+          );
+        });
+        charIndex++; // the space between words costs one stagger step
+        return (
+          <span key={`${w}-${wi}`} style={{ display: "inline-flex", margin: "0 10px" }}>
+            {chars}
+          </span>
+        );
+      })}
+    </div>
+  );
+};
+
+/** Mask / clip reveal: each line sits in an overflow:hidden wrapper
+ *  and wipes up from translateY(110%). The industry-standard
+ *  headline reveal — no blur artifacts, GPU-cheap. */
+export const MaskRevealLine: React.FC<{
+  words: string[];
+  firstFrame: number;
+  frame: number;
+  fontSize: number;
+  color?: string;
+  fontFamily?: string;
+  align?: "center" | "left";
+  easing?: string;
+}> = ({ words, firstFrame, frame, fontSize, color = "#FFFFFF", fontFamily = SERIF, align = "center", easing }) => {
+  const mid = Math.max(1, Math.ceil(words.length / 2));
+  const lines = [words.slice(0, mid), words.slice(mid)].filter((l) => l.length > 0);
+  return (
+    <div
+      aria-label={words.join(" ")}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 12,
+        fontFamily,
+        lineHeight: 1.2,
+        textAlign: align,
+        alignItems: align === "left" ? "flex-start" : "center",
+        padding: "0 48px",
+      }}
+    >
+      {lines.map((line, li) => {
+        const start = firstFrame + li * 3;
+        const p = applyEasing(
+          easing ?? "easeOut",
+          interpolate(frame, [start, start + 18], [0, 1], {
+            extrapolateLeft: "clamp",
+            extrapolateRight: "clamp",
+          }),
+        );
+        return (
+          <div key={li} style={{ overflow: "hidden" }}>
+            <div
+              aria-hidden="true"
+              style={{
+                transform: `translateY(${interpolate(p, [0, 1], [110, 0])}%)`,
+                fontSize,
+                fontWeight: 700,
+                color,
+                textShadow: "0 4px 28px rgba(0,0,0,0.35)",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {line.join(" ")}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+/** Blur-in: filter blur(12px) -> 0 with opacity 0 -> 1, per word.
+ *  The focus-pull feel; radius stays modest and durations short,
+ *  per the skill (blur is the costliest reveal). */
+export const BlurInLine: React.FC<{
+  words: string[];
+  firstFrame: number;
+  frame: number;
+  fontSize: number;
+  color?: string;
+  gapFrames?: number;
+  fontFamily?: string;
+  align?: "center" | "left";
+  easing?: string;
+}> = ({ words, firstFrame, frame, fontSize, color = "#FFFFFF", gapFrames = 2, fontFamily = SERIF, align = "center", easing }) => (
+  <div
+    aria-label={words.join(" ")}
+    style={{
+      display: "flex",
+      flexWrap: "wrap",
+      justifyContent: align === "left" ? "flex-start" : "center",
+      alignItems: "center",
+      fontFamily,
+      lineHeight: 1.25,
+      textAlign: align,
+      padding: "0 70px",
+    }}
+  >
+    {words.map((w, i) => {
+      const start = firstFrame + i * gapFrames;
+      const p = applyEasing(
+        "easeOut",
+        interpolate(frame, [start, start + 15], [0, 1], {
+          extrapolateLeft: "clamp",
+          extrapolateRight: "clamp",
+        }),
+      );
+      return (
+        <span
+          key={`${w}-${i}`}
+          aria-hidden="true"
+          style={{
+            display: "inline-block",
+            opacity: p,
+            filter: `blur(${interpolate(p, [0, 1], [12, 0])}px)`,
+            fontSize,
+            fontWeight: 700,
+            color,
+            textShadow: "0 4px 28px rgba(0,0,0,0.35)",
+            margin: "0 10px",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {w}
+        </span>
+      );
+    })}
+  </div>
+);
+
+/** Clip-path wipe: a directional reveal without moving the glyphs —
+ *  clip-path inset(0 100% 0 0) -> inset(0), per line. */
+export const ClipWipeLine: React.FC<{
+  words: string[];
+  firstFrame: number;
+  frame: number;
+  fontSize: number;
+  color?: string;
+  fontFamily?: string;
+  align?: "center" | "left";
+  easing?: string;
+}> = ({ words, firstFrame, frame, fontSize, color = "#FFFFFF", fontFamily = SERIF, align = "center", easing }) => {
+  const mid = Math.max(1, Math.ceil(words.length / 2));
+  const lines = [words.slice(0, mid), words.slice(mid)].filter((l) => l.length > 0);
+  return (
+    <div
+      aria-label={words.join(" ")}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 12,
+        fontFamily,
+        lineHeight: 1.2,
+        textAlign: align,
+        alignItems: align === "left" ? "flex-start" : "center",
+        padding: "0 48px",
+      }}
+    >
+      {lines.map((line, li) => {
+        const start = firstFrame + li * 3;
+        const p = applyEasing(
+          easing ?? "easeOut",
+          interpolate(frame, [start, start + 15], [0, 1], {
+            extrapolateLeft: "clamp",
+            extrapolateRight: "clamp",
+          }),
+        );
+        return (
+          <div
+            key={li}
+            aria-hidden="true"
+            style={{
+              clipPath: `inset(0 ${interpolate(p, [0, 1], [100, 0])}% 0 0)`,
+              fontSize,
+              fontWeight: 700,
+              color,
+              textShadow: "0 4px 28px rgba(0,0,0,0.35)",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {line.join(" ")}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+/** Text on a path: the line rides a gentle SVG arc and scrolls into
+ *  place as startOffset runs 100% -> 0%. Falls back to the mask
+ *  reveal when the text is too long for the path (a long string
+ *  would run off the curve and clip mid-word). */
+export const ArcText: React.FC<{
+  words: string[];
+  firstFrame: number;
+  frame: number;
+  fontSize: number;
+  color?: string;
+  fontFamily?: string;
+  width?: number;
+  easing?: string;
+}> = ({ words, firstFrame, frame, fontSize, color = "#FFFFFF", fontFamily = SERIF, width = 720, easing }) => {
+  const text = words.join(" ");
+  const p = applyEasing(
+    easing ?? "easeOut",
+    interpolate(frame, [firstFrame, firstFrame + 30], [0, 1], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    }),
+  );
+  const startOffset = interpolate(p, [0, 1], [100, 0]);
+  return (
+    <div aria-label={text} style={{ width: "100%" }}>
+      <svg
+        width={width}
+        height={Math.round(fontSize * 2.4)}
+        viewBox={`0 0 ${width} ${Math.round(fontSize * 2.4)}`}
+        aria-hidden="true"
+      >
+        <defs>
+          <path
+            id="kinetic-arc"
+            d={`M 10,${Math.round(fontSize * 1.7)} Q ${width / 2},10 ${width - 10},${Math.round(fontSize * 1.7)}`}
+            fill="none"
+          />
+        </defs>
+        <text
+          fontSize={fontSize}
+          fontWeight={700}
+          fill={color}
+          fontFamily={fontFamily}
+          style={{ textShadow: "0 4px 28px rgba(0,0,0,0.35)" }}
+        >
+          <textPath href="#kinetic-arc" startOffset={`${startOffset}%`}>
+            {text}
+          </textPath>
+        </text>
+      </svg>
+    </div>
+  );
+};
+
+/**
+ * KineticReveal — the dispatcher. `word` is the v2.6 KineticLine
+ * (word-by-word spring); the other four are the pack-10 reveals.
+ * `path` needs a short string; long copy falls back to `mask` so
+ * nothing clips mid-word. `rise` only applies to the word path.
+ */
+export const KineticReveal: React.FC<{
+  reveal: string;
+  words: string[];
+  firstFrame: number;
+  frame: number;
+  fps: number;
+  fontSize: number;
+  color?: string;
+  gapFrames?: number;
+  rise?: boolean;
+  fontFamily?: string;
+  align?: "center" | "left";
+  easing?: string;
+}> = ({ reveal, words, firstFrame, frame, fps, fontSize, color, gapFrames = 7, rise = false, fontFamily, align, easing }) => {
+  const r = resolveKinetic(reveal);
+  if (r === "char") {
+    return words.join(" ").length > 60 ? (
+      <MaskRevealLine words={words} firstFrame={firstFrame} frame={frame} fontSize={fontSize} color={color} fontFamily={fontFamily} align={align} easing={easing} />
+    ) : (
+      <CharStaggerLine words={words} firstFrame={firstFrame} frame={frame} fontSize={fontSize} color={color} fontFamily={fontFamily} align={align} easing={easing} />
+    );
+  }
+  if (r === "mask") {
+    return <MaskRevealLine words={words} firstFrame={firstFrame} frame={frame} fontSize={fontSize} color={color} fontFamily={fontFamily} align={align} easing={easing} />;
+  }
+  if (r === "blur") {
+    return <BlurInLine words={words} firstFrame={firstFrame} frame={frame} fontSize={fontSize} gapFrames={2} color={color} fontFamily={fontFamily} align={align} easing={easing} />;
+  }
+  if (r === "wipe") {
+    return <ClipWipeLine words={words} firstFrame={firstFrame} frame={frame} fontSize={fontSize} color={color} fontFamily={fontFamily} align={align} easing={easing} />;
+  }
+  if (r === "path") {
+    return words.join(" ").length > 28 ? (
+      <MaskRevealLine words={words} firstFrame={firstFrame} frame={frame} fontSize={fontSize} color={color} fontFamily={fontFamily} align={align} easing={easing} />
+    ) : (
+      <ArcText words={words} firstFrame={firstFrame} frame={frame} fontSize={fontSize} color={color} fontFamily={fontFamily} easing={easing} />
+    );
+  }
+  return (
+    <KineticLine
+      words={words}
+      firstFrame={firstFrame}
+      frame={frame}
+      fps={fps}
+      fontSize={fontSize}
+      color={color}
+      gapFrames={gapFrames}
+      rise={rise}
+      fontFamily={fontFamily}
+      align={align}
+    />
+  );
+};
+
+/** Camera wrapper: scale + lateral drift driven by the local frame.
+ *  v2.10: the drive is ease-in-out (shot-composition: camera moves
+ *  use ease-in-out, never linear except continuous loops) — the
+ *  move itself is unchanged, only its pacing curve. */
 export const Camera: React.FC<{
   localFrame: number;
   sceneFrames: number;
@@ -487,7 +887,8 @@ export const Camera: React.FC<{
   toX: number;
   children: React.ReactNode;
 }> = ({ localFrame, sceneFrames, fromScale, toScale, fromX, toX, children }) => {
-  const progress = interpolate(localFrame, [0, Math.max(1, sceneFrames - 1)], [0, 1]);
+  const raw = interpolate(localFrame, [0, Math.max(1, sceneFrames - 1)], [0, 1]);
+  const progress = applyEasing("easeInOut", raw);
   const scale = interpolate(progress, [0, 1], [fromScale, toScale]);
   const x = interpolate(progress, [0, 1], [fromX, toX]);
   return (

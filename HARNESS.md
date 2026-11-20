@@ -576,6 +576,183 @@ Regression: `out/proof-panel-centered.mp4` re-rendered after the
 v2.9 sync, critic PASS (diffs 2.90 / 5.09 / 2.99 — identical to
 v2.8). `src/Vertical.tsx` is untouched.
 
+## Packs 10–12 as Remotion code (v2.10, 2026-11-20)
+
+kinetic-typography-skills, lower-thirds-skills, and
+motion-design-skills are no longer craft notes only — each has
+real primitives / compositions / router and watcher wiring.
+Defaults are unchanged when no pack is selected (centered /
+serif / kinetic word-by-word, Harness or Vertical).
+
+- **Pack 10 — Kinetic reveals** (`src/harness/primitives.tsx`:
+  `CharStaggerLine`, `MaskRevealLine`, `BlurInLine`,
+  `ClipWipeLine`, `ArcText`, dispatcher `KineticReveal`) —
+  kinetic-typography-skills. The v2.6 KineticLine is
+  word-by-word; these are the pack's other workhorse reveals,
+  each a real primitive with the skill's own timings
+  (per-fragment 400-600ms, stagger lines 60-100ms, words
+  40-70ms, characters 20-40ms = 1 frame at 30fps, total
+  reveal capped near ~800ms, ease-out entries via
+  `applyEasing("easeOut")`): char stagger (per-character
+  fade + rise, 1-frame offset; falls back to mask above 60
+  characters — long copy would feel busy), mask/clip reveal
+  (line in `overflow:hidden`, child `translateY(110%) -> 0`),
+  blur-in (`blur(12px) -> 0` + opacity, per word), clip-path
+  wipe (`inset(0 100% 0 0) -> inset(0)`, glyphs never move),
+  text-on-path (SVG `textPath` on a gentle arc,
+  `startOffset` 100% -> 0%; falls back to mask above 28
+  characters so nothing clips mid-word). Splits carry
+  `aria-label` on the container + `aria-hidden` on the
+  fragments. Selected by an explicit `Kinetic:` label
+  (`word | char | mask | blur | wipe | path`) — `pick_kinetic`
+  in `watcher/harness_director.py` — or a `Motion:` / `Move:`
+  value naming a reveal; there is NO rotation, so a clip
+  with no label renders the v2.6 word line exactly as before.
+  The reveal replaces the v2.6 motion choice for that clip
+  (`Vertical.tsx: renderWords`, `Harness.tsx: Scene`).
+  Fonts are the installed Liberation stacks only (see v2.6).
+  **DROPPED:** variable-font animation and per-character
+  morph — no variable font is installed on the render host
+  (`fc-list`, 2026-11-20: zero families match "variable";
+  Liberation Serif/Sans/Mono are static weights), so a
+  wght-axis animation would clamp silently.
+- **Pack 11 — Lower thirds, first-class**
+  (`src/LowerThird.tsx`: `LowerThirdOverlay`,
+  `LowerThirdStrap`; `src/Vertical.tsx`, `src/Harness.tsx`)
+  — lower-thirds-skills. The v2.3 standalone transparent
+  overlay is now a shared strap: name + role slide in and
+  settle, keyword pills (up to 4, `Pills:` label, staggered
+  in after the name settles), corner source credit
+  (`Source:` label), in/out in 11 frames (the skill's "under
+  12 frames" rule; v2.3 shipped 15), first and last frames
+  empty (opacity hits 0 two frames before the end), text on
+  its own backing panel, long names shrink to fit, inside the
+  6% title-safe margin (landscape) or the 9:16 safe areas
+  (vertical: left 43px, bottom 230px). Wiring, verified live
+  by simulation: a bare `Name:` label now routes the pack
+  (router trigger `\bname\s*:` added) AND fires the watcher
+  rung (the rung condition dropped the
+  `lower-thirds-skills in route` requirement — v2.8's LABEL_RE
+  fix pattern: `Pills:` / `Source:` added to the watcher's
+  LABEL_RE too). The Director passes `name` / `role` /
+  `pills` / `source` into the storyboard, so a Vertical short
+  or Harness clip with a `Name:` label carries the strap
+  in-clip (`LowerThirdOverlay`, layout vertical/landscape);
+  in Harness the strap suppresses the project end card (the
+  strap IS the identification). The standalone export is
+  unchanged in shape: 1280x720, ProRes 4444 alpha.
+- **Pack 12 — Motion-design core**
+  (`src/harness/motionDesign.tsx`, shared module; used by
+  `primitives.tsx`, `Vertical.tsx`, `Harness.tsx`) —
+  motion-design-skills, always on in the router. Easing
+  library: named curves with the skill's exact values
+  (`easeOut` 0.16,1,0.3,1; `easeIn` 0.7,0,0.84,0;
+  `easeInOut` 0.65,0,0.35,1; `overshoot` 0.34,1.56,0.64,1;
+  `linear` for loops only) via a real cubic-bezier solver
+  (`applyEasing`); the primitives, the logo reveal, and the
+  camera drive use it — the camera's progress is now
+  ease-in-out (shot-composition: camera moves use
+  ease-in-out, never linear), and each clip's mood tone
+  picks a motion personality (playful 4-beat/overshoot,
+  premium 8-beat/easeOut, corporate 8-beat/easeInOut,
+  energetic 2-beat/overshoot) whose easing the kinetic
+  reveals settle with. Beat-sync timing: `BPM:` label
+  (40-240) snaps scene starts to the beat grid
+  (`frames_per_beat = (60/BPM)*fps`; `sceneStarts` keeps the
+  even split when no BPM is set). Color-motion: OKLab
+  interpolation (`mixOklab`, standard sRGB<->OKLab
+  matrices — never raw sRGB, so midpoints stay vivid);
+  `ColorMotionWash` grades the clip along an OKLab path
+  (accent -> surface -> accentDeep -> accent, 0.18 opacity)
+  and `tintedBackground` drifts the frame background
+  bg -> surface, capped so the rendered background never
+  strays more than 24 RGB units from the storyboard
+  background (inside the critic's 30-unit tolerance).
+  Logo animation: `LogoReveal` — one technique per logo,
+  stroke draw-on (sphere + orbit ring, `pathLength="1"`,
+  ~1.2s, ease-in-out) then the wordmark settles last
+  (per-letter mask stagger); the mark is code-drawn with the
+  brief's own wordmark (`Logo:` label, end card in Vertical
+  and Harness). Motion backgrounds: `MeshGradient`
+  (drifting radial blobs, kinetic variant),
+  `ConstellationLines` (dots + near-neighbour lines, orbit
+  variant, alongside the existing PortraitDots),
+  `ParallaxChip` (foreground layer at 1.2x, blurred, below
+  the text). Shot composition: 9:16 safe areas are now the
+  skill's numbers (top 12% / bottom 18% / sides 6% —
+  Vertical content padding 154px / 230px / 48px, was
+  120/160px) with `SAFE_16_9` / `SAFE_9_16`, thirds power
+  points, and the 0.2x / 0.6x / 1.2x parallax speeds. The
+  v2.6 panels/motions are extended, not duplicated. The
+  default palette moved to `DEFAULT_PALETTE` in
+  `primitives.tsx` — Harness importing LowerThirdOverlay
+  while LowerThird imported `HARNESS_DEFAULTS` from Harness
+  was a module cycle that crashed the bundle
+  ("Cannot access 'HARNESS_DEFAULTS' before
+  initialization"); the palette now lives where both can
+  reach it without a cycle. **DROPPED:** After Effects
+  itself (expressions, MOGRTs, Render Queue / AME recipes,
+  ExtendScript) — Motion Bot renders in Remotion, not AE;
+  the export half is already covered by ffmpeg-finishing
+  (v2.9). The Glenride camel / D'Vaughn sphere as a drawn
+  mark: no SVG asset of either mark is available to the
+  renderer (the camel PNG lives outside the repo, and a PNG
+  cannot draw on — only fade/scale in); `LogoReveal` draws
+  the generic sphere + orbit mark instead, and takes a real
+  SVG path when one lands in `public/`.
+
+Proof (task-391 story + palette; all rendered on the iMac,
+critic **PASS** each, exit 0, unless noted):
+- kinetic-mask: `out/proof-v210-kinetic-mask.mp4`, 695,011 B,
+  12s, diffs 5.64 / 6.39 / 3.83, light field 84–92%.
+- kinetic-char: `out/proof-v210-kinetic-char.mp4`, 692,792 B,
+  12s, diffs 5.71 / 8.10 / 4.06.
+- kinetic-wipe: `out/proof-v210-kinetic-wipe.mp4`, 679,734 B,
+  12s, diffs 5.65 / 6.40 / 3.81.
+- kinetic-blur: `out/proof-v210-kinetic-blur.mp4`, 691,091 B,
+  12s, diffs 5.68 / 8.07 / 4.02.
+- kinetic-path: `out/proof-v210-kinetic-path.mp4`, 482,399 B,
+  8s, diffs 7.57 / 3.46; frame read-back shows "Panels
+  turn" riding the arc. (Scenes re-split from the hook's own
+  words — "Panels turn" / "Face morning" — because the
+  full hook exceeds the 28-character path limit.)
+- lower-third-vertical: `out/proof-v210-lower-third-vertical.mp4`,
+  770,496 B, 12s, diffs 5.57 / 7.97 / 3.95; frame read-back
+  shows the strap (D'Vaughn House / Independent AI
+  Orchestrator), pills Glenride / Supply chain / AI, and
+  corner credit glenride.com.
+- lower-third standalone: `out/proof-v210-lower-third.mov`,
+  18,844,401 B, ProRes 4444 (`yuva444p12le`), 1280x720, 6.0s;
+  alpha verified from decoded frames — first frame 0%
+  opaque, hold frame 6.3% nonzero (the strap); frame
+  read-back shows strap + pills + credit on transparency.
+- motion-design: `out/proof-v210-motion-design.mp4`, 710,475 B,
+  12s, diffs 5.61 / 8.48 / 5.39; BPM 100 (18f/beat) snaps
+  the cuts to [0, 126, 234] instead of the even [0, 120,
+  240] — frame 124f still shows scene-1 words and the wipe
+  starts at 122f; frame 11.5s shows the LogoReveal end card
+  (drawn sphere + orbit, "Glenride" wordmark).
+Routing simulation: bare `Name:` label -> lower-thirds-skills
+in route and parses in the watcher's LABEL_RE; Director
+passes Kinetic mask / BPM 100 / Name / Role / Pills /
+Source / Logo through; a no-label task still gets
+kinetic `word`, no bpm, no name, no logo.
+Regression: `out/proof-panel-centered.mp4` re-rendered after
+the v2.10 sync, critic PASS (diffs 5.89 / 8.20 / 4.17 —
+up from v2.8's 2.90 / 5.09 / 2.99; the wash, chip, and
+constellation lines add motion). **Known limitation, NOT
+a v2.10 regression:** Harness + the task-391 palette fails
+palette_present (light field 18–23%) — the landscape
+MovingBackground gradient between far-apart colors (sand
+#D9C7A7 vs sky #4FC3F7, ~160 apart) leaves most pixels
+>30 from both colors, the same mechanism as the v2.9
+Explainer lesson. Control render with the wash disabled
+measures 19–24% — the wash moves the field by <1pt.
+Harness was never proven with this palette (prior Harness
+proofs used close bg/surface pairs). Fix owed, out of
+scope here: a solid/flat field when bg/surface are far
+apart, as v2.9 did for Explainer.
+
 ## Narrated mode (v2, built 2026-10-26)
 
 Ported from Automated Video Generator (MIT, v5.0.0) — only its

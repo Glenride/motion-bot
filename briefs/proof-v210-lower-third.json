@@ -1,0 +1,24 @@
+{
+  "name": "D'Vaughn House",
+  "role": "Independent AI Orchestrator",
+  "pills": [
+    "Glenride",
+    "Supply chain",
+    "AI"
+  ],
+  "source": "glenride.com",
+  "palette": {
+    "background": "#D9C7A7",
+    "surface": "#4FC3F7",
+    "accent": "#0F766E",
+    "accentDeep": "#0A4D48",
+    "text": "#1F1A14",
+    "glow": "#0F766E",
+    "particle": "#0F766E"
+  },
+  "lengthSeconds": 6,
+  "skills": [
+    "lower-thirds-skills"
+  ],
+  "format": "overlay"
+}

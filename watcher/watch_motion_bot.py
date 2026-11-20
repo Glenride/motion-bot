@@ -146,13 +146,15 @@ BRIEF_DEFAULTS = {
 HEX_RE = re.compile(r"#(?:[0-9a-fA-F]{6}|[0-9a-fA-F]{3})\b")
 LENGTH_RE = re.compile(r"(\d+(?:\.\d+)?)\s*(?:s|sec|secs|second|seconds)\b", re.I)
 LABEL_RE = re.compile(
-    r"(?im)^\s*(project|subtitle|tagline|end card|background|accent|text|image|images|length|duration|name|role|chart|unit|mode|product|everest|style|finish)\s*[:\-=]\s*(.+?)\s*$"
+    r"(?im)^\s*(project|subtitle|tagline|end card|background|accent|text|image|images|length|duration|name|role|pills|source|chart|unit|mode|product|everest|style|finish)\s*[:\-=]\s*(.+?)\s*$"
 )
 # NOTE (v2.8 fix): this LABEL_RE used to list only the translate_to_brief
 # keys, so the Harness route's `Name:` (lower-thirds rung) and `Chart:
 # d3` (D3 rung) labels could never parse — both rungs were dead
 # through the watcher. The keys above are the rung-relevant labels;
 # the director's own LABEL_RE (harness_director.py) stays the full set.
+# v2.10: `Pills:` / `Source:` added — the lower-third rung passes them
+# into the standalone overlay brief.
 
 
 # ---------------------------------------------------------------- helpers
@@ -1173,13 +1175,24 @@ def main():
                             storyboard["scenes"] = _explainer["scenes"]
                             storyboard["lengthSeconds"] = _explainer[
                                 "lengthSeconds"]
-                    elif "lower-thirds-skills" in _route["skills"] and _labels.get("name"):
-                        # Lower-third rung (v2.3): transparent overlay export.
+                    elif _labels.get("name"):
+                        # Lower-third rung (v2.3, v2.10): transparent
+                        # overlay export. v2.10: a Name: label ALONE
+                        # fires the rung — the old condition also
+                        # required lower-thirds-skills in the route,
+                        # and the router's triggers are narrow
+                        # ("lower third", "name card"...), so a bare
+                        # Name: label never reached the overlay.
+                        # Pills:/Source: ride along when present.
                         _composition = "LowerThird"
                         _codec = "alpha-prores"
                         storyboard = {
                             "name": _labels["name"],
                             "role": _labels.get("role", ""),
+                            "pills": [p.strip() for p in
+                                      re.split(r"[,|]", _labels.get("pills", ""))
+                                      if p.strip()][:4],
+                            "source": _labels.get("source", ""),
                             "palette": storyboard.get("palette"),
                             "lengthSeconds": 6,
                             "skills": _route["skills"],

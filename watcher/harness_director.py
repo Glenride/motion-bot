@@ -100,11 +100,12 @@ HEX_RE = re.compile(r"#(?:[0-9a-fA-F]{6}|[0-9a-fA-F]{3})\b")
 LENGTH_RE = re.compile(r"(\d+(?:\.\d+)?)\s*(?:s|sec|secs|second|seconds)\b", re.I)
 LABEL_RE = re.compile(
     r"(?im)^\s*(project|subtitle|tagline|end card|background|accent|text|name|role|"
+    r"pills|source|logo|kinetic|bpm|"
     r"image|images|length|duration|mood|tone|motif|panel|font|motion|move|"
     r"hook|benefit|proof|cta|style|test|ad|"
     r"product|features|feature|offer|was|now|code|deadline|everest|data|unit|mode|"
     r"chart|prompt|steps|step|output|benchmark|tier|usage|reset|quote|highlight|"
-    r"compare|row|version|receipt|pills|idea)\s*[:\-=]\s*(.+?)\s*$"
+    r"compare|row|version|receipt|idea)\s*[:\-=]\s*(.+?)\s*$"
 )
 
 # ------------------------------------------------------------------ mood
@@ -514,6 +515,56 @@ def pick_motion(task, notes):
     return "kinetic"
 
 
+# ------------------------------------------- kinetic reveals / beat grid (v2.10)
+# kinetic-typography-skills: the reveal is explicit-only, never
+# rotated — a clip with no Kinetic: label renders the v2.6
+# word-by-word line, exactly as before. A Motion:/Move: value that
+# names a reveal (mask/blur/wipe/char/path) sets it too, so the
+# director choice and the label agree.
+KINETIC_REVEALS = ["word", "char", "mask", "blur", "wipe", "path"]
+KINETIC_RE = re.compile(r"(?im)^\s*kinetic\s*[:\-=]\s*([A-Za-z]+)\s*$")
+BPM_RE = re.compile(r"(?im)^\s*bpm\s*[:\-=]\s*(\d+)\s*$")
+
+
+def pick_kinetic(task, notes):
+    """Task -> kinetic reveal name. `Kinetic:` wins; a `Move:` /
+    `Motion:` value naming a reveal wins next; else `word`."""
+    details = task.get("details") or ""
+    m = KINETIC_RE.search(details)
+    if m and m.group(1).lower() in KINETIC_REVEALS:
+        notes.append(f"kinetic '{m.group(1).lower()}' (explicit label)")
+        return m.group(1).lower()
+    m = MOVE_RE.search(details)
+    if m and m.group(1).lower() in KINETIC_REVEALS:
+        notes.append(f"kinetic '{m.group(1).lower()}' (explicit Move: label)")
+        return m.group(1).lower()
+    m = VARIANT_RE.search(details)
+    if m and m.group(2).lower() in KINETIC_REVEALS:
+        notes.append(f"kinetic '{m.group(2).lower()}' (explicit Motion: label)")
+        return m.group(2).lower()
+    return "word"
+
+
+def pick_bpm(task, notes):
+    """Task -> BPM for the beat grid, or None. `BPM:` label only,
+    clamped 40-240; no label means the even scene split."""
+    details = task.get("details") or ""
+    m = BPM_RE.search(details)
+    if not m:
+        return None
+    bpm = max(40, min(240, int(m.group(1))))
+    notes.append(f"bpm {bpm} (explicit label, beat-grid cuts)")
+    return bpm
+
+
+def parse_pills(labels):
+    """`Pills:` label -> up to 4 keyword pills (comma/pipe separated)."""
+    raw = (labels.get("pills") or "").strip()
+    if not raw:
+        return []
+    return [p.strip() for p in re.split(r"[,|]", raw) if p.strip()][:4]
+
+
 # ------------------------------------------------- ad template (v2.7)
 # ad-video-skills: ONE data-driven template, variant {hook, benefit,
 # proof, cta}, 5-beat hook -> CTA, CTA hold >= 2s, one variable per
@@ -794,6 +845,8 @@ def build_storyboard(task):
     panel = pick_panel(task, notes)
     font = pick_font(task, notes)
     motion = pick_motion(task, notes)
+    kinetic = pick_kinetic(task, notes)
+    bpm = pick_bpm(task, notes)
     legacy_story = parse_story(details)
     if legacy_story and not story_beats:
         notes.append(f"story: {len(legacy_story)} beats")
@@ -819,8 +872,30 @@ def build_storyboard(task):
         "panel": panel,
         "font": font,
         "motion": motion,
+        "kinetic": kinetic,
         "notes": notes,
     }
+    if bpm is not None:
+        storyboard["bpm"] = bpm
+    # Lower-third overlay (v2.10): Name:/Role:/Pills:/Source: labels
+    # pass through so Vertical/Harness can strap the clip; the
+    # standalone LowerThird rung reads the same labels in the watcher.
+    # Logo: label passes the wordmark for the LogoReveal end card.
+    name_label = (labels.get("name") or "").strip()
+    if name_label:
+        storyboard["name"] = name_label
+    role_label = (labels.get("role") or "").strip()
+    if role_label:
+        storyboard["role"] = role_label
+    pills = parse_pills(labels)
+    if pills:
+        storyboard["pills"] = pills
+    source_label = (labels.get("source") or "").strip()
+    if source_label:
+        storyboard["source"] = source_label
+    logo_label = (labels.get("logo") or "").strip()
+    if logo_label:
+        storyboard["logo"] = logo_label
     if story_beats:
         # The critic's story-coverage check reads this: every beat
         # must show up in the rendered video, not just in the notes.

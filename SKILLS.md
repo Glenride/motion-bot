@@ -534,3 +534,65 @@ no-ideas → None, task-391 text matches no ffmpeg pack,
 `Finish:` → ffmpeg-finishing). The v2.6 centered proof
 re-rendered after the v2.9 sync, critic PASS (diffs 2.90 /
 5.09 / 2.99 — identical to v2.8).
+
+## Packs 10–12 as Remotion code (v2.10, 2026-11-20)
+
+kinetic-typography-skills, lower-thirds-skills, and
+motion-design-skills are translated as code, not notes. The
+router's focus strings for all three packs now describe the
+shipped code paths; the Director (`watcher/harness_director.py`)
+picks them up from labels.
+
+- **Pack 10 — kinetic-typography-skills**: five reveals in
+  `src/harness/primitives.tsx` (`CharStaggerLine`,
+  `MaskRevealLine`, `BlurInLine`, `ClipWipeLine`, `ArcText`,
+  dispatcher `KineticReveal`; `resolveKinetic` /
+  `KINETIC_REVEALS` list the six valid values `word | char |
+  mask | blur | wipe | path`). `Kinetic:` label (or a `Motion:` /
+  `Move:` value naming a reveal) selects; no label = v2.6
+  word-by-word, unchanged. **DROPPED:** variable-font animation
+  and per-character morph — no variable font on the render host
+  (fc-list, 2026-11-20: zero matches).
+- **Pack 11 — lower-thirds-skills**: `src/LowerThird.tsx`
+  (`LowerThirdOverlay`, `LowerThirdStrap`) — name + role slide
+  in and settle in 11 frames, keyword pills (`Pills:`), corner
+  source credit (`Source:`), usable as a standalone alpha export
+  AND in-clip in Vertical (`Vertical.tsx`) and Harness
+  (`Harness.tsx`). A bare `Name:` label routes the pack (router
+  trigger `\bname\s*:`) and fires the watcher rung; `Pills:` /
+  `Source:` parse in the watcher's LABEL_RE.
+- **Pack 12 — motion-design-skills**: the always-on base craft
+  pack in `src/harness/motionDesign.tsx` — named easing library
+  (`EASINGS` / `applyEasing`, cubic-bezier solver; easings from
+  the skill: easeOut 0.16,1,0.3,1 / easeIn 0.7,0,0.84,0 /
+  easeInOut 0.65,0,0.35,1 / overshoot 0.34,1.56,0.64,1),
+  beat-grid cuts (`sceneStarts`, `BPM:` label 40–240),
+  OKLab color-motion (`mixOklab`, `ColorMotionWash`,
+  `tintedBackground` capped to 24 units of drift), code-drawn
+  logo reveal (`LogoReveal`, `Logo:` label), motion backgrounds
+  (`MeshGradient`, `ConstellationLines`, `ParallaxChip`),
+  shot-composition framings (9:16 safe areas 12/18/6,
+  `SAFE_16_9` / `SAFE_9_16`, thirds power points, parallax
+  0.2x / 0.6x / 1.2x, `PERSONALITIES` per mood tone), camera
+  on ease-in-out. **DROPPED:** After Effects itself
+  (expressions, MOGRTs, Render Queue / AME, ExtendScript) —
+  Motion Bot renders in Remotion; the Glenride camel /
+  D'Vaughn sphere as a drawn mark (no SVG asset available to
+  the renderer).
+
+Proof (task-391 story + palette, iMac, critic PASS each):
+`out/proof-v210-kinetic-{mask,char,wipe,blur}.mp4` (12s),
+`out/proof-v210-kinetic-path.mp4` (8s), `out/proof-v210-lower-
+third-vertical.mp4` (12s), `out/proof-v210-motion-design.mp4`
+(12s, BPM 100, logo) — diffs 3.5–8.5 per pair, all PASS;
+`out/proof-v210-lower-third.mov` (ProRes 4444 alpha, 6.0s,
+first frame fully transparent, hold frame 6.3% opaque).
+Routing simulation: bare `Name:` routes + parses; Director
+passes Kinetic / BPM / Name / Role / Pills / Source / Logo;
+no-label task keeps kinetic `word` and no name/logo. Panel-
+centered regression re-rendered after the sync, critic PASS
+(diffs 5.89 / 8.20 / 4.17). **Known limitation:** Harness +
+the task-391 palette fails palette_present (light field
+18–23%) — the landscape gradient between far-apart colors
+leaves most pixels >30 from both; a no-wash control measured
+19–24%, so it is pre-existing, not v2.10 (see HARNESS.md).

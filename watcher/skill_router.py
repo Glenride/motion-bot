@@ -29,12 +29,12 @@ SKILLS_DIR = Path(__file__).resolve().parent.parent / "skills"
 PACKS = {
     "motion-design-skills": (
         [r"\b(motion design|easing|loop|safe area|brand motion)\b"],
-        "Base craft: easing curves, safe areas, seamless loops, on-brand type/color.",
+        "Base craft, always on: named easing library, beat-grid cuts (BPM: label), OKLab palette transitions, code-drawn logo reveal (Logo: label), mesh/constellation/aurora backgrounds, thirds framings + parallax + 9:16 safe areas. After Effects itself DROPPED — Motion Bot renders in Remotion, not AE.",
         None,
     ),
     "kinetic-typography-skills": (
         [r"\b(kinetic|typography|title card|word by word|big text|text anim)\b"],
-        "Kinetic type: word-by-word landings, stagger timing, readable at speed.",
+        "Kinetic type: per-character stagger, mask/clip reveal, blur-in, clip-path wipe, text-on-path (Kinetic: label picks the reveal; word-by-word is the default). Variable-font morph DROPPED — no variable font on the render host.",
         None,
     ),
     "explainer-video-skills": (
@@ -54,8 +54,9 @@ PACKS = {
         None,
     ),
     "lower-thirds-skills": (
-        [r"\b(lower third|name card|overlay|stream overlay)\b"],
-        "Lower thirds: transparent overlay, name + role, in/out in under 12 frames.",
+        [r"\b(lower third|name card|overlay|stream overlay)\b",
+         r"\bname\s*:"],
+        "Lower thirds: transparent overlay, name + role slide in and settle in <=11 frames, keyword pills, corner source credit. A Name: label alone routes the overlay; Vertical shorts carry the strap in-clip.",
         None,
     ),
     "synthwave-style": (

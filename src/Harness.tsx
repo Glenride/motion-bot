@@ -10,12 +10,17 @@ import {
   Camera,
   DiagonalWipe,
   KineticLine,
+  KineticReveal,
   MovingBackground,
   Teardrops,
   ZoomCut,
+  resolveFont,
+  DEFAULT_PALETTE,
   SERIF,
   type HarnessPalette,
 } from "./harness/primitives";
+import { ColorMotionWash, LogoReveal, sceneStarts } from "./harness/motionDesign";
+import { LowerThirdOverlay } from "./LowerThird";
 import { MotifLayer, type HarnessMotif } from "./harness/motifs";
 
 /**
@@ -82,6 +87,31 @@ export type HarnessProps = {
    *  words in place; rise lifts words from below. Defaults to
    *  kinetic. */
   motion?: string;
+  /** Kinetic reveal (v2.10, kinetic-typography-skills): word | char |
+   *  mask | blur | wipe | path. `word` is the v2.6 KineticLine; the
+   *  others are the pack's reveal primitives (KineticReveal). From
+   *  an explicit `Kinetic:` label, else a `Motion:`/`Move:` value
+   *  naming one. Defaults to word — no label, no change. */
+  kinetic?: string;
+  /** Beat grid (v2.10, motion-design-skills): BPM for beat-sync
+   *  cuts. 0 / unset = the even scene split, exactly as before;
+   *  a BPM snaps scene starts to the nearest beat. From a `BPM:`
+   *  label (40-240). */
+  bpm?: number;
+  /** Lower-third overlay (v2.10, lower-thirds-skills): name + role
+   *  (+ keyword pills, + corner source credit) from `Name:` /
+   *  `Role:` / `Pills:` / `Source:` labels. When set, the strap
+   *  overlays every scene and the project end card is suppressed
+   *  (the strap IS the identification). */
+  name?: string;
+  role?: string;
+  pills?: string[];
+  source?: string;
+  /** Logo reveal (v2.10, motion-design-skills): wordmark for the
+   *  code-drawn LogoReveal end card, from a `Logo:` label. When
+   *  set, the last scene's end card is the drawn mark + wordmark
+   *  instead of plain project text. */
+  logo?: string;
 };
 
 export const HARNESS_DEFAULTS: Required<
@@ -90,15 +120,7 @@ export const HARNESS_DEFAULTS: Required<
   version: 1,
   hook: "Every mirror in your house shows you smiling, except when you turn your back — that's when it starts to cry.",
   lengthSeconds: 10,
-  palette: {
-    background: "#FFFFFF",
-    surface: "#F4EEDC",
-    accent: "#D4AF37",
-    accentDeep: "#8A7224",
-    text: "#1F1A14",
-    glow: "#D4AF37",
-    particle: "#D4AF37",
-  },
+  palette: DEFAULT_PALETTE,
   mood: { tone: "neutral", pacing: "medium" },
   motif: { type: "mirror", scene: 0, reflectionWord: "SMILING", tears: true },
   scenes: [
@@ -125,6 +147,13 @@ export const HARNESS_DEFAULTS: Required<
   panel: "centered",
   font: "serif",
   motion: "kinetic",
+  kinetic: "word",
+  bpm: 0,
+  name: "",
+  role: "",
+  pills: [],
+  source: "",
+  logo: "",
 };
 
 const VARIANTS = ["orbit", "kinetic", "sweep", "rise"] as const;
@@ -188,6 +217,14 @@ const resolveProps = (props: HarnessProps) => {
     project,
     subtitle: props.subtitle ?? "",
     variant: resolveVariant(props.variant),
+    kinetic: props.kinetic ?? "word",
+    bpm: props.bpm ?? 0,
+    name: (props.name ?? "").trim(),
+    role: (props.role ?? "").trim(),
+    pills: props.pills ?? [],
+    source: (props.source ?? "").trim(),
+    logo: (props.logo ?? "").trim(),
+    fontFamily: resolveFont(props.font),
   };
 };
 
@@ -212,26 +249,48 @@ const Scene: React.FC<{
   subtitle: string;
   pacing: string;
   variant: string;
-}> = ({ scene, sceneFrames, frame, fps, palette, motif, isMotifScene, isLastScene, project, subtitle, pacing, variant }) => {
+  kinetic: string;
+  fontFamily: string;
+  logo: string;
+  hasName: boolean;
+}> = ({ scene, sceneFrames, frame, fps, palette, motif, isMotifScene, isLastScene, project, subtitle, pacing, variant, kinetic, fontFamily, logo, hasName }) => {
   const gapFrames = gapFor(pacing);
   // Variant type treatments: orbit = the original kinetic line;
   // kinetic = bigger, faster, type-only; rise = words rise from below.
-  const line = (
-    <KineticLine
-      words={scene.words}
-      firstFrame={8}
-      frame={frame}
-      fps={fps}
-      fontSize={
-        variant === "kinetic"
-          ? fontSizeFor(scene.words.length) + 14
-          : fontSizeFor(scene.words.length)
-      }
-      color={palette.text}
-      gapFrames={variant === "kinetic" ? 4 : gapFrames}
-      rise={variant === "rise"}
-    />
-  );
+  // v2.10: a Kinetic: reveal replaces the word-by-word line with the
+  // pack-10 primitive (mask / blur / wipe / char / path); `word`
+  // keeps exactly the v2.6 line.
+  const fontSize =
+    variant === "kinetic"
+      ? fontSizeFor(scene.words.length) + 14
+      : fontSizeFor(scene.words.length);
+  const line =
+    kinetic !== "word" ? (
+      <KineticReveal
+        reveal={kinetic}
+        words={scene.words}
+        firstFrame={8}
+        frame={frame}
+        fps={fps}
+        fontSize={fontSize}
+        color={palette.text}
+        gapFrames={variant === "kinetic" ? 4 : gapFrames}
+        rise={variant === "rise"}
+        fontFamily={fontFamily}
+      />
+    ) : (
+      <KineticLine
+        words={scene.words}
+        firstFrame={8}
+        frame={frame}
+        fps={fps}
+        fontSize={fontSize}
+        color={palette.text}
+        gapFrames={variant === "kinetic" ? 4 : gapFrames}
+        rise={variant === "rise"}
+        fontFamily={fontFamily}
+      />
+    );
   // Variant backgrounds: orbit = gradient + particles (+ motif);
   // kinetic = flat field, type is the motion; sweep = swaying bands;
   // rise = clean gradient, no particles, so the rising type reads.
@@ -254,7 +313,7 @@ const Scene: React.FC<{
       : scene.camera;
   // End-card line fades in over the last 30% of the final scene.
   const endOpacity =
-    project || subtitle
+    logo || project || subtitle
       ? interpolate(frame, [sceneFrames * 0.7, sceneFrames * 0.85], [0, 1], {
           extrapolateLeft: "clamp",
           extrapolateRight: "clamp",
@@ -289,7 +348,11 @@ const Scene: React.FC<{
       {isLastScene && motif.tears && variant === "orbit" ? (
         <Teardrops frame={frame} palette={palette} />
       ) : null}
-      {isLastScene && (project || subtitle) ? (
+      {/* End card: suppressed when a name strap overlays the clip
+          (the strap IS the identification). With a Logo: label the
+          end card is the code-drawn mark + wordmark; otherwise the
+          plain project / subtitle lines, as before. */}
+      {isLastScene && !hasName && (logo || project || subtitle) ? (
         <div
           style={{
             position: "absolute",
@@ -306,11 +369,15 @@ const Scene: React.FC<{
             padding: "0 60px",
           }}
         >
-          {project ? (
-            <div style={{ fontSize: 44, fontWeight: 700, color: palette.accent }}>
-              {project}
-            </div>
-          ) : null}
+          {logo ? (
+            <LogoReveal wordmark={logo} palette={palette} frame={frame} fps={fps} fontFamily={fontFamily} size={360} />
+          ) : (
+            project ? (
+              <div style={{ fontSize: 44, fontWeight: 700, color: palette.accent }}>
+                {project}
+              </div>
+            ) : null
+          )}
           {subtitle ? (
             <div style={{ fontSize: 30, color: palette.text }}>{subtitle}</div>
           ) : null}
@@ -323,20 +390,13 @@ const Scene: React.FC<{
 export const Harness: React.FC<HarnessProps> = (props) => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
-  const { palette, mood, motif, scenes, project, subtitle, variant } = resolveProps(props);
+  const { palette, mood, motif, scenes, project, subtitle, variant, kinetic, bpm, name, role, pills, source, logo, fontFamily } = resolveProps(props);
 
-  // Scenes split the duration evenly; the last scene takes the remainder.
+  // Scenes split the duration evenly (v2.10: or snap to the beat grid
+  // when a BPM is set — sceneStarts keeps the even split when bpm
+  // is 0, so no-BPM storyboards render exactly as before).
   const n = scenes.length;
-  const base = Math.floor(durationInFrames / n);
-  const starts: number[] = [];
-  let at = 0;
-  for (let i = 0; i < n; i++) {
-    starts.push(at);
-    at += i === n - 1 ? durationInFrames - at : base;
-  }
-  const lengths = starts.map((s, i) =>
-    i === n - 1 ? durationInFrames - s : starts[i + 1] - s,
-  );
+  const { starts, lengths } = sceneStarts(durationInFrames, n, bpm > 0 ? bpm : undefined, fps);
 
   return (
     <AbsoluteFill style={{ backgroundColor: palette.background }}>
@@ -360,9 +420,30 @@ export const Harness: React.FC<HarnessProps> = (props) => {
             subtitle={subtitle}
             pacing={mood.pacing}
             variant={variant}
+            kinetic={kinetic}
+            fontFamily={fontFamily}
+            logo={logo}
+            hasName={name.length > 0}
           />
         </Sequence>
       ))}
+      {/* Color-motion wash (v2.10): the OKLab grade drifting accent
+          -> surface -> accentDeep across the clip, over the scenes. */}
+      <ColorMotionWash frame={frame} durationInFrames={durationInFrames} palette={palette} />
+      {/* Lower-third overlay (v2.10): a Name: label straps the clip. */}
+      {name ? (
+        <LowerThirdOverlay
+          name={name}
+          role={role}
+          pills={pills}
+          source={source}
+          palette={palette}
+          frame={frame}
+          durationInFrames={durationInFrames}
+          fontFamily={fontFamily}
+          layout="landscape"
+        />
+      ) : null}
       {/* Kinetic variant's gold rule, at clip level OUTSIDE the scene
           cameras: inside a scene the camera push scales it off the
           top edge within frames, so it must live here to stay
