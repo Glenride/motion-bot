@@ -1,0 +1,123 @@
+{
+  "version": 1,
+  "hook": "Panels turn to face the morning",
+  "lengthSeconds": 12,
+  "palette": {
+    "background": "#D9C7A7",
+    "surface": "#4FC3F7",
+    "accent": "#0F766E",
+    "accentDeep": "#0A4D48",
+    "text": "#1F1A14",
+    "glow": "#0F766E",
+    "particle": "#0F766E"
+  },
+  "mood": {
+    "tone": "neutral",
+    "pacing": "medium"
+  },
+  "motif": {
+    "type": "orbit",
+    "scene": 1
+  },
+  "scenes": [
+    {
+      "words": [
+        "Panels",
+        "turn",
+        "to",
+        "face",
+        "the",
+        "morning"
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.08,
+        "fromX": 0,
+        "toX": -26
+      },
+      "transitionOut": "wipe",
+      "durationSeconds": 3.1
+    },
+    {
+      "words": [
+        "The",
+        "grid",
+        "wakes",
+        "row",
+        "by",
+        "row"
+      ],
+      "camera": {
+        "fromScale": 1.08,
+        "toScale": 1.0,
+        "fromX": -26,
+        "toX": 22
+      },
+      "transitionOut": "zoom-cut",
+      "durationSeconds": 5.07
+    },
+    {
+      "words": [
+        "Power",
+        "reaches",
+        "the",
+        "town",
+        "by",
+        "noon"
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.14,
+        "fromX": 22,
+        "toX": 0
+      },
+      "transitionOut": "none",
+      "durationSeconds": 3.83
+    }
+  ],
+  "variant": "rise",
+  "notes": [
+    "story: 3 beats from story_block",
+    "label override: background = #D9C7A7 ('sand')",
+    "text color adjusted for contrast (>= 3.0)",
+    "color 'sand' -> #D9C7A7",
+    "color 'teal' -> #0F766E",
+    "color 'sky' -> #4FC3F7",
+    "motif 'orbit' in scene 2",
+    "variant 'rise' (explicit label)",
+    "v2.11 pack 14: TikTok: fast-cut"
+  ],
+  "story": {
+    "source": "story_block",
+    "beats": [
+      {
+        "title": "",
+        "start": null,
+        "end": null,
+        "text": "Panels turn to face the morning"
+      },
+      {
+        "title": "",
+        "start": null,
+        "end": null,
+        "text": "The grid wakes row by row"
+      },
+      {
+        "title": "",
+        "start": null,
+        "end": null,
+        "text": "Power reaches the town by noon"
+      }
+    ]
+  },
+  "skills": [
+    "motion-design-skills",
+    "tiktok-video-skills"
+  ],
+  "format": "vertical",
+  "craft_notes": "- motion-design-skills: Base craft: easing curves, safe areas, seamless loops, on-brand type/color.\n- tiktok-video-skills: Short-form vertical: 720x1280, 120px safe areas top/bottom, hook in first 1s, fast cuts.\n- Format: 720x1280 vertical (Vertical composition), safe areas 120px top/bottom.",
+  "panel": "centered",
+  "font": "serif",
+  "motion": "kinetic",
+  "tiktokFormat": "fast-cut"
+}

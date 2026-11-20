@@ -753,6 +753,162 @@ proofs used close bg/surface pairs). Fix owed, out of
 scope here: a solid/flat field when bg/surface are far
 apart, as v2.9 did for Explainer.
 
+## Packs 13–15 as Remotion code (v2.11, 2026-11-20)
+
+motion-prompt, tiktok-video-skills, and what-if-animation are no
+longer craft notes only — each has real primitives / compositions
+/ router and watcher wiring. Defaults are unchanged when no pack
+is selected (centered / serif / kinetic word-by-word, Harness or
+Vertical, no move, no TikTok format).
+
+- **Pack 13 — Motion Prompt registry**
+  (`src/harness/motionRegistry.tsx`, consumed by `src/Vertical.tsx`;
+  director `pick_move` / `pick_moves` in
+  `watcher/harness_director.py`) — motion-prompt. The upstream
+  catalog is 192 named moves; 18 are real Remotion code here,
+  each with its catalog number, spec duration, and strength:
+  reveals pop-in #001 (0.4 s, overshoot spring), stagger #002
+  (0.08 s apart), mask reveal #005 (0.6 s, the v2.10 mask
+  primitive), typewriter #006 (0.05 s/char + blinking cursor),
+  count-up #007 (1.5 s ease-out — the target is the brief's own
+  numeric scene word, never a hardcoded number; no numeric word
+  falls back to a mask reveal), kinetic type #008 (the v2.6
+  KineticLine); effects shape morph #012 (0.8 s, 10-point
+  polygon interpolating circle → star, accent → surface),
+  light sweep #022 (one band, ~0.9 s), impact shake #024
+  (deterministic sine-decay shake, settles in 0.4 s), rack
+  focus #033 (1 s, words blur 6px → 0 while a foreground disc
+  blurs 0 → 8px); camera pan #025, dolly in #027, zoom in #028
+  (Camera param overrides); transitions mask transition #017
+  (0.7 s — the next scene appears inside a circle growing from
+  the center, implemented as a clip-path on the incoming scene),
+  jump cut #041 (mid-scene scale jump 1 → 1.06 at 40%),
+  match cut #042 (a shared accent disc grows over the outgoing
+  scene's last 6 frames and shrinks away over the incoming
+  scene's first 6), whip pan #043 (translate + blur sweep out /
+  in, 9 frames), cross dissolve #044 (1 s — outgoing fades out
+  over its last 1 s while incoming fades in over its first 1 s;
+  a true dissolve needs both scenes' pixels, which an overlay
+  never has, so the dissolve lives in-scene, not as an overlay).
+  A `Move:` label names one move for every scene; `Moves:` names
+  one per scene in order (a transition-kind move sets the cut
+  AFTER its scene). Unknown names are dropped with a note, never
+  invented. `Motion:` values naming a registry move also set it
+  (mask-reveal via the alias map — this also fixed a pre-existing
+  gap: `VARIANT_RE` / `MOVE_RE` only captured `[A-Za-z]+`, so a
+  hyphenated `Move: mask-reveal` never matched either regex).
+  The registry never rotates — no label, no move. **Not
+  implemented (174 of 192):** `NOT_IMPLEMENTED_MOVES` in the
+  registry lists the SKILL.md-named ones (line draw #004,
+  overshoot #010, parallax #016, shape transition #018, zoom
+  through #020, orbit #030, slow motion #037, speed ramp #038,
+  freeze frame #040, smash cut #046, low/high angle #177/#178,
+  over-the-shoulder #180, establishing #183, extreme close-up
+  #184, insert #185, fade to black #187, montage #192, the UI
+  pack #049/#056/#058/#060/#061/#069/#070/#071, the 24-name
+  photo pack #097–#120 as looks-not-code) plus the 149 further
+  IDs the skill file never names. **Gap, stated:** the registry
+  is wired into Vertical only — Harness (landscape) keeps its
+  v2.10 kinetic reveals and does not read `move` / `moves`.
+- **Pack 14 — TikTok formats** (`src/TikTokFormats.tsx`,
+  consumed by `src/Vertical.tsx`; director `pick_tiktok_format`)
+  — tiktok-video-skills. Three genuinely new patterns extending
+  the v2.6 Vertical (new timing and layouts, not palette swaps),
+  selected by a `TikTok:` label: hook-first (scene 1 is exactly
+  1 s — the hook on screen at frame 1, biggest type in the clip,
+  snap zoom, no fade-up; word gap tightened to 2 frames so the
+  hook lands inside its 1 s scene), fast-cut (uneven cut
+  schedule [0.72, 1.18, 0.9, …] normalized to the duration,
+  punch-in zoom interrupt at every cut), duet (two-phase
+  reaction split: the original plays full-width, then the
+  reaction lands at 40% with a punch-in and the frame splits
+  50/50 on a 4px accent divider; the payoff scene goes
+  full-width after). No label means the v2.6 Vertical exactly as
+  before. **Not built:** caption-led storytelling (word-timed
+  karaoke needs real Whisper word timestamps — the skill's rule 1
+  forbids faking them by even-splitting a line, and no
+  transcription step is wired) and the countdown trend template
+  (a frame-accurate countdown is its own composition shape, not
+  a Vertical format). **Fixes found by the critic:** the first
+  duet cut was a static split (frames_differ 1.28 at 2 s vs 6 s)
+  — the two-phase beat fixed it (41.38); the first hook-first
+  cut sampled beat 1 as missed — the brief now carries the real
+  scene durations (`durationSeconds`), so the critic samples the
+  1 s punch at its midpoint instead of an even split.
+- **Pack 15 — What If** (`src/WhatIf.tsx`, registered in
+  `src/Root.tsx`; director `build_whatif`, watcher WhatIf rung)
+  — what-if-animation. A 15–25 s episode, every frame drawn in
+  code: a dusk stick-figure rig (one hero, one look — head,
+  body, arms, legs as stroke lines, fixed poses per demo,
+  hand-held props in rig coordinates so wide and close shots
+  agree), cold open with three escalating demos (each wide then
+  close-up — cuts come from changing shot size), premise title
+  card ("WHAT IF YOU COULD" / the power ≤ 4 words + "?" / one
+  rule), one fun escalation, the turn (the fact with its number
+  big in the accent, "That's real.", then the closing question).
+  Dusk palette from the brief (deep navy ground, low amber sun
+  as the visible light source, lamp / headlight pools). The
+  fact and its number come only from the brief's `Fact:` label
+  — the proof fact (Earth moves 185 miles around the Sun in ten
+  seconds) is arithmetic from NASA's Earth Fact Sheet (mean
+  orbital velocity 29.78 km/s = 18.50 mi/s; × 10 s = 185.0
+  miles). **Silent:** ElevenLabs is NOT wired (no key); the
+  composition ships with no voiceover, and the power's word
+  rides as a small chip readout in every demo. The watcher rung
+  sits after Explainer (a task matching both keeps the
+  pre-v2.11 Explainer route); `build_whatif` returns None
+  without Power + 3 Demo lines + Fact + Question, so those tasks
+  keep the default route, craft notes only. **Fix found by the
+  critic:** the fun line in the close shot sat across the hero's
+  legs and tesseract misread "slice" — the fun beat now uses
+  the wide shot, and the proof question carries a matchable word
+  ("Where would you land tonight?").
+
+Proof (all rendered on the iMac, critic **PASS** each, exit 0):
+- motion-registry: `out/proof-v211-motion-registry.mp4`, 689,075 B,
+  12s, diffs 5.81 / 8.08 / 3.59, story 3/3. Moves: pop-in,
+  mask-transition, dolly-in (task-391 story + palette).
+- motion-registry-2: `out/proof-v211-motion-registry-2.mp4`,
+  732,546 B, 12s, diffs 5.20 / 7.77 / 4.00, story 3/3. Moves:
+  typewriter, count-up, impact-shake. Scene 2 carries the
+  brief's own test figure 1,280 ("The grid wakes 1,280 homes")
+  as the count-up target.
+- motion-registry-3: `out/proof-v211-motion-registry-3.mp4`,
+  725,718 B, 12s, diffs 6.06 / 8.26 / 4.08, story 3/3. Moves:
+  shape-morph, cross-dissolve, rack-focus.
+- tiktok-duet: `out/proof-v211-tiktok-duet.mp4`, 617,189 B, 12s,
+  diffs 41.38 / 40.07 / 4.68, story 3/3.
+- tiktok-hook-first: `out/proof-v211-tiktok-hook-first.mp4`,
+  745,858 B, 12s, diffs 11.57 / 9.26 / 5.26, story 3/3.
+- tiktok-fast-cut: `out/proof-v211-tiktok-fast-cut.mp4`, 750,572 B,
+  12s, diffs 6.12 / 9.82 / 4.53, story 3/3.
+- whatif: `out/proof-v211-whatif.mp4`, 250,054 B, 20s, diffs 2.75 /
+  4.69 / 13.53 / 10.94 / 5.49 / 4.61, story 7/7, contrast 12.4.
+Routing simulation: `Moves: pop-in, mask-transition, dolly-in`
+→ moves list; `Move: typewriter` → move; unknown `Move:
+zoom-through` dropped, no crash; `Motion: mask-reveal` → move
+mask-reveal; `Motion: kinetic` → motion kinetic + move
+kinetic-type (same render — kinetic-type IS the KineticLine);
+`Motion: rise` / `Variant: sweep` set no move; `TikTok: duet` →
+tiktokFormat duet; what-if labels → payload with 3 demos + 20 s
++ 7 beats + scene durations summing to 20.0; what-if without
+Fact → None; a no-label task gets no move / moves /
+tiktokFormat props. Pre-existing router tests
+(`watcher/test_viral_formats.py`): 26/26 pass.
+Regression: `out/proof-panel-centered.mp4` re-rendered after
+the v2.11 sync, critic PASS with diffs 5.89 / 8.20 / 4.17 —
+identical to v2.10, so the Vertical changes did not move the
+default path. **Known limitation, NOT a v2.11 regression:**
+Harness + the task-391 palette still fails palette_present
+(light field 18–23%) — recorded in v2.10, untouched here.
+**iMac note (pre-existing, fixed in this run):** renders were
+blocked on arrival — `node_modules/@remotion/cli/
+remotion-cli.js`, `@esbuild/linux-x64/bin/esbuild`, and the
+headless-Chrome binary under `node_modules/.remotion/` had all
+lost their exec bits (644, dated Oct 24). Fixed with `chmod +x`
+on those binaries only — no install, no new packages — and the
+bundle then listed all 17 compositions including WhatIf.
+
 ## Narrated mode (v2, built 2026-10-26)
 
 Ported from Automated Video Generator (MIT, v5.0.0) — only its

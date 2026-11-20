@@ -101,7 +101,8 @@ LENGTH_RE = re.compile(r"(\d+(?:\.\d+)?)\s*(?:s|sec|secs|second|seconds)\b", re.
 LABEL_RE = re.compile(
     r"(?im)^\s*(project|subtitle|tagline|end card|background|accent|text|name|role|"
     r"pills|source|logo|kinetic|bpm|"
-    r"image|images|length|duration|mood|tone|motif|panel|font|motion|move|"
+    r"image|images|length|duration|mood|tone|motif|panel|font|motion|move|moves|tiktok|"
+    r"power|demo|rule|fact|question|fun|"
     r"hook|benefit|proof|cta|style|test|ad|"
     r"product|features|feature|offer|was|now|code|deadline|everest|data|unit|mode|"
     r"chart|prompt|steps|step|output|benchmark|tier|usage|reset|quote|highlight|"
@@ -435,7 +436,7 @@ TRANSITIONS = ["wipe", "zoom-cut"]  # alternate; never plain fades only
 # `Variant:` / `Motion:` line in the details overrides rotation.
 VARIANTS = ["orbit", "kinetic", "sweep", "rise"]
 VARIANT_RE = re.compile(
-    r"(?im)^\s*(variant|motion)\s*[:\-=]\s*([A-Za-z]+)\s*$")
+    r"(?im)^\s*(variant|motion)\s*[:\-=]\s*([A-Za-z][A-Za-z\-]*)\s*$")
 
 
 def pick_variant(task, notes):
@@ -466,7 +467,7 @@ FONTS = ["serif", "sans", "mono"]
 MOTIONS = ["kinetic", "slide", "scale", "rise"]
 PANEL_RE = re.compile(r"(?im)^\s*panel\s*[:\-=]\s*([A-Za-z\-]+)\s*$")
 FONT_RE = re.compile(r"(?im)^\s*font\s*[:\-=]\s*([A-Za-z]+)\s*$")
-MOVE_RE = re.compile(r"(?im)^\s*move\s*[:\-=]\s*([A-Za-z]+)\s*$")
+MOVE_RE = re.compile(r"(?im)^\s*move\s*[:\-=]\s*([A-Za-z][A-Za-z\-]*)\s*$")
 
 
 def _pick_rotating(task, notes, name, values, regex, stride, offset):
@@ -555,6 +556,193 @@ def pick_bpm(task, notes):
     bpm = max(40, min(240, int(m.group(1))))
     notes.append(f"bpm {bpm} (explicit label, beat-grid cuts)")
     return bpm
+
+
+# ------------------------------------------- named moves / TikTok formats (v2.11)
+# motion-prompt registry (src/harness/motionRegistry.tsx is the
+# source of truth — this list mirrors its 18 shipped names; a name
+# here that is not in the registry renders nothing, and a registry
+# name missing here never reaches a clip). tiktok-video-skills
+# formats live in src/TikTokFormats.tsx.
+REGISTRY_MOVES = {
+    "pop-in", "stagger", "mask-reveal", "typewriter", "count-up",
+    "kinetic-type", "shape-morph", "light-sweep", "impact-shake",
+    "rack-focus", "pan", "dolly-in", "zoom-in", "mask-transition",
+    "jump-cut", "match-cut", "whip-pan", "cross-dissolve",
+}
+MOVE_ALIASES = {
+    "mask reveal": "mask-reveal", "mask": "mask-reveal",
+    "count up": "count-up", "shape morph": "shape-morph",
+    "light sweep": "light-sweep", "impact shake": "impact-shake",
+    "rack focus": "rack-focus", "dolly in": "dolly-in",
+    "slow dolly in": "dolly-in", "zoom in": "zoom-in",
+    "mask transition": "mask-transition", "jump cut": "jump-cut",
+    "match cut": "match-cut", "whip pan": "whip-pan",
+    "cross dissolve": "cross-dissolve",
+    "kinetic typography": "kinetic-type", "kinetic": "kinetic-type",
+}
+MOVES_RE = re.compile(r"(?im)^\s*moves\s*[:\-=]\s*(.+?)\s*$")
+TIKTOK_RE = re.compile(r"(?im)^\s*tiktok\s*[:\-=]\s*([A-Za-z\- ]+)\s*$")
+TIKTOK_FORMATS = {"hook-first": "hook-first", "hook first": "hook-first",
+                  "fast-cut": "fast-cut", "fast cut": "fast-cut",
+                  "duet": "duet", "reaction": "duet", "reaction-split": "duet"}
+
+
+def _normalize_move(value):
+    """Label value -> registry name, or None."""
+    key = (value or "").strip().lower().replace("_", " ")
+    key = re.sub(r"\s+", " ", key)
+    if key in REGISTRY_MOVES:
+        return key
+    return MOVE_ALIASES.get(key)
+
+
+def pick_move(task, notes):
+    """Task -> registry move name, or None. `Move:` wins; a
+    `Motion:` value naming a registry move wins next (mask-reveal
+    via the alias map — VARIANT_RE only captures the first word,
+    so "mask-reveal" arrives as "mask"). No label means no move:
+    the registry never rotates, so a clip with no label renders
+    exactly as before."""
+    details = task.get("details") or ""
+    m = MOVE_RE.search(details)
+    if m:
+        name = _normalize_move(m.group(1))
+        if name:
+            notes.append(f"move '{name}' (explicit Move: label)")
+            return name
+    m = VARIANT_RE.search(details)
+    if m:
+        name = _normalize_move(m.group(2))
+        if name:
+            notes.append(f"move '{name}' (explicit Motion: label)")
+            return name
+    return None
+
+
+def pick_moves(task, notes):
+    """Task -> per-scene registry move names, or None. `Moves:`
+    is a comma list, one move per scene in order; unknown names
+    are dropped with a note, never invented. A list shorter than
+    the scene count leaves the later scenes on the clip move (or
+    the default)."""
+    details = task.get("details") or ""
+    m = MOVES_RE.search(details)
+    if not m:
+        return None
+    names = []
+    for part in re.split(r"[,;]", m.group(1)):
+        name = _normalize_move(part)
+        if name:
+            names.append(name)
+        elif part.strip():
+            notes.append(f"move '{part.strip()}' unknown — dropped")
+    if not names:
+        return None
+    notes.append(f"moves {names} (explicit Moves: label)")
+    return names
+
+
+def pick_tiktok_format(task, notes):
+    """Task -> TikTok format name, or None. `TikTok:` label only
+    (hook-first | fast-cut | duet); no label means the v2.6
+    Vertical exactly as before."""
+    details = task.get("details") or ""
+    m = TIKTOK_RE.search(details)
+    if not m:
+        return None
+    key = re.sub(r"\s+", " ", m.group(1).strip().lower())
+    fmt = TIKTOK_FORMATS.get(key)
+    if fmt:
+        notes.append(f"tiktok format '{fmt}' (explicit TikTok: label)")
+        return fmt
+    notes.append(f"tiktok format '{key}' unknown — dropped")
+    return None
+
+
+# ------------------------------------------- what-if episodes (v2.11)
+# what-if-animation: the WhatIf composition (src/WhatIf.tsx) needs
+# Power + 3 Demo lines + Fact; Rule / Fun / Question ride along.
+# A demo line is "line | prop" — the prop is the picture
+# (mug | phone | crosswalk | slice | stair | quiz | cookie);
+# unknown props fall back to "none" (figure only), never invented.
+WHATIF_PROPS = {"mug", "phone", "crosswalk", "slice", "stair", "quiz", "cookie", "none"}
+
+
+def build_whatif(task, storyboard):
+    """Task + its storyboard -> what-if dict for the WhatIf rung,
+    or None. Returns None without Power + 3 Demo lines + Fact —
+    those tasks keep the default route, craft notes only, never
+    an invented fact, demo, or number. The length clamps to the
+    skill's 15–25 s (default 20 s). Scenes carry durationSeconds
+    so the critic samples each beat at its midpoint."""
+    details = task.get("details") or ""
+    labels = parse_labels(details)
+    power = (labels.get("power") or "").strip()
+    rule = (labels.get("rule") or "").strip()
+    fun = (labels.get("fun") or "").strip()
+    fact = (labels.get("fact") or "").strip()
+    question = (labels.get("question") or "").strip()
+    demo_lines = _repeated_lines(details, "demo")
+    if not power or len(demo_lines) < 3 or not fact or not question:
+        return None
+    power_word = power.split()[0].capitalize()
+    demos = []
+    for line in demo_lines[:3]:
+        if "|" in line:
+            text, prop = line.rsplit("|", 1)
+            prop = prop.strip().lower()
+        else:
+            text, prop = line, "none"
+        demos.append({"line": text.strip(),
+                      "prop": prop if prop in WHATIF_PROPS else "none"})
+    # Fun defaults to the third demo line — one more escalation of
+    # the brief's own demo, never an invented line.
+    fun = fun or demos[2]["line"]
+    length = storyboard.get("lengthSeconds") or 20
+    length = max(15, min(25, int(length)))
+    cold = round(length * 0.525 / 3, 2)
+    beats = [
+        {"title": "Demo 1", "text": f"{power_word}. {demos[0]['line']}"},
+        {"title": "Demo 2", "text": f"{power_word}. {demos[1]['line']}"},
+        {"title": "Demo 3", "text": f"{power_word}. {demos[2]['line']}"},
+        {"title": "Premise", "text": f"What if you could {power}? {rule}"},
+        {"title": "Fun", "text": fun},
+        {"title": "Turn", "text": f"{fact} That's real."},
+        {"title": "Question", "text": question},
+    ]
+    # Beat durations follow the composition's fractions (cold open
+    # 52.5%, premise 20%, fun 7.5%, turn 20%) — the demo scenes
+    # split the cold open evenly.
+    scenes = [
+        {"words": demos[0]["line"].split(), "durationSeconds": cold,
+         "camera": {"fromScale": 1, "toScale": 1, "fromX": 0, "toX": 0},
+         "transitionOut": "none"},
+        {"words": demos[1]["line"].split(), "durationSeconds": cold,
+         "camera": {"fromScale": 1, "toScale": 1, "fromX": 0, "toX": 0},
+         "transitionOut": "none"},
+        {"words": demos[2]["line"].split(), "durationSeconds": cold,
+         "camera": {"fromScale": 1, "toScale": 1, "fromX": 0, "toX": 0},
+         "transitionOut": "none"},
+        {"words": ["WHAT", "IF", "YOU", "COULD", power.upper() + "?"],
+         "durationSeconds": round(length * 0.2, 1),
+         "camera": {"fromScale": 1, "toScale": 1, "fromX": 0, "toX": 0},
+         "transitionOut": "none"},
+        {"words": (fun or demos[2]["line"]).split(),
+         "durationSeconds": round(length * 0.075, 1),
+         "camera": {"fromScale": 1, "toScale": 1, "fromX": 0, "toX": 0},
+         "transitionOut": "none"},
+        {"words": fact.split(), "durationSeconds": round(length * 0.2, 1),
+         "camera": {"fromScale": 1, "toScale": 1, "fromX": 0, "toX": 0},
+         "transitionOut": "none"},
+    ]
+    return {
+        "whatif": {"power": power, "rule": rule, "demos": demos,
+                   "fun": fun, "fact": fact, "question": question},
+        "lengthSeconds": length,
+        "story": {"source": "whatif", "beats": beats},
+        "scenes": scenes,
+    }
 
 
 def parse_pills(labels):
@@ -847,6 +1035,9 @@ def build_storyboard(task):
     motion = pick_motion(task, notes)
     kinetic = pick_kinetic(task, notes)
     bpm = pick_bpm(task, notes)
+    move = pick_move(task, notes)
+    moves = pick_moves(task, notes)
+    tiktok_format = pick_tiktok_format(task, notes)
     legacy_story = parse_story(details)
     if legacy_story and not story_beats:
         notes.append(f"story: {len(legacy_story)} beats")
@@ -877,6 +1068,16 @@ def build_storyboard(task):
     }
     if bpm is not None:
         storyboard["bpm"] = bpm
+    # Named moves (v2.11, motion-prompt registry): Move: / Moves:
+    # labels pass through so Vertical can dispatch the registry;
+    # no label means no move prop at all. TikTok: label selects a
+    # short-form format for Vertical.
+    if move is not None:
+        storyboard["move"] = move
+    if moves is not None:
+        storyboard["moves"] = moves
+    if tiktok_format is not None:
+        storyboard["tiktokFormat"] = tiktok_format
     # Lower-third overlay (v2.10): Name:/Role:/Pills:/Source: labels
     # pass through so Vertical/Harness can strap the clip; the
     # standalone LowerThird rung reads the same labels in the watcher.

@@ -1,0 +1,197 @@
+{
+  "version": 1,
+  "hook": "What if you could pause time for ten seconds?",
+  "lengthSeconds": 20,
+  "palette": {
+    "background": "#1B2A4A",
+    "surface": "#24405E",
+    "accent": "#F2A93B",
+    "accentDeep": "#B97A1F",
+    "text": "#F5EFE0",
+    "glow": "#F2A93B",
+    "particle": "#F2A93B"
+  },
+  "mood": {
+    "tone": "neutral",
+    "pacing": "medium"
+  },
+  "motif": {
+    "type": "orbit",
+    "scene": 1
+  },
+  "whatif": {
+    "power": "pause time",
+    "rule": "Ten seconds. Once a day.",
+    "demos": [
+      {
+        "line": "The coffee hangs mid-air.",
+        "prop": "mug"
+      },
+      {
+        "line": "The phone never hits the floor.",
+        "prop": "phone"
+      },
+      {
+        "line": "You cross while traffic waits.",
+        "prop": "crosswalk"
+      }
+    ],
+    "fun": "Grab the last slice. Twice.",
+    "fact": "In ten seconds, Earth moves 185 miles around the Sun.",
+    "question": "Where would you land tonight?"
+  },
+  "scenes": [
+    {
+      "words": [
+        "The",
+        "coffee",
+        "hangs",
+        "mid-air."
+      ],
+      "durationSeconds": 3.5,
+      "camera": {
+        "fromScale": 1,
+        "toScale": 1,
+        "fromX": 0,
+        "toX": 0
+      },
+      "transitionOut": "none"
+    },
+    {
+      "words": [
+        "The",
+        "phone",
+        "never",
+        "hits",
+        "the",
+        "floor."
+      ],
+      "durationSeconds": 3.5,
+      "camera": {
+        "fromScale": 1,
+        "toScale": 1,
+        "fromX": 0,
+        "toX": 0
+      },
+      "transitionOut": "none"
+    },
+    {
+      "words": [
+        "You",
+        "cross",
+        "while",
+        "traffic",
+        "waits."
+      ],
+      "durationSeconds": 3.5,
+      "camera": {
+        "fromScale": 1,
+        "toScale": 1,
+        "fromX": 0,
+        "toX": 0
+      },
+      "transitionOut": "none"
+    },
+    {
+      "words": [
+        "WHAT",
+        "IF",
+        "YOU",
+        "COULD",
+        "PAUSE",
+        "TIME?"
+      ],
+      "durationSeconds": 4.0,
+      "camera": {
+        "fromScale": 1,
+        "toScale": 1,
+        "fromX": 0,
+        "toX": 0
+      },
+      "transitionOut": "none"
+    },
+    {
+      "words": [
+        "Grab",
+        "the",
+        "last",
+        "slice.",
+        "Twice."
+      ],
+      "durationSeconds": 1.5,
+      "camera": {
+        "fromScale": 1,
+        "toScale": 1,
+        "fromX": 0,
+        "toX": 0
+      },
+      "transitionOut": "none"
+    },
+    {
+      "words": [
+        "In",
+        "ten",
+        "seconds,",
+        "Earth",
+        "moves",
+        "185",
+        "miles",
+        "around",
+        "the",
+        "Sun."
+      ],
+      "durationSeconds": 4.0,
+      "camera": {
+        "fromScale": 1,
+        "toScale": 1,
+        "fromX": 0,
+        "toX": 0
+      },
+      "transitionOut": "none"
+    }
+  ],
+  "story": {
+    "source": "whatif",
+    "beats": [
+      {
+        "title": "Demo 1",
+        "text": "Pause. The coffee hangs mid-air."
+      },
+      {
+        "title": "Demo 2",
+        "text": "Pause. The phone never hits the floor."
+      },
+      {
+        "title": "Demo 3",
+        "text": "Pause. You cross while traffic waits."
+      },
+      {
+        "title": "Premise",
+        "text": "What if you could pause time? Ten seconds. Once a day."
+      },
+      {
+        "title": "Fun",
+        "text": "Grab the last slice. Twice."
+      },
+      {
+        "title": "Turn",
+        "text": "In ten seconds, Earth moves 185 miles around the Sun. That's real."
+      },
+      {
+        "title": "Question",
+        "text": "Where would you land tonight?"
+      }
+    ]
+  },
+  "notes": [
+    "v2.11 pack 15: What If episode \u2014 pause time for ten seconds",
+    "fact: Earth moves 185 miles around the Sun in ten seconds \u2014 NASA Earth Fact Sheet, mean orbital velocity 29.78 km/s = 18.50 mi/s, x 10 s",
+    "silent: ElevenLabs NOT wired (no key); no voiceover"
+  ],
+  "skills": [
+    "motion-design-skills",
+    "what-if-animation"
+  ],
+  "format": "vertical",
+  "craft_notes": "- motion-design-skills: Base craft: easing curves, safe areas, seamless loops, on-brand type/color.\n- what-if-animation: What If episode: cold open with three escalating demos, premise title card, one real fact with a number in the turn, end on a question.\n- Format: 720x1280 vertical (WhatIf composition), safe areas 120px top/bottom."
+}

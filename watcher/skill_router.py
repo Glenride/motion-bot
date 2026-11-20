@@ -44,7 +44,7 @@ PACKS = {
     ),
     "tiktok-video-skills": (
         [r"\b(vertical|reel|short|tiktok|9:16|portrait|story format)\b"],
-        "Short-form vertical: 720x1280, 120px safe areas top/bottom, hook in first 1s, fast cuts.",
+        "Short-form vertical: 720x1280, 120px safe areas top/bottom, hook in first 1s, fast cuts. TikTok formats (v2.11): hook-first cold open (1s punch), fast-cut beat timing (uneven cuts + punch-in), duet/reaction split — TikTok: label selects; Vertical extends its v2.6 panels, not a duplicate.",
         "vertical",
     ),
     "data-animation-skills": (
@@ -141,9 +141,28 @@ PACKS = {
         "Everest AI usage & cost (EverestPanels): usage bar fills to the cap, limit banner slides in with a reset countdown — caps only from the brief.",
         None,
     ),
+    # Viral Claude Code formats (wired 2026-11-10, craft guidance only).
+    # what-if-animation: kelano86/what-if-animation — 15-25s "What If"
+    # cartoons, SVG + Remotion, dusk stick-figure rig, 7-beat formula.
+    # animate-canvas: cth9191/animate — procedural canvas animation, 7
+    # styles, story -> look -> storyboard gates, shape-morph bridges.
+    # motion-prompt: showheyohtaki/motion-prompt — 192 named moves in 8
+    # packs; a naming dictionary, not a renderer. All three recreate
+    # their patterns code-drawn in Remotion; none imports an upstream
+    # engine, studio, or Canvas code. ElevenLabs is NOT wired (no key).
+    "what-if-animation": (
+        [r"\b(what if episode|what-if episode|what if cartoon|dusk stick figure|stick figure episode)\b"],
+        "What If episode (v2.11): WhatIf composition — dusk stick-figure rig, cold open with three escalating demos, premise title card, one real fact with a number in the turn, end on a question. Needs Power: + 3 Demo: lines + Fact: + Question: labels; silent (ElevenLabs NOT wired).",
+        None,
+    ),
     "animate-canvas": (
         [r"\b(cut paper|cut-paper|crosshatch ink|crosshatch-ink|riso print|sketchbook style|pixel animation|isometric animation|canvas animation|procedural animation)\b"],
         "Procedural canvas style: story, look, and storyboard approved before animating; one style per piece; shape-morph bridges between eras; silence before the payoff, loudest on it. Cut-paper and crosshatch render as Remotion code (CanvasStyles); riso/sketchbook/math/pixel/isometric are craft notes only.",
+        None,
+    ),
+    "motion-prompt": (
+        [r"\b(motion prompt|motion-prompt|motion dictionary|mask reveal|slow dolly in|dolly in|shape morph|count-up|mask transition|jump cut|match cut|rack focus|impact shake|light sweep)\b"],
+        "Motion Prompt registry (v2.11): 18 named moves are real Remotion code (src/harness/motionRegistry.tsx) — pop-in, stagger, mask reveal, typewriter, count-up, kinetic type, shape morph, light sweep, impact shake, rack focus, pan, dolly in, zoom in, mask transition, jump cut, match cut, whip pan, cross dissolve — request by name with a Move:/Moves: label; the other 174 catalog names are craft notes only.",
         None,
     ),
     # ffmpeg packs (v2.9) — post-render steps, not compositions.

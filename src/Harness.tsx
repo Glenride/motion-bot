@@ -112,6 +112,19 @@ export type HarnessProps = {
    *  set, the last scene's end card is the drawn mark + wordmark
    *  instead of plain project text. */
   logo?: string;
+  /** Named motion (v2.11, motion-prompt registry): one `Move:`
+   *  label value naming a registry move (e.g. pop-in, typewriter,
+   *  dolly-in, mask-transition) applied to every scene, or a
+   *  `Moves:` list naming one move per scene. Consumed by
+   *  Vertical; Harness (landscape) does not yet read the registry
+   *  — its kinetic reveals already cover the mask/blur/wipe/char
+   *  names. Defaults to none — no label, no change. */
+  move?: string;
+  moves?: string[];
+  /** TikTok format (v2.11, tiktok-video-skills): hook-first |
+   *  fast-cut | duet, from a `TikTok:` label. Extends Vertical;
+   *  unset means the v2.6 Vertical exactly as before. */
+  tiktokFormat?: string;
 };
 
 export const HARNESS_DEFAULTS: Required<
@@ -154,6 +167,9 @@ export const HARNESS_DEFAULTS: Required<
   pills: [],
   source: "",
   logo: "",
+  move: "",
+  moves: [],
+  tiktokFormat: "",
 };
 
 const VARIANTS = ["orbit", "kinetic", "sweep", "rise"] as const;

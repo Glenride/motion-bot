@@ -8,7 +8,7 @@ Installed packs live in `skills/` (9 packs, 30 skills, cloned 2026-10-29):
 | motion-design-skills | 9 | Base craft, always on: easing, safe areas, loops, color, shot composition, Remotion technique |
 | kinetic-typography-skills | 1 | Kinetic type: word/character stagger, title cards |
 | explainer-video-skills | 5 | Explainer grammar: one idea per scene, diagram reveal, whiteboard, wrapped-style data recaps — Explainer comp, 3 code-drawn styles + end-card recap (v2.9) |
-| tiktok-video-skills | 4 | Short-form vertical: 9:16, hook in 1s, caption animation, countdowns |
+| tiktok-video-skills | 4 | Short-form vertical: 9:16, hook in 1s, caption animation, countdowns — hook-first / fast-cut / duet formats render as Remotion code since v2.11 (TikTokFormats, `TikTok:` label) |
 | data-animation-skills | 3 | Data: chart animation, infographic reveals, key-number counters |
 | lower-thirds-skills | 1 | Transparent lower thirds / overlays |
 | b-roll-skills | 1 | B-roll timed to spoken words: BRoll comp, cuts on the noun from local pool clips, code-drawn panel fallback (v2.7) |
@@ -283,9 +283,9 @@ words and numbers.
 
 | Pack | Source | What it adds |
 |---|---|---|
-| what-if-animation | kelano86/what-if-animation (300 stars) | 15–25 s "What If" cartoons: 7-beat formula, cold open with three escalating demos, premise title card, one real fact with a number in the turn, end on a question. 27+ cuts/min opening, one hero who never changes, storyboard self-check before animating. |
+| what-if-animation | kelano86/what-if-animation (300 stars) | 15–25 s "What If" cartoons: 7-beat formula, cold open with three escalating demos, premise title card, one real fact with a number in the turn, end on a question. 27+ cuts/min opening, one hero who never changes, storyboard self-check before animating. Renders as Remotion code since v2.11 (WhatIf comp, dusk stick-figure rig). |
 | animate-canvas | cth9191/animate (1,729 stars) | Procedural canvas animation: 7 styles (cut paper, crosshatch ink, riso, sketchbook, math, pixel, isometric), story → look → storyboard approvals before animating, shape-morph bridges, silence before the payoff / loudest on it, one constant the eye can hold, colour means one thing. Cut-paper and crosshatch render as Remotion code since v2.7 (CanvasStyles); the other five stay craft notes only. |
-| motion-prompt | showheyohtaki/motion-prompt (1,899 stars) | A naming dictionary: 192 named moves in 8 packs × 24 (motion, camera, UI, landing-page, photo, motion2, lp2, camera2). Name the move with its duration, strength, and what moves; keep the spec's timings and easing, replace only words, colours, and content. |
+| motion-prompt | showheyohtaki/motion-prompt (1,899 stars) | A naming dictionary: 192 named moves in 8 packs × 24 (motion, camera, UI, landing-page, photo, motion2, lp2, camera2). Name the move with its duration, strength, and what moves; keep the spec's timings and easing, replace only words, colours, and content. 18 moves are real Remotion code since v2.11 (motionRegistry, `Move:` / `Moves:` labels); the other 174 stay craft notes only. |
 
 ### Router entries (watcher/skill_router.py)
 
@@ -312,14 +312,19 @@ not fire).
   ElevenLabs key is on file and none was provisioned. Motion Bot's
   voiceover stays on its existing path; the -14 LUFS master target
   is guidance for the mix, not a new step.
-- The what-if 15–25 s pace is guidance, not a new composition:
-  briefs still render through the existing Harness / Vertical /
-  Narrated routes at their own lengths.
+- The what-if 15–25 s shape is a real composition since v2.11
+  (WhatIf, cold open + premise title card + turn; silent —
+  ElevenLabs is NOT wired). A what-if task without Power + 3
+  Demo lines + Fact + Question keeps the default route, craft
+  notes only; the rung sits after Explainer, so a task matching
+  both keeps the pre-v2.11 Explainer route.
 - motion-prompt is a naming dictionary, not a renderer: the catalog
-  only covers individual moves. The watcher has no gallery picker
-  — moves come from the brief's own words or the director naming
-  them in the storyboard, never invented IDs. Never write a move
-  from its name alone; the numbers live in the element's spec.
+  only covers individual moves. 18 of its 192 names are real code
+  since v2.11 (motionRegistry); the rest stay craft notes. The
+  watcher has no gallery picker — moves come from the brief's own
+  words or the director naming them in the storyboard, never
+  invented IDs. Never write a move from its name alone; the
+  numbers live in the element's spec.
 - Upstream formats F2 (chronology / morph chain) and F4 (mission)
   are the proven animate formats; the others are documented from
   study but unproven. Isometric has only its demo so far.

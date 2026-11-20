@@ -32,6 +32,24 @@ import {
 } from "./harness/motionDesign";
 import { LowerThirdOverlay } from "./LowerThird";
 import {
+  MoveEffect,
+  MoveReveal,
+  incomingTransitionDisc,
+  incomingTransitionStyle,
+  moveCamera,
+  outgoingTransition,
+  sceneMoveFor,
+  transitionForMove,
+  type MoveSpec,
+} from "./harness/motionRegistry";
+import {
+  DuetSplit,
+  PunchIn,
+  fastCutStarts,
+  hookFirstStarts,
+  resolveTikTokFormat,
+} from "./TikTokFormats";
+import {
   HARNESS_DEFAULTS,
   type HarnessProps,
   type HarnessScene,
@@ -72,6 +90,13 @@ import {
  * id unless a Panel: / Font: / Motion: (or Move:) label overrides
  * them. Defaults (centered / serif / kinetic) render exactly the
  * pre-v2.6 look, so in-flight work is unchanged.
+ *
+ * Named moves / TikTok formats (v2.11): props.move / props.moves
+ * name Motion Prompt registry moves per scene (reveal / camera /
+ * effect / cut / transition — see harness/motionRegistry); props.
+ * tiktokFormat selects a short-form format (hook-first | fast-cut
+ * | duet — see TikTokFormats). Neither is set without a label, so
+ * a clip with no Move: / TikTok: label renders exactly as v2.10.
  */
 
 const VERTICAL_DEFAULTS = {
@@ -242,7 +267,17 @@ const VScene: React.FC<{
   kinetic: string;
   easing: string;
   logo: string;
-}> = ({ scene, sceneFrames, frame, fps, palette, isLastScene, project, subtitle, pacing, variant, panel, fontFamily, motion, kinetic, easing, logo }) => {
+  /** v2.11: the registry move for this scene (Move:/Moves: label). */
+  sceneMove: MoveSpec | null;
+  /** v2.11: the transitionOut of the previous scene (incoming cut). */
+  prevTransition?: string;
+  /** v2.11: this scene's cut, after the registry move overrides it. */
+  effectiveTransitionOut: string;
+  /** v2.11: hook-first scene 0 — 1 s punch, biggest type, frame 0. */
+  hookPunch?: boolean;
+  /** v2.11: fast-cut — punch-in zoom interrupt at the scene start. */
+  fastCut?: boolean;
+}> = ({ scene, sceneFrames, frame, fps, palette, isLastScene, project, subtitle, pacing, variant, panel, fontFamily, motion, kinetic, easing, logo, sceneMove, prevTransition, effectiveTransitionOut, hookPunch = false, fastCut = false }) => {
   const endOpacity =
     isLastScene && (logo || project || subtitle)
       ? interpolate(frame, [sceneFrames * 0.7, sceneFrames * 0.85], [0, 1], {
@@ -251,30 +286,51 @@ const VScene: React.FC<{
         })
       : 0;
   const baseSize =
-    variant === "kinetic"
+    (variant === "kinetic"
       ? fontSizeFor(scene.words.length) + 14
-      : fontSizeFor(scene.words.length);
-  const gap = variant === "kinetic" ? 4 : gapFor(pacing);
+      : fontSizeFor(scene.words.length)) + (hookPunch ? 40 : 0);
+  const gap = hookPunch ? 2 : variant === "kinetic" ? 4 : gapFor(pacing);
   // Rise stays on for the rise variant (pre-v2.6 behavior) and for
   // the rise motion; every other motion keeps its own entry.
   const rise = motion === "rise" || variant === "rise";
+  // Hook-first: the hook is on screen at frame 1 — no fade-up.
+  const firstFrame = hookPunch ? 0 : 8;
 
-  /** Render words with the clip's motion language. A Kinetic:
-   *  reveal (v2.10) IS the entry — it replaces the v2.6 motion
-   *  choice for that clip; `word` keeps the motion dispatch below
-   *  exactly as before. */
+  /** Render words with the clip's motion language. A registry
+   *  reveal (v2.11) IS the entry for its scene — it replaces the
+   *  v2.6 motion choice and the v2.10 kinetic reveal alike. A
+   *  Kinetic: reveal (v2.10) IS the entry — it replaces the v2.6
+   *  motion choice for that clip; `word` keeps the motion dispatch
+   *  below exactly as before. */
   const renderWords = (
     ws: string[],
     size: number,
     color: string,
     align: "center" | "left" = "center",
   ) => {
+    if (sceneMove && sceneMove.kind === "reveal") {
+      return (
+        <MoveReveal
+          move={sceneMove}
+          words={ws}
+          firstFrame={firstFrame}
+          frame={frame}
+          fps={fps}
+          fontSize={size}
+          color={color}
+          gapFrames={gap}
+          rise={rise}
+          fontFamily={fontFamily}
+          align={align}
+        />
+      );
+    }
     if (kinetic !== "word") {
       return (
         <KineticReveal
           reveal={kinetic}
           words={ws}
-          firstFrame={8}
+          firstFrame={firstFrame}
           frame={frame}
           fps={fps}
           fontSize={size}
@@ -291,7 +347,7 @@ const VScene: React.FC<{
       return (
         <SlideLines
           words={ws}
-          firstFrame={8}
+          firstFrame={firstFrame}
           frame={frame}
           fontSize={size}
           color={color}
@@ -304,7 +360,7 @@ const VScene: React.FC<{
       return (
         <ScaleLine
           words={ws}
-          firstFrame={8}
+          firstFrame={firstFrame}
           frame={frame}
           fontSize={size}
           color={color}
@@ -317,7 +373,7 @@ const VScene: React.FC<{
     return (
       <KineticLine
         words={ws}
-        firstFrame={8}
+        firstFrame={firstFrame}
         frame={frame}
         fps={fps}
         fontSize={size}
@@ -505,16 +561,66 @@ const VScene: React.FC<{
     );
   }
 
+  // v2.11: a registry camera move overrides the scene's camera
+  // plan; a registry effect / cut move wraps the body; a registry
+  // transition is in-scene geometry on the two scenes either side
+  // of the cut (see motionRegistry). The outgoing geometry applies
+  // only inside its window at the end of the scene; the incoming
+  // geometry clamps harmlessly after its window.
+  const camera =
+    sceneMove && sceneMove.kind === "camera"
+      ? moveCamera(sceneMove, scene.camera)
+      : scene.camera;
+  const inStyle = incomingTransitionStyle(prevTransition, frame, fps);
+  const inDisc = incomingTransitionDisc(prevTransition, frame, palette);
+  const out = outgoingTransition(effectiveTransitionOut, frame, sceneFrames, fps, palette);
+  const outWindow =
+    effectiveTransitionOut === "cross-dissolve" ? fps : effectiveTransitionOut === "whip-pan" ? 9 : 6;
+  const outActive =
+    (effectiveTransitionOut === "cross-dissolve" ||
+      effectiveTransitionOut === "whip-pan" ||
+      effectiveTransitionOut === "match-cut") &&
+    frame >= Math.max(0, sceneFrames - outWindow);
+  const wrapStyle: React.CSSProperties = { ...inStyle };
+  if (outActive) {
+    if (out.style.opacity !== undefined && wrapStyle.opacity !== undefined) {
+      wrapStyle.opacity = (wrapStyle.opacity as number) * (out.style.opacity as number);
+    } else if (out.style.opacity !== undefined) {
+      wrapStyle.opacity = out.style.opacity;
+    }
+    if (out.style.transform) {
+      wrapStyle.transform = out.style.transform;
+    }
+    if (out.style.filter) {
+      wrapStyle.filter = out.style.filter;
+    }
+  }
+  let content: React.ReactNode = body;
+  if (sceneMove && (sceneMove.kind === "effect" || sceneMove.kind === "cut")) {
+    content = (
+      <MoveEffect move={sceneMove} frame={frame} fps={fps} sceneFrames={sceneFrames} palette={palette}>
+        {body}
+      </MoveEffect>
+    );
+  }
+  if (fastCut || hookPunch) {
+    content = <PunchIn frame={frame}>{content}</PunchIn>;
+  }
+
   return (
     <Camera
       localFrame={frame}
       sceneFrames={sceneFrames}
-      fromScale={scene.camera.fromScale}
-      toScale={scene.camera.toScale}
-      fromX={scene.camera.fromX}
-      toX={scene.camera.toX}
+      fromScale={camera.fromScale}
+      toScale={camera.toScale}
+      fromX={camera.fromX}
+      toX={camera.toX}
     >
-      {body}
+      <div style={{ position: "relative", width: "100%", height: "100%", ...wrapStyle }}>
+        {content}
+        {inDisc}
+        {outActive ? out.disc : null}
+      </div>
     </Camera>
   );
 };
@@ -559,7 +665,29 @@ export const Vertical: React.FC<HarnessProps> = (props) => {
   const easing = personalityForTone(tone).easing;
 
   const n = scenes.length;
-  const { starts, lengths } = sceneStarts(durationInFrames, n, bpm > 0 ? bpm : undefined, fps);
+  // v2.11: the registry move per scene (Move: / Moves: labels) and
+  // the TikTok format (TikTok: label). A transition-kind move
+  // overrides the scene's transitionOut for the cut after it.
+  const tiktokFormat = resolveTikTokFormat(props.tiktokFormat);
+  const sceneMoves = scenes.map((_, i) => sceneMoveFor(props.moves ?? [], props.move, i));
+  const effectiveTransitions = scenes.map(
+    (scene, i) => transitionForMove(sceneMoves[i]) ?? scene.transitionOut,
+  );
+  // Scene timing: hook-first fixes scene 0 at exactly 1 s; fast-cut
+  // uses the uneven schedule; otherwise the beat grid / even split.
+  const { starts, lengths } =
+    tiktokFormat === "hook-first"
+      ? hookFirstStarts(durationInFrames, n, fps)
+      : tiktokFormat === "fast-cut"
+        ? fastCutStarts(durationInFrames, n)
+        : sceneStarts(durationInFrames, n, bpm > 0 ? bpm : undefined, fps);
+  // Duet: scenes 0+1 share the first 60% as the split; the rest
+  // split the remaining 40% (hard cut at the format boundary).
+  const isDuet = tiktokFormat === "duet" && n >= 2;
+  const duetFrames = Math.round(durationInFrames * 0.6);
+  const tail = isDuet && n > 2 ? sceneStarts(durationInFrames - duetFrames, n - 2, bpm > 0 ? bpm : undefined, fps) : { starts: [], lengths: [] };
+  const tailStarts = tail.starts.map((s) => s + duetFrames);
+  const tailLengths = tail.lengths;
   // Color-motion (v2.10): the frame background drifts in OKLab from
   // background toward surface across the clip (capped inside the
   // critic's palette tolerance — see tintedBackground).
@@ -580,48 +708,108 @@ export const Vertical: React.FC<HarnessProps> = (props) => {
           <ConstellationLines frame={frame} palette={palette} width={720} height={1280} />
         </>
       )}
-      {scenes.map((scene, i) => (
-        <Sequence
-          key={i}
-          from={starts[i]}
-          durationInFrames={lengths[i]}
-          name={`Scene ${i + 1}`}
-        >
-          <VScene
-            scene={scene}
-            sceneFrames={lengths[i]}
-            frame={frame - starts[i]}
-            fps={fps}
-            palette={palette}
-            isLastScene={i === n - 1}
-            project={project}
-            subtitle={subtitle}
-            pacing={pacing}
-            variant={variant}
-            panel={panel}
-            fontFamily={fontFamily}
-            motion={motion}
-            kinetic={kinetic}
-            easing={easing}
-            logo={logo}
-          />
-        </Sequence>
-      ))}
-      {scenes.slice(0, -1).map((scene, i) => {
-        const cut = starts[i + 1];
-        if (scene.transitionOut === "wipe") {
-          return (
-            <Sequence key={`t${i}`} from={cut - 4} durationInFrames={18} name="Wipe">
-              <DiagonalWipe frame={frame - (cut - 4)} palette={palette} />
-            </Sequence>
-          );
-        }
-        return (
-          <Sequence key={`t${i}`} from={cut - 2} durationInFrames={14} name="ZoomCut">
-            <ZoomCut frame={frame - (cut - 2)} palette={palette} />
+      {isDuet ? (
+        <>
+          <Sequence from={0} durationInFrames={duetFrames} name="Duet">
+            <DuetSplit
+              originalWords={scenes[0].words}
+              reactionWords={scenes[1].words}
+              frame={frame}
+              durationInFrames={duetFrames}
+              fps={fps}
+              palette={palette}
+              fontFamily={fontFamily}
+            />
           </Sequence>
-        );
-      })}
+          {scenes.slice(2).map((scene, j) => {
+            const i = j + 2;
+            return (
+              <Sequence key={i} from={tailStarts[j]} durationInFrames={tailLengths[j]} name={`Scene ${i + 1}`}>
+                <VScene
+                  scene={scene}
+                  sceneFrames={tailLengths[j]}
+                  frame={frame - tailStarts[j]}
+                  fps={fps}
+                  palette={palette}
+                  isLastScene={i === n - 1}
+                  project={project}
+                  subtitle={subtitle}
+                  pacing={pacing}
+                  variant={variant}
+                  panel={panel}
+                  fontFamily={fontFamily}
+                  motion={motion}
+                  kinetic={kinetic}
+                  easing={easing}
+                  logo={logo}
+                  sceneMove={sceneMoves[i]}
+                  prevTransition={undefined}
+                  effectiveTransitionOut={effectiveTransitions[i]}
+                  hookPunch={false}
+                  fastCut={false}
+                />
+              </Sequence>
+            );
+          })}
+        </>
+      ) : (
+        scenes.map((scene, i) => (
+          <Sequence
+            key={i}
+            from={starts[i]}
+            durationInFrames={lengths[i]}
+            name={`Scene ${i + 1}`}
+          >
+            <VScene
+              scene={scene}
+              sceneFrames={lengths[i]}
+              frame={frame - starts[i]}
+              fps={fps}
+              palette={palette}
+              isLastScene={i === n - 1}
+              project={project}
+              subtitle={subtitle}
+              pacing={pacing}
+              variant={variant}
+              panel={panel}
+              fontFamily={fontFamily}
+              motion={motion}
+              kinetic={kinetic}
+              easing={easing}
+              logo={logo}
+              sceneMove={sceneMoves[i]}
+              prevTransition={i > 0 ? effectiveTransitions[i - 1] : undefined}
+              effectiveTransitionOut={effectiveTransitions[i]}
+              hookPunch={tiktokFormat === "hook-first" && i === 0}
+              fastCut={tiktokFormat === "fast-cut"}
+            />
+          </Sequence>
+        ))
+      )}
+      {/* Transition overlays: only wipe / zoom-cut live here now.
+          Registry transitions (mask / match-cut / whip-pan /
+          cross-dissolve) are in-scene geometry, and the duet
+          boundary is a hard cut. */}
+      {!isDuet &&
+        scenes.slice(0, -1).map((scene, i) => {
+          const cut = starts[i + 1];
+          const t = effectiveTransitions[i];
+          if (t === "wipe") {
+            return (
+              <Sequence key={`t${i}`} from={cut - 4} durationInFrames={18} name="Wipe">
+                <DiagonalWipe frame={frame - (cut - 4)} palette={palette} />
+              </Sequence>
+            );
+          }
+          if (t === "zoom-cut") {
+            return (
+              <Sequence key={`t${i}`} from={cut - 2} durationInFrames={14} name="ZoomCut">
+                <ZoomCut frame={frame - (cut - 2)} palette={palette} />
+              </Sequence>
+            );
+          }
+          return null;
+        })}
       {/* Color-motion wash (v2.10): the OKLab grade over the scenes. */}
       <ColorMotionWash frame={frame} durationInFrames={durationInFrames} palette={palette} />
       {/* Lower-third overlay (v2.10): a Name: label straps the short. */}

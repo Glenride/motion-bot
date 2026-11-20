@@ -95,6 +95,7 @@ from harness_director import (  # noqa: E402
     build_everest_panel,
     build_explainer,
     build_product_demo,
+    build_whatif,
     pick_canvas_style,
 )
 from broll_timing import build_segments as build_broll_segments  # noqa: E402
@@ -1175,6 +1176,29 @@ def main():
                             storyboard["scenes"] = _explainer["scenes"]
                             storyboard["lengthSeconds"] = _explainer[
                                 "lengthSeconds"]
+                    elif "what-if-animation" in _route["skills"]:
+                        # What If rung (v2.11): WhatIf comp, dusk
+                        # stick-figure rig. Placed after Explainer on
+                        # purpose: a task matching both ("explain what
+                        # if...") keeps the pre-v2.11 Explainer route;
+                        # a pure what-if task falls through the earlier
+                        # rungs (none match its narrow triggers) to
+                        # here. build_whatif returns None without
+                        # Power + 3 Demo lines + Fact + Question —
+                        # those tasks keep the default route, craft
+                        # notes only, never an invented fact, demo, or
+                        # number. Silent: no ElevenLabs voiceover is
+                        # wired. The comp is 720x1280, so the route
+                        # format flips to vertical for the
+                        # expected-dimensions check.
+                        _whatif = build_whatif(task, storyboard)
+                        if _whatif:
+                            _composition = "WhatIf"
+                            _route["format"] = "vertical"
+                            storyboard["whatif"] = _whatif["whatif"]
+                            storyboard["lengthSeconds"] = _whatif["lengthSeconds"]
+                            storyboard["story"] = _whatif["story"]
+                            storyboard["scenes"] = _whatif["scenes"]
                     elif _labels.get("name"):
                         # Lower-third rung (v2.3, v2.10): transparent
                         # overlay export. v2.10: a Name: label ALONE

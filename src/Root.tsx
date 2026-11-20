@@ -16,6 +16,7 @@ import { BRoll, BROLL_DEFAULTS } from "./BRoll";
 import { ProductDemo, PRODUCT_DEMO_DEFAULTS } from "./ProductDemo";
 import { EverestPanels, EVEREST_DEFAULTS } from "./EverestPanels";
 import { Explainer, EXPLAINER_DEFAULTS } from "./Explainer";
+import { WhatIf, WHATIF_DEFAULTS_EXPORT } from "./WhatIf";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -256,6 +257,31 @@ export const RemotionRoot: React.FC = () => {
           return {
             durationInFrames: Math.max(
               90,
+              Math.round(lengthSeconds * 30),
+            ),
+          };
+        }}
+      />
+      {/* v2.11: packs 13–15 translated to code. WhatIf is the
+          what-if-animation composition (dusk stick-figure rig,
+          cold open + premise title card + turn, 15–25 s, silent —
+          ElevenLabs is not wired). The motion-prompt registry
+          (src/harness/motionRegistry.tsx) and the TikTok formats
+          (src/TikTokFormats.tsx) extend Vertical, not new
+          compositions — see Vertical.tsx. */}
+      <Composition
+        id="WhatIf"
+        component={WhatIf}
+        durationInFrames={WHATIF_DEFAULTS_EXPORT.lengthSeconds * 30}
+        fps={30}
+        width={720}
+        height={1280}
+        defaultProps={WHATIF_DEFAULTS_EXPORT as any}
+        calculateMetadata={async ({ props }) => {
+          const lengthSeconds = props.lengthSeconds ?? WHATIF_DEFAULTS_EXPORT.lengthSeconds;
+          return {
+            durationInFrames: Math.max(
+              450,
               Math.round(lengthSeconds * 30),
             ),
           };
