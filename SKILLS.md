@@ -285,7 +285,7 @@ words and numbers.
 |---|---|---|
 | what-if-animation | kelano86/what-if-animation (300 stars) | 15–25 s "What If" cartoons: 7-beat formula, cold open with three escalating demos, premise title card, one real fact with a number in the turn, end on a question. 27+ cuts/min opening, one hero who never changes, storyboard self-check before animating. Renders as Remotion code since v2.11 (WhatIf comp, dusk stick-figure rig). |
 | animate-canvas | cth9191/animate (1,729 stars) | Procedural canvas animation: 7 styles (cut paper, crosshatch ink, riso, sketchbook, math, pixel, isometric), story → look → storyboard approvals before animating, shape-morph bridges, silence before the payoff / loudest on it, one constant the eye can hold, colour means one thing. Cut-paper and crosshatch render as Remotion code since v2.7 (CanvasStyles); the other five stay craft notes only. |
-| motion-prompt | showheyohtaki/motion-prompt (1,899 stars) | A naming dictionary: 192 named moves in 8 packs × 24 (motion, camera, UI, landing-page, photo, motion2, lp2, camera2). Name the move with its duration, strength, and what moves; keep the spec's timings and easing, replace only words, colours, and content. 18 moves are real Remotion code since v2.11 (motionRegistry, `Move:` / `Moves:` labels); the other 174 stay craft notes only. |
+| motion-prompt | showheyohtaki/motion-prompt (1,899 stars) | A naming dictionary: 192 named moves in 8 packs × 24 (motion, camera, UI, landing-page, photo, motion2, lp2, camera2). Name the move with its duration, strength, and what moves; keep the spec's timings and easing, replace only words, colours, and content. 18 moves are real Remotion code since v2.11 (motionRegistry, `Move:` / `Moves:` labels), dispatched by Vertical since v2.11 and by Harness since v2.13; the other 174 stay craft notes only. |
 
 ### Router entries (watcher/skill_router.py)
 
@@ -335,12 +335,13 @@ not fire).
   from the hook; the story gate, title-is-hook, and palette
   (parchment/gold, never purple/magenta/pink) rules are untouched.
 
-## Panel / font / motion variety (v2.6, 2026-11-20)
+## Panel / font / motion variety (v2.6 Vertical, v2.13 Harness, 2026-11-20)
 
 The sameness correction: variants (orbit / kinetic / sweep / rise)
 changed background + type size, but every clip still read as the
 same centered serif paragraph. v2.6 adds three independent axes to
-the Vertical composition, wired through the Director
+the Vertical composition, v2.13 ports them to the Harness
+(landscape) composition, wired through the Director
 (watcher/harness_director.py) and the storyboard JSON — not through
 skill text. Skills stay text guidance; they do not render.
 
@@ -361,6 +362,22 @@ look. Rotation strides differ per axis, so adjacent tasks differ in
 all three. No axis changes the palette — the field follows the
 brief, as always. Proof renders: briefs/proof-panel-*.json, critic
 PASS each, 2026-11-20.
+
+**Harness (v2.13).** The same five panels re-geometried for
+1280x720, the same three fonts, the same motion dispatch — plus the
+v2.10 kinetic reveals (`Kinetic:` label: mask / blur / wipe / char
+/ path) and the v2.11 registry moves (`Move:` / `Moves:` labels),
+which Harness did not read before v2.13. Dispatch order per scene:
+registry reveal > kinetic reveal > slide / scale / kinetic line;
+word-stack always uses its stacked-rise entry whatever the motion
+says. Defaults render exactly the pre-v2.13 look (default-regression
+clip byte-identical to the v2.12 proof). Proof renders:
+briefs/proof-v213-harness-*.json, critic PASS each, 2026-11-20.
+**Stale-brief rule:** proofs never reuse a pre-v2.6 brief — a brief
+with no `panel` / `font` / `motion` keys falls back to defaults on
+every axis, so a green critic on it proves nothing about variety.
+Rebuild through the current Director (task-391 was rebuilt this
+way) or write fresh proof briefs from a Director-built base.
 
 ## Packs 1–3 as Remotion code (v2.7, 2026-11-20)
 

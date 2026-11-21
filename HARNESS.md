@@ -86,7 +86,7 @@ model, no keys: it works when the Mac Studio is down.
   the field follows the brief's colors, the variant changes how it
   moves. Vertical honors `variant` since v2.5 (before that it
   rendered one fixed recipe for every variant).
-- **Panel / font / motion (v2.6, Vertical only).** The 2026-11-20
+- **Panel / font / motion (v2.6 in Vertical, v2.13 in Harness).** The 2026-11-20
   correction: variants changed background + type size, but every
   clip still read as the same centered serif paragraph. `Panel:`
   changes the composition of the words — centered (the pre-v2.6
@@ -112,7 +112,15 @@ model, no keys: it works when the Mac Studio is down.
   always uses its stacked-rise entry whatever the motion prop says.
   The end card renders only on centered and card panels, where
   there is room below the words. No panel, font, or motion changes
-  the palette: the field follows the brief, as always.
+  the palette: the field follows the brief, as always. Harness
+  (v2.13) ports the same five panels re-geometried for 1280x720,
+  the same three fonts via `resolveFont`, and the same motion
+  dispatch — plus the v2.10 kinetic reveals and the v2.11 registry
+  moves, which Harness did not read before v2.13 (see the v2.13
+  section). The mirror motif wraps the words only on the centered
+  panel; on other panels the glass sits behind them like any other
+  motif. Registry whip-pan uses a 1280px sweep in Harness (the
+  shared helper is portrait-tuned at 720px).
 - **Camera + transitions.** Scenes alternate push-in / pull-back /
   push-in-closer / lateral drift; transitions alternate diagonal wipe
   / zoom-cut. Never plain fades only.
@@ -148,6 +156,19 @@ by the storyboard; shared engine in `src/harness/`:
   flame (flicker), wave, star, crown, coin (shine sweep), window,
   orbit (fallback rings + travelling dot). `MotifLayer` switches on
   `motif.type`; unknown types fall back to orbit.
+- Variety (v2.13, Harness): `panel` / `font` / `motion` /
+  `kinetic` / `move` / `moves` dispatch in `Scene` through one
+  `renderWords` (registry reveal > kinetic reveal > slide / scale /
+  kinetic line, mirroring Vertical), five landscape panels
+  (centered = the pre-v2.13 layout, unchanged; split / card /
+  lower-third / word-stack re-geometried for 1280x720), registry
+  camera overrides (`moveCamera`), effect / cut wraps
+  (`MoveEffect`), and in-scene registry transition geometry
+  (mask / match-cut / cross-dissolve via the shared helpers,
+  whip-pan with a 1280px sweep). Clip-level wipe / zoom-cut
+  overlays fire only for wipe / zoom-cut cuts — registry
+  transitions are in-scene, and `transitionOut: "none"` now renders
+  no overlay (before v2.13 it rendered a ZoomCut).
 - Scenes split the duration evenly (remainder to the last scene).
   Font size scales with word count (88 / 76 / 64 / 52). The final
   scene carries falling teardrops when the motif says so, and an
@@ -940,6 +961,92 @@ the v2.12 sync, critic PASS with diffs 5.89 / 8.20 / 4.17 —
 identical to v2.10/v2.11, so the Vertical default is unmoved.
 Modes: the synced `primitives.tsx` and brief arrived on the
 iMac at 660 via rsync and were set to 644 after syncing.
+
+## Harness variety (v2.13, 2026-11-20)
+
+The v2.12 Harness proof (`out/proof-v212-harness-391.mp4`) looked
+identical to every old render — centered serif kinetic line — even
+though the palette fix worked (flat field, `palette_present`
+passes). Two stacked causes, both verified live before the fix:
+
+1. The proof reused the stale Nov 14 brief
+   `briefs/task-391-panels-turn-to-face-the-morning-harness.json`,
+   which had NO `panel` / `font` / `motion` / `kinetic` keys at
+   all, so every proof re-render fell back to defaults.
+2. `src/Harness.tsx` never got the v2.6 variety: the word panel
+   appeared only at line 80 (type) and line 160 (default centered).
+   The scene renderer always used `KineticLine`. Font did flow
+   through `resolveFont(props.font)`, but panel never branched and
+   motion was always the word-by-word kinetic line. The v2.6
+   panels, fonts, and motions lived in `src/Vertical.tsx` and
+   `src/harness/primitives.tsx` only.
+
+The fix ports the variety into `src/Harness.tsx` for the 1280x720
+landscape composition: the same 5 panels (centered, split, card,
+lower-third, word-stack) adapted to landscape geometry, the same 3
+font stacks via the existing `resolveFont`, and the motion dispatch
+(kinetic word-by-word as default, plus the mask / blur / wipe /
+path reveals from primitives, and the motion-registry moves where
+they fit landscape). `Panel:` / `Font:` / `Motion:` / `Kinetic:` /
+`Move:` labels are honored; with no label the Director rotation
+applies. Defaults (centered / serif / kinetic) render exactly the
+pre-fix look — proven byte-identical below, not just eyeballed.
+
+The task-391 brief was rebuilt through the current Director
+(`watcher/harness_director.py: build_storyboard`, id 391) instead
+of editing the stale file in place. Story, palette, mood, motif,
+scenes, hook, and length are byte-identical to the Nov 14 brief
+(verified key by key); the only new keys are `panel` (`split`,
+rotation by task id), `font` (`serif`), `motion` (`rise`), and
+`kinetic` (`word`). The rebuilt brief carries a note recording the
+stale-brief cause. The dropped keys (`craft_notes`, `format`,
+`skills`) were watcher-added extras, never Director output — the
+stale brief's `"format": "vertical"` is also why the old
+task-391 mp4 rendered 720x1280 instead of landscape.
+
+**Rule (stale-brief cause): proofs never reuse a pre-v2.6 brief
+again.** A proof brief must carry real `panel` / `font` /
+`motion` values — rebuilt through the current Director, or written
+fresh from a Director-built brief with the axes overridden and
+noted. A brief with none of those keys is stale on sight: re-render
+proofs against it prove nothing about variety, however green the
+critic is.
+
+Proof (same task-391 story + palette, Harness composition,
+rendered on the iMac, critic **PASS** each, exit 0; frame grabs
+in `out/proof-v213-frames/`, 2s + 6s per clip, read back and
+visibly different — split is huge teal sans top-left with an
+accent rule, card is a bordered sky card with a mono kicker,
+lower-third is a serif headline anchored low-left, word-stack is
+one huge sans word per line, typewriter is a centered mono line
+with a blinking cursor, default is the old centered serif line):
+- split / sans / slide: `out/proof-v213-harness-split.mp4`,
+  1,383,781 B, diffs 6.39 / 6.91 / 7.66.
+- card / mono / scale: `out/proof-v213-harness-card.mp4`,
+  1,063,512 B, diffs 4.84 / 6.12 / 6.96.
+- lower-third / serif / kinetic mask: `out/proof-v213-harness-lower-third.mp4`,
+  1,184,051 B, diffs 4.64 / 5.78 / 5.93.
+- word-stack / sans / kinetic: `out/proof-v213-harness-word-stack.mp4`,
+  1,310,298 B, diffs 8.24 / 7.93 / 9.93 (accent family in 3/4
+  frames — still overall PASS; the stack's huge words cover the
+  accent carrier in one sampled frame).
+- centered / mono / Move typewriter: `out/proof-v213-harness-typewriter.mp4`,
+  1,241,363 B, diffs 5.99 / 5.91 / 7.92.
+Contrast 10.42 on all five; OCR + story coverage PASS on all
+five (OCR via iMac this run). Briefs:
+`briefs/proof-v213-harness-*.json` (all derived from the rebuilt
+task-391 brief, variant `orbit` except the default).
+Default regression: `out/proof-v213-harness-default.mp4`,
+903,123 B, diffs 4.40 / 5.20 / 4.87, md5
+`a36300d859979e5edca6230660c70349` — byte-identical to
+`out/proof-v212-harness-391.mp4`, so the pre-fix default is
+unmoved.
+Vertical regression: `out/proof-panel-centered.mp4` re-rendered
+after the v2.13 sync, critic PASS with diffs 5.89 / 8.20 / 4.17,
+md5 `644dd876a0b311a093ac6adf95d7f718` — byte-identical to the
+v2.12 file.
+Modes: synced `src/` files arrived on the iMac at 660 via rsync
+and were set to 644 (dirs 755) after syncing, same as v2.12.
 
 ## Narrated mode (v2, built 2026-10-26)
 

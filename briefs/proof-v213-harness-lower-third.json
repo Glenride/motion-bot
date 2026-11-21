@@ -1,0 +1,123 @@
+{
+  "version": 1,
+  "hook": "Panels turn to face the morning",
+  "lengthSeconds": 12,
+  "palette": {
+    "background": "#D9C7A7",
+    "surface": "#4FC3F7",
+    "accent": "#0F766E",
+    "accentDeep": "#0A4D48",
+    "text": "#1F1A14",
+    "glow": "#0F766E",
+    "particle": "#0F766E"
+  },
+  "mood": {
+    "tone": "neutral",
+    "pacing": "medium"
+  },
+  "motif": {
+    "type": "orbit",
+    "scene": 1
+  },
+  "scenes": [
+    {
+      "words": [
+        "Panels",
+        "turn",
+        "to",
+        "face",
+        "the",
+        "morning"
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.08,
+        "fromX": 0,
+        "toX": -26
+      },
+      "transitionOut": "wipe"
+    },
+    {
+      "words": [
+        "The",
+        "grid",
+        "wakes",
+        "row",
+        "by",
+        "row"
+      ],
+      "camera": {
+        "fromScale": 1.08,
+        "toScale": 1.0,
+        "fromX": -26,
+        "toX": 22
+      },
+      "transitionOut": "zoom-cut"
+    },
+    {
+      "words": [
+        "Power",
+        "reaches",
+        "the",
+        "town",
+        "by",
+        "noon"
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.14,
+        "fromX": 22,
+        "toX": 0
+      },
+      "transitionOut": "none"
+    }
+  ],
+  "variant": "orbit",
+  "panel": "lower-third",
+  "font": "serif",
+  "motion": "kinetic",
+  "kinetic": "mask",
+  "notes": [
+    "story: 3 beats from story_block",
+    "label override: background = #D9C7A7 ('sand')",
+    "label override: accent = #0F766E ('teal')",
+    "text color adjusted for contrast (>= 3.0)",
+    "color 'sand' -> #D9C7A7",
+    "color 'teal' -> #0F766E",
+    "color 'sky' -> #4FC3F7",
+    "motif 'orbit' in scene 2",
+    "variant 'rise' (explicit label)",
+    "panel 'split' (rotation by task id)",
+    "font 'serif' (rotation by task id)",
+    "motion 'rise' (explicit Motion: label)",
+    "memory: learned (ponder-2026-11-20): Get his Nov 13 correction into memory verbatim: the corrections list is empty while the record holds a fourth-time correction with a traced mechanism. Record corrections where the Director reads them; a correction that lives only in the daily record is not learned from.",
+    "memory: learned (ponder-2026-11-20): Record critic per-check outcomes in memory, not just the overall (carry-over, third week): a render entry should carry which checks passed and which failed, so the next ponder reads the outcome from memory instead of reopening JSONs.",
+    "memory: learned (ponder-2026-11-20): Watch the next genuine intake now that Strata is back (restarted Nov 20 10:45 ET, verified live) and record what the director does: whether the storyboard comes from the LLM or falls back. Do not simulate an intake; the next real task is the test.",
+    "memory: memory: 20 past renders on record; latest: Panels turn to face the morning",
+    "rebuilt 2026-11-20 via current director \u2014 replaces the stale Nov 14 brief, which predated v2.6 panel/font/motion and carried none of those keys; proofs must never reuse a pre-v2.6 brief again",
+    "proof v2.13: panel 'lower-third', font 'serif', kinetic 'mask' (Harness landscape)"
+  ],
+  "story": {
+    "source": "story_block",
+    "beats": [
+      {
+        "title": "",
+        "start": null,
+        "end": null,
+        "text": "Panels turn to face the morning"
+      },
+      {
+        "title": "",
+        "start": null,
+        "end": null,
+        "text": "The grid wakes row by row"
+      },
+      {
+        "title": "",
+        "start": null,
+        "end": null,
+        "text": "Power reaches the town by noon"
+      }
+    ]
+  }
+}
