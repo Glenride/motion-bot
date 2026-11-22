@@ -290,6 +290,14 @@ def check_variety(picks, runs=None):
                 "detail": "labelled override — exempt from rotation"}
     if runs is None:
         runs = recent_runs(COOLDOWN_WINDOW)
+    else:
+        # A caller-passed history may hold every run; the gate only
+        # ever looks at the last COOLDOWN_WINDOW (same window the
+        # router's pair_in_last uses). Without the slice the critic
+        # was stricter than the router: it failed pairs that last
+        # ran 6+ renders ago, which the router correctly allowed
+        # (proof run p03, Nov 22).
+        runs = runs[-COOLDOWN_WINDOW:]
     panel = picks.get("panel") or ""
     entry = picks.get("entry") or effective_entry(picks)
     # No style pick means no style family: a plain host render is

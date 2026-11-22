@@ -411,6 +411,16 @@ def run_brief(brief_path, tag, dry_run=False):
             if i + 1 < len(attempts):
                 rp["to_entry"] = attempts[i + 1]["entry"]
 
+    # Draft-first: the builders record placeholders in the
+    # storyboard notes ("phase1 draft: ...", "product demo draft:
+    # ..."); surface them in the router record so the delivery
+    # note and the history record carry them. Without this the
+    # draft renders but its note never names the placeholders
+    # (proof run d01, Nov 22: critic PASS, report FAIL).
+    for _n in storyboard.get("notes", []):
+        if "draft" in _n.lower():
+            routed.setdefault("placeholders", []).append(_n)
+
     note = delivery_note(brief_id, task, routed, composition, mp4_name,
                          critic, repicks, attempts)
     note_path = REPO / "out" / f"{slug}-phase1.note.md"
