@@ -149,16 +149,25 @@ def pair_in_last(panel_id, motion_id, n=COOLDOWN_WINDOW):
 
 
 def primary_family_of(run):
-    """The distinguishing style family of a run record."""
+    """The distinguishing style family of a run record, or None
+    when the run has no style pick (a plain Harness/Vertical
+    render). 'Default' is the absence of a style, not a family —
+    counting every unstyled render as one family made the cap fire
+    on any third consecutive plain brief (admission run, Nov 22:
+    adm-3 failed 4 times on a 'default' cap that no re-pick of
+    the entry could fix)."""
     picks = run.get("picks") or {}
     style = picks.get("style")
     if style:
         return style.split(".")[0]
-    return "default"
+    return None
 
 
 def family_count_last(family, n=COOLDOWN_WINDOW):
-    """How many of the last n runs used this primary style family."""
+    """How many of the last n runs used this primary style family.
+    None (no family) counts 0 — unstyled runs never trip the cap."""
+    if family is None:
+        return 0
     return sum(1 for run in recent_runs(n)
                if primary_family_of(run) == family)
 

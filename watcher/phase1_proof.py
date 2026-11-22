@@ -387,6 +387,14 @@ def run_brief(brief_path, tag, dry_run=False):
         if variety.get("status") == "FAIL" and attempt < MAX_REPICKS:
             failed_entry = routed.get("entry")
             exclude.add(failed_entry)
+            # A family-cap failure needs the family out of the fit
+            # set, not just a new entry — exclude the style id too.
+            # A pair failure excludes the entry only: excluding the
+            # style would break single-entry families (product.demo
+            # is the only product entry) by dropping the style.
+            if ("family" in (variety.get("detail") or "")
+                    and routed.get("style")):
+                exclude.add(routed["style"])
             repicks.append({
                 "reason": f"Check 8 FAIL: {variety.get('detail', '')}",
                 "from_entry": failed_entry,

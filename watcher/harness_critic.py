@@ -292,7 +292,11 @@ def check_variety(picks, runs=None):
         runs = recent_runs(COOLDOWN_WINDOW)
     panel = picks.get("panel") or ""
     entry = picks.get("entry") or effective_entry(picks)
-    family = (picks.get("style") or "default").split(".")[0]
+    # No style pick means no style family: a plain host render is
+    # not a family, and its cap is never tripped (see
+    # phase1_history.primary_family_of).
+    family = picks.get("style")
+    family = family.split(".")[0] if family else None
     if runs:
         prev = runs[-1]
         prev_picks = prev.get("picks") or {}
@@ -308,17 +312,21 @@ def check_variety(picks, runs=None):
                 return {"status": "FAIL",
                         "detail": (f"pair {panel} + {entry} repeats "
                                    f"within the last {len(runs)} renders")}
-    fam_count = sum(1 for run in runs
-                    if primary_family_of(run) == family)
-    if fam_count >= FAMILY_CAP:
-        return {"status": "FAIL",
-                "detail": (f"family '{family}' already takes {fam_count} "
-                           f"of the last {len(runs)} renders "
-                           f"(cap {FAMILY_CAP})")}
+    fam_count = 0
+    if family is not None:
+        fam_count = sum(1 for run in runs
+                        if primary_family_of(run) == family)
+        if fam_count >= FAMILY_CAP:
+            return {"status": "FAIL",
+                    "detail": (f"family '{family}' already takes {fam_count} "
+                               f"of the last {len(runs)} renders "
+                               f"(cap {FAMILY_CAP})")}
+    fam_note = (f"family '{family}' at {fam_count}/{len(runs)}"
+                if family is not None
+                else "no style family (plain host render)")
     return {"status": "PASS",
             "detail": (f"pair {panel} + {entry} not in the last "
-                       f"{len(runs)} renders; family '{family}' at "
-                       f"{fam_count}/{len(runs)}")}
+                       f"{len(runs)} renders; {fam_note}")}
 
 
 def critic(mp4_path, storyboard, imac_mp4=None, srt_path=None,
