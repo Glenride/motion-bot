@@ -414,12 +414,26 @@ def critic(mp4_path, storyboard, imac_mp4=None, srt_path=None,
                 1 for t, _ in frames
                 if per_frame[f"{t}s"].get("accent_family", {"pct": 0})["pct"] > 0.02
             )
-            palette_ok = light_ok and text_ok and accent_frames >= (n_frames + 1) // 2
+            # Rise renders no accent by design (Harness.tsx: "rise =
+            # clean gradient, no particles, so the rising type reads";
+            # particleCount 0, no accent background treatment). The
+            # accent-family sub-check is SKIP for rise, never a false
+            # FAIL — the light-field and text sub-checks still apply.
+            # Same pattern as narrated clips skipping palette checks.
+            variant = storyboard.get("variant")
+            if variant == "rise":
+                accent_ok = True
+                accent_note = ("accent family: SKIP (rise variant renders "
+                               "no accent by design)")
+            else:
+                accent_ok = accent_frames >= (n_frames + 1) // 2
+                accent_note = (f"accent family >0.02% in "
+                               f"{accent_frames}/{n_frames} frames")
+            palette_ok = light_ok and text_ok and accent_ok
             checks["palette_present"] = {
                 "status": "PASS" if palette_ok else "FAIL",
                 "detail": ("light field (bg/surface union) >50% every frame; "
-                           f"text >0.02% every frame ({text_ok}); accent family "
-                           f">0.02% in {accent_frames}/{n_frames} frames"),
+                           f"text >0.02% every frame ({text_ok}); {accent_note}"),
                 "numbers": per_frame,
             }
         else:
