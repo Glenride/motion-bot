@@ -88,7 +88,9 @@ from harness_director import (  # noqa: E402
 from llm_director import run_llm_via_imac  # noqa: E402
 from skill_router import route as skill_route, craft_notes, load_skill_text  # noqa: E402
 from skill_verify import verify as skill_verify, has_alpha  # noqa: E402
-from harness_director import parse_data_rows, parse_labels  # noqa: E402
+from harness_director import parse_data_rows, parse_labels, draft_data_rows  # noqa: E402
+from phase1_router import route as phase1_route  # noqa: E402
+from phase1_history import append_run as phase1_append_run  # noqa: E402
 from harness_director import (  # noqa: E402
     ad_beat_scenes,
     build_ad_variant,
@@ -448,16 +450,25 @@ CRITIC_STRUCTURAL_NARRATED = (
     "probe", "frames_differ", "not_blank", "audio_present", "captions_present")
 
 
-def run_critic(mp4_path, storyboard_path, imac_mp4_rel, srt_path=None):
+def run_critic(mp4_path, storyboard_path, imac_mp4_rel, srt_path=None,
+               picks=None):
     """Run harness_critic.py on a rendered clip. Returns its report dict.
     Never raises for a FAIL verdict — only for a critic crash (no report
-    file), which the caller treats as a Harness-step failure."""
+    file), which the caller treats as a Harness-step failure. picks
+    (a Phase 1 route record) runs Check 8, the variety gate; without
+    it the gate SKIPs and the live watcher behaves as before."""
     critic_path = Path(__file__).resolve().parent / "harness_critic.py"
     cmd = [sys.executable, str(critic_path), str(mp4_path),
            str(storyboard_path), "--imac-mp4",
            f"~/projects/motion-bot/{imac_mp4_rel}"]
     if srt_path is not None:
         cmd += ["--srt", str(srt_path)]
+    if picks is not None:
+        picks_path = Path(mp4_path).with_suffix(".picks.json")
+        picks_path.write_text(json.dumps(picks, indent=2) + "\n")
+        cmd += ["--picks", str(picks_path),
+                "--history",
+                str(Path(__file__).resolve().parent / "history.jsonl")]
     r = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
     report_path = Path(str(mp4_path).replace(".mp4", ".critic.json"))
     if report_path.exists():
@@ -483,6 +494,58 @@ def critic_summary(report):
         cues = checks.get("captions_present", {}).get("number", "?")
         summary += f" [narrated: voice {audio} dB, {cues} caption cues]"
     return summary
+
+
+# ------------------------------------------------------- Phase 1 routing
+# (Nov 22): the Harness route uses the Phase 1 router (registry +
+# LRU rotation, draft-first) instead of skill_route + task-id
+# rotation. The rung chain still keys off skill-pack names, so the
+# route's style pick maps to the pack the rung expects; the narrated
+# path keeps skill_route.
+PHASE1_STYLE_SKILLS = {
+    "product.demo": ["ecommerce-video-skills"],
+    "ad.template": ["ad-video-skills"],
+    "canvas.cut-paper": ["animate-canvas"],
+    "canvas.crosshatch": ["animate-canvas"],
+    "broll.cut-on-noun": ["b-roll-skills"],
+    "explainer.diagram": ["explainer-video-skills"],
+    "explainer.whiteboard": ["explainer-video-skills"],
+    "explainer.isometric": ["explainer-video-skills"],
+    "whatif.rig": ["what-if-animation"],
+}
+
+
+def phase1_skills_for(style):
+    """Phase 1 style id -> skill-pack names the rung chain expects."""
+    if not style:
+        return []
+    if style in PHASE1_STYLE_SKILLS:
+        return list(PHASE1_STYLE_SKILLS[style])
+    if style.startswith("everest."):
+        return [f"everest-{style.split('.', 1)[1]}"]
+    if style.startswith("canvas."):
+        return ["animate-canvas"]
+    if style.startswith("explainer."):
+        return ["explainer-video-skills"]
+    return []
+
+
+def phase1_craft_notes(route):
+    """One-line craft note from a Phase 1 route record."""
+    parts = []
+    if route.get("labelled"):
+        parts.append(f"labelled: {route.get('label_source') or ''}")
+    approx = route.get("approximation")
+    if approx:
+        note = approx.get("note") if isinstance(approx, dict) else str(approx)
+        parts.append(f"APPROXIMATION: {note}")
+    if route.get("reason"):
+        parts.append(str(route["reason"]))
+    for a in route.get("assumptions", []):
+        parts.append(f"assumption: {a}")
+    for p in route.get("placeholders", []):
+        parts.append(f"placeholder: {p}")
+    return "\n".join(parts) if parts else "phase1 route (registry rotation)"
 
 
 # ------------------------------------------------------- brief translation
@@ -611,6 +674,34 @@ def _hq_status_text(snapshot_tasks):
             "." + latest)
 
 
+def _find_verbatim_task(password, title, body, project_id, seen_task_ids):
+    """Find an OPEN task in this bot's project with this exact title
+    AND verbatim details, not already linked to another HQ message.
+    Crash-window dedup (fix 2026-11-14): when a POST /api/tasks
+    response is lost to the proxy, or the process dies before
+    mark_seen, a retry must adopt the existing task, never create a
+    second one. A live read-back, not the snapshot — the task may
+    have been created seconds ago by this same run. Title-only
+    matching is NOT enough: two different messages can share a
+    first line. Status must be open (an in_progress task is already
+    being worked). Tasks already in seen for another HQ message are
+    excluded: they belong to that message. Raises on a failed /
+    unparseable workspace read: the caller keeps the message
+    pending rather than creating a possible duplicate."""
+    resp = api("GET", "/api/workspace", password)
+    ws = resp.get("data") if isinstance(resp, dict) else None
+    if not isinstance(ws, dict) or not isinstance(ws.get("tasks"), list):
+        raise RuntimeError("workspace read-back missing task list")
+    for t in ws["tasks"]:
+        if (t.get("projectId") == project_id
+                and (t.get("title") or "") == title
+                and (t.get("details") or "") == body
+                and t.get("status") == "open"
+                and t.get("id") not in seen_task_ids):
+            return t
+    return None
+
+
 def _hq_handle_message(password, msg, origin, summary, status_text):
     """One HQ message -> command reply / correction / new task.
     Returns True when fully handled (safe to drop from pending)."""
@@ -696,6 +787,32 @@ def _hq_handle_message(password, msg, origin, summary, status_text):
         summary["hq"].append({"hq_id": hq_id, "action": "empty_ignored"})
         return True
 
+    # Crash-window dedup (fix 2026-11-14): a task with this exact
+    # title AND verbatim body may already exist (the create landed
+    # but the response was lost, or the process died before
+    # mark_seen). Adopt it instead of creating a second task. A
+    # read failure keeps the message pending — never create blind.
+    seen_task_ids = set()
+    for rec in hq_bridge.load_seen().values():
+        tid = rec.get("task_id") if isinstance(rec, dict) else rec
+        if tid:
+            seen_task_ids.add(tid)
+    try:
+        existing = _find_verbatim_task(password, title, body,
+                                       MOTION_BOT_PROJECT_ID,
+                                       seen_task_ids)
+    except Exception as e:
+        log(f"HQ {hq_id}: verbatim check failed ({e}); kept in pending")
+        return False
+    if existing:
+        tid = existing["id"]
+        origin[tid] = hq_id
+        hq_bridge.drop_pending(hq_id)
+        hq_bridge.mark_seen(hq_id, tid)
+        summary["hq"].append({"hq_id": hq_id, "action": "task_adopted",
+                              "task_id": tid})
+        return existing
+
     try:
         resp = api("POST", "/api/tasks", password, {
             "title": title, "status": "open", "priority": "normal",
@@ -708,8 +825,22 @@ def _hq_handle_message(password, msg, origin, summary, status_text):
     data = resp.get("data") if isinstance(resp, dict) else resp
     tid = data.get("id") if isinstance(data, dict) else None
     if not tid:
-        log(f"HQ {hq_id}: task create returned no id; kept in pending")
-        return False
+        # The create may have succeeded server-side while the
+        # response was lost. Adopt the verbatim task instead of
+        # creating a duplicate.
+        try:
+            adopted = _find_verbatim_task(password, title, body,
+                                          MOTION_BOT_PROJECT_ID,
+                                          seen_task_ids)
+        except Exception as e:
+            log(f"HQ {hq_id}: adopt check failed ({e}); kept in pending")
+            return False
+        if adopted:
+            tid = adopted["id"]
+            log(f"HQ {hq_id}: create response lost; adopted task {tid}")
+        else:
+            log(f"HQ {hq_id}: task create returned no id; kept in pending")
+            return False
     # Created: record it BEFORE verifying, so a verify hiccup can never
     # duplicate the task on retry.
     origin[tid] = hq_id
@@ -1046,26 +1177,48 @@ def main():
             rendered = False
             if composition != "Signalwood":
                 try:
-                    storyboard = build_storyboard(task)
-                    _route = skill_route((task.get("title") or "") + "\n" + (task.get("details") or ""))
+                    # Phase 1 routing (Nov 22): the registry router
+                    # picks panel/variant/font/motion/kinetic/move/
+                    # style by label, content fit, then LRU — the
+                    # old skill_route + task-id rotation is retired
+                    # for the Harness route (narrated keeps it).
+                    # The route dict gains a "skills" key so the rung
+                    # chain below reads it unchanged.
+                    _route = phase1_route(task)
+                    _route["skills"] = phase1_skills_for(_route.get("style"))
+                    storyboard = build_storyboard(task, route=_route)
                     storyboard["skills"] = _route["skills"]
-                    storyboard["format"] = _route["format"]
-                    storyboard["craft_notes"] = craft_notes(_route)
-                    _composition = "Vertical" if _route["format"] == "vertical" else "Harness"
+                    storyboard["format"] = _route.get("format", "landscape")
+                    storyboard["craft_notes"] = phase1_craft_notes(_route)
+                    _composition = "Vertical" if _route.get("format") == "vertical" else "Harness"
                     _codec = None
                     _labels = parse_labels(task.get("details") or "")
                     _rows = parse_data_rows(task.get("details") or "")
-                    if _rows:
+                    _style = _route.get("style") or ""
+                    if _rows or _style.startswith("chart."):
                         # Chart rung (v2.3, v2.8): data rows ALONE fire
                         # the chart — a task carrying Data: rows is a
                         # data task, no chart trigger words needed.
                         # Numbers from the task, nothing invented.
                         # Count-up / build-and-hold live in Chart.tsx
                         # (v2.8); Unit:/Mode: labels pass through.
+                        # Phase 1 draft-first: a chart-style pick
+                        # with no numbers still renders, with
+                        # placeholder bars — never a refusal.
+                        if not _rows:
+                            _rows = draft_data_rows(task.get("details") or "")
+                            storyboard.setdefault("notes", []).append(
+                                "phase1 draft: chart brief carries no "
+                                "numbers — placeholder bars "
+                                "[VALUE 1/2 NEEDED] at 0; add Data: "
+                                "rows and re-render")
                         _composition = "Chart"
-                        if _labels.get("chart", "").lower() == "d3":
+                        if _labels.get("chart", "").lower() == "d3" or _style == "chart.d3":
                             # D3 rung (Nov 3 2026, opt-in only): d3 scales
                             # lay out the same bars; default Chart unchanged.
+                            # The route pick honors an LRU d3 pick too —
+                            # without this the record would claim D3Chart
+                            # while the rung rendered Chart.
                             _composition = "D3Chart"
                         storyboard["bars"] = _rows
                         storyboard["chartTitle"] = storyboard.get("hook", "")
@@ -1073,6 +1226,10 @@ def main():
                             storyboard["unit"] = _labels["unit"]
                         if _labels.get("mode", "").lower() in ("bars", "stats"):
                             storyboard["mode"] = _labels["mode"].lower()
+                        elif _style == "chart.stats":
+                            storyboard["mode"] = "stats"
+                        elif _style == "chart.count-up":
+                            storyboard["mode"] = "bars"
                     elif "ecommerce-video-skills" in _route["skills"] or _labels.get("product"):
                         # Product-demo rung (v2.8): ProductDemo comp.
                         # build_product_demo returns None without a
@@ -1081,7 +1238,8 @@ def main():
                         # product, and money only from labels.
                         _demo = build_product_demo(
                             task, storyboard,
-                            ecommerce_matched=("ecommerce-video-skills" in _route["skills"]))
+                            ecommerce_matched=("ecommerce-video-skills" in _route["skills"]),
+                            draft=True)
                         if _demo:
                             _composition = "ProductDemo"
                             storyboard["product"] = _demo["product"]
@@ -1112,7 +1270,10 @@ def main():
                         # Remotion code. pick_canvas_style returns None
                         # for the five unimplemented styles — those
                         # tasks keep the default route, craft notes only.
-                        _style = pick_canvas_style(task, storyboard["notes"])
+                        _style = pick_canvas_style(
+                            task, storyboard["notes"],
+                            style=_style.split(".", 1)[1]
+                            if _style.startswith("canvas.") else None)
                         if _style:
                             _composition = "CanvasStyles"
                             storyboard["canvasStyle"] = _style
@@ -1144,7 +1305,7 @@ def main():
                         # multi-word phrases, so a bare label would
                         # otherwise never reach the panel code.
                         _everest = build_everest_panel(
-                            task, storyboard, _route["skills"])
+                            task, storyboard, _route["skills"], draft=True)
                         if _everest:
                             _composition = "EverestPanels"
                             storyboard["category"] = _everest["category"]
@@ -1166,7 +1327,11 @@ def main():
                         # returns None when the task carries no ideas —
                         # those tasks keep the default route, craft
                         # notes only, never an invented diagram.
-                        _explainer = build_explainer(task, storyboard)
+                        _explainer = build_explainer(
+                            task, storyboard, draft=True,
+                            style=(_route.get("style") or "").split(".", 1)[1]
+                            if (_route.get("style") or "").startswith("explainer.")
+                            else None)
                         if _explainer:
                             _composition = "Explainer"
                             # Top-level keys: the brief IS the props.
@@ -1191,7 +1356,7 @@ def main():
                         # wired. The comp is 720x1280, so the route
                         # format flips to vertical for the
                         # expected-dimensions check.
-                        _whatif = build_whatif(task, storyboard)
+                        _whatif = build_whatif(task, storyboard, draft=True)
                         if _whatif:
                             _composition = "WhatIf"
                             _route["format"] = "vertical"
@@ -1260,6 +1425,38 @@ def main():
                                 "lower-third export has no alpha channel)")
                         entry["skill_verify"] = {"alpha": True}
                         entry["critic"] = "alpha-ok"
+                        try:
+                            _approx = _route.get("approximation")
+                            _approx_note = (
+                                _approx.get("note")
+                                if isinstance(_approx, dict) else str(_approx or ""))
+                            phase1_append_run({
+                                "brief_id": f"task-{tid}",
+                                "brief_title": title,
+                                "picks": {k: _route.get(k) for k in
+                                          ("panel", "variant", "font", "motion",
+                                           "kinetic", "move", "style",
+                                           "composition", "format")
+                                          if _route.get(k) is not None},
+                                "critic": {"overall": "PASS",
+                                           "checks": {"alpha": "PASS"},
+                                           "summary": "alpha-ok"},
+                                "labelled": bool(_route.get("labelled")),
+                                "label": _route.get("label_source") or "",
+                                "approximation": _approx_note,
+                                "assumptions": _route.get("assumptions", []),
+                                "placeholders": _route.get("placeholders", []),
+                                "repicks": [],
+                                "delivery_note": "",
+                                "mp4": mp4_name,
+                                "storyboard": sb_name,
+                                "tag": "live",
+                                "composition": _composition,
+                                "forced": False,
+                                "expect": {},
+                            })
+                        except Exception as _h_e:
+                            log(f"task {tid}: phase1 history append failed: {_h_e}")
                         _done = mark_done(password, tid, (
                             f"Motion Bot rendered (LowerThird, transparent ProRes .mov): "
                             f"out/{mp4_name} — video file: "
@@ -1283,7 +1480,8 @@ def main():
                         raise RuntimeError(
                             "critic structural FAIL (skill_verify: "
                             + "; ".join(_sverify["mismatches"]) + ")")
-                    critic = run_critic(mp4_path, sb_path, f"out/{mp4_name}")
+                    critic = run_critic(mp4_path, sb_path, f"out/{mp4_name}",
+                                        picks=_route)
                     entry["critic"] = critic.get("overall")
                     structural_fail = [
                         name for name in CRITIC_STRUCTURAL
@@ -1295,6 +1493,17 @@ def main():
                             + ", ".join(structural_fail) + "): "
                             + critic_summary(critic)
                         )
+                    # Check 8 (Phase 1): a repeat ships never — the
+                    # run stops here and the task stays open for the
+                    # next sweep (fresh route), instead of falling
+                    # back to Generic and delivering a repeat clip.
+                    # The router's own cooldown loop re-picks at route
+                    # time, so this fires only when it missed one.
+                    _variety = critic.get("checks", {}).get("variety", {})
+                    if _variety.get("status") == "FAIL":
+                        raise RuntimeError(
+                            "critic variety FAIL (Check 8): "
+                            + _variety.get("detail", ""))
                     # Opt-in silence cut (Nov 3 2026): ONLY when details
                     # carry `Silence-cut: on`. Runs on the iMac (where
                     # auto-editor lives) and is ffprobe-verified before
@@ -1365,6 +1574,43 @@ def main():
                         except Exception as _fin_e:
                             entry["finishing"] = {"ok": False,
                                                   "reason": str(_fin_e)[:300]}
+                    # Phase 1 history: every render is logged; the
+                    # Router reads this log, never the model. The
+                    # record carries the FINAL mp4 (after any
+                    # finishing pass) and the shipped picks.
+                    try:
+                        _approx = _route.get("approximation")
+                        _approx_note = (
+                            _approx.get("note")
+                            if isinstance(_approx, dict) else str(_approx or ""))
+                        phase1_append_run({
+                            "brief_id": f"task-{tid}",
+                            "brief_title": title,
+                            "picks": {k: _route.get(k) for k in
+                                      ("panel", "variant", "font", "motion",
+                                       "kinetic", "move", "style",
+                                       "composition", "format")
+                                      if _route.get(k) is not None},
+                            "critic": {"overall": critic.get("overall"),
+                                       "checks": {k: v.get("status") for k, v in
+                                                  critic.get("checks", {}).items()},
+                                       "summary": critic_summary(critic)},
+                            "labelled": bool(_route.get("labelled")),
+                            "label": _route.get("label_source") or "",
+                            "approximation": _approx_note,
+                            "assumptions": _route.get("assumptions", []),
+                            "placeholders": _route.get("placeholders", []),
+                            "repicks": [],
+                            "delivery_note": "",
+                            "mp4": mp4_name,
+                            "storyboard": sb_name,
+                            "tag": "live",
+                            "composition": _composition,
+                            "forced": False,
+                            "expect": {},
+                        })
+                    except Exception as _h_e:
+                        log(f"task {tid}: phase1 history append failed: {_h_e}")
                     _done = mark_done(password, tid, (
                         f"Motion Bot rendered ({_composition}, "
                         f"{storyboard.get('lengthSeconds', 12)}s): "
@@ -1388,7 +1634,8 @@ def main():
                     rendered = True
                 except Exception as e:
                     if (isinstance(e, RuntimeError)
-                            and str(e).startswith("critic structural FAIL")):
+                            and (str(e).startswith("critic structural FAIL")
+                                 or str(e).startswith("critic variety FAIL"))):
                         raise
                     log(f"task {tid}: harness failed, falling back to Generic: {e}")
                     entry["harness_fallback"] = str(e)[:300]

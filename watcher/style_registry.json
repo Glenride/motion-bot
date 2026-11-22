@@ -13,7 +13,7 @@
       ],
       "family": "panel",
       "id": "panel.centered",
-      "last_used_at": "2026-11-22T21:53:43+00:00",
+      "last_used_at": "2026-11-22T22:26:36+00:00",
       "proof_clip": "out/proof-panel-centered.mp4",
       "props_key": "panel",
       "ratios": [
@@ -21,7 +21,7 @@
         "16:9"
       ],
       "status": "implemented",
-      "use_count": 2,
+      "use_count": 5,
       "use_for": [
         "layout structure",
         "default centered words"
@@ -40,7 +40,7 @@
       ],
       "family": "panel",
       "id": "panel.split",
-      "last_used_at": "2026-11-22T21:49:11+00:00",
+      "last_used_at": "2026-11-22T22:25:40+00:00",
       "proof_clip": "out/proof-panel-split.mp4",
       "props_key": "panel",
       "ratios": [
@@ -48,7 +48,7 @@
         "16:9"
       ],
       "status": "implemented",
-      "use_count": 1,
+      "use_count": 5,
       "use_for": [
         "layout structure",
         "two-zone split"
@@ -67,7 +67,7 @@
       ],
       "family": "panel",
       "id": "panel.card",
-      "last_used_at": "2026-11-22T21:50:04+00:00",
+      "last_used_at": "2026-11-22T22:26:09+00:00",
       "proof_clip": "out/proof-panel-card.mp4",
       "props_key": "panel",
       "ratios": [
@@ -75,7 +75,7 @@
         "16:9"
       ],
       "status": "implemented",
-      "use_count": 2,
+      "use_count": 5,
       "use_for": [
         "layout structure",
         "card-framed words"
@@ -94,7 +94,7 @@
       ],
       "family": "panel",
       "id": "panel.lower-third",
-      "last_used_at": "2026-11-22T21:48:43+00:00",
+      "last_used_at": "2026-11-22T22:27:02+00:00",
       "proof_clip": "out/proof-panel-lower-third.mp4",
       "props_key": "panel",
       "ratios": [
@@ -102,7 +102,7 @@
         "16:9"
       ],
       "status": "implemented",
-      "use_count": 1,
+      "use_count": 5,
       "use_for": [
         "layout structure",
         "words low with space above"
@@ -121,7 +121,7 @@
       ],
       "family": "panel",
       "id": "panel.word-stack",
-      "last_used_at": "2026-11-22T21:49:39+00:00",
+      "last_used_at": "2026-11-22T22:33:28+00:00",
       "proof_clip": "out/proof-panel-word-stack.mp4",
       "props_key": "panel",
       "ratios": [
@@ -129,7 +129,7 @@
         "16:9"
       ],
       "status": "implemented",
-      "use_count": 1,
+      "use_count": 5,
       "use_for": [
         "layout structure",
         "stacked words, staggered rise"
@@ -148,7 +148,7 @@
       ],
       "family": "variant",
       "id": "variant.orbit",
-      "last_used_at": "2026-11-22T21:53:43+00:00",
+      "last_used_at": "2026-11-22T22:33:28+00:00",
       "proof_clip": "out/proof-v212-harness-391.mp4",
       "props_key": "variant",
       "ratios": [
@@ -156,7 +156,7 @@
         "16:9"
       ],
       "status": "implemented",
-      "use_count": 4,
+      "use_count": 10,
       "use_for": [
         "background motion",
         "drifting-dot field"
@@ -175,7 +175,7 @@
       ],
       "family": "motion",
       "id": "motion.kinetic",
-      "last_used_at": "2026-11-22T21:48:43+00:00",
+      "last_used_at": "2026-11-22T22:27:02+00:00",
       "proof_clip": "out/proof-panel-centered.mp4",
       "proof_note": "implicit: the default motion in all five panel proof clips",
       "props_key": "motion",
@@ -184,7 +184,7 @@
         "16:9"
       ],
       "status": "implemented",
-      "use_count": 3,
+      "use_count": 8,
       "use_for": [
         "word entry",
         "default kinetic word-by-word"
@@ -203,7 +203,7 @@
       ],
       "family": "font",
       "id": "font.serif",
-      "last_used_at": "2026-11-22T21:50:04+00:00",
+      "last_used_at": "2026-11-22T22:27:02+00:00",
       "proof_clip": "out/proof-panel-centered.mp4",
       "proof_note": "implicit: the default font in all five panel proof clips",
       "props_key": "font",
@@ -212,7 +212,7 @@
         "16:9"
       ],
       "status": "implemented",
-      "use_count": 4,
+      "use_count": 10,
       "use_for": [
         "typeface",
         "default serif stack"
@@ -233,7 +233,7 @@
       ],
       "family": "move",
       "id": "move.pop-in",
-      "last_used_at": "2026-11-22T21:50:04+00:00",
+      "last_used_at": "2026-11-22T22:27:02+00:00",
       "proof_clip": "out/proof-v211-motion-registry.mp4",
       "proof_note": "on screen in proof-v211-motion-registry (moves: pop-in, mask-transition, dolly-in)",
       "props_key": "moves",
@@ -242,7 +242,7 @@
         "16:9"
       ],
       "status": "implemented",
-      "use_count": 1,
+      "use_count": 2,
       "use_for": [
         "entrance",
         "reveal"
@@ -262,7 +262,7 @@
       ],
       "family": "move",
       "id": "move.mask-transition",
-      "last_used_at": "2026-11-22T21:49:39+00:00",
+      "last_used_at": "2026-11-22T22:26:36+00:00",
       "proof_clip": "out/proof-v211-motion-registry.mp4",
       "proof_note": "on screen in proof-v211-motion-registry (moves: pop-in, mask-transition, dolly-in)",
       "props_key": "moves",
@@ -271,7 +271,7 @@
         "16:9"
       ],
       "status": "implemented",
-      "use_count": 1,
+      "use_count": 2,
       "use_for": [
         "transition",
         "growing-circle scene change"
@@ -291,7 +291,7 @@
       ],
       "family": "move",
       "id": "move.dolly-in",
-      "last_used_at": "2026-11-22T21:48:43+00:00",
+      "last_used_at": "2026-11-22T22:24:52+00:00",
       "proof_clip": "out/proof-v211-motion-registry.mp4",
       "proof_note": "on screen in proof-v211-motion-registry (moves: pop-in, mask-transition, dolly-in)",
       "props_key": "moves",
@@ -300,7 +300,7 @@
         "16:9"
       ],
       "status": "implemented",
-      "use_count": 1,
+      "use_count": 2,
       "use_for": [
         "camera",
         "slow push-in"
@@ -321,7 +321,7 @@
       ],
       "family": "move",
       "id": "move.typewriter",
-      "last_used_at": null,
+      "last_used_at": "2026-11-22T22:20:09+00:00",
       "proof_clip": "out/proof-v211-motion-registry-2.mp4",
       "proof_note": "on screen in proof-v211-motion-registry-2 (moves: typewriter, count-up, impact-shake); also proof-v213-harness-typewriter.mp4",
       "props_key": "moves",
@@ -330,7 +330,7 @@
         "16:9"
       ],
       "status": "implemented",
-      "use_count": 0,
+      "use_count": 1,
       "use_for": [
         "entrance",
         "reveal",
@@ -352,7 +352,7 @@
       ],
       "family": "move",
       "id": "move.count-up",
-      "last_used_at": "2026-11-22T21:47:43+00:00",
+      "last_used_at": "2026-11-22T22:21:05+00:00",
       "proof_clip": "out/proof-v211-motion-registry-2.mp4",
       "proof_note": "on screen in proof-v211-motion-registry-2 (counts to the brief's own 1,280)",
       "props_key": "moves",
@@ -361,7 +361,7 @@
         "16:9"
       ],
       "status": "implemented",
-      "use_count": 1,
+      "use_count": 2,
       "use_for": [
         "entrance",
         "reveal",
@@ -382,7 +382,7 @@
       ],
       "family": "move",
       "id": "move.impact-shake",
-      "last_used_at": "2026-11-22T21:49:11+00:00",
+      "last_used_at": "2026-11-22T22:26:09+00:00",
       "proof_clip": "out/proof-v211-motion-registry-2.mp4",
       "proof_note": "on screen in proof-v211-motion-registry-2 (moves: typewriter, count-up, impact-shake)",
       "props_key": "moves",
@@ -391,7 +391,7 @@
         "16:9"
       ],
       "status": "implemented",
-      "use_count": 1,
+      "use_count": 2,
       "use_for": [
         "effect",
         "emphasis hit"
@@ -412,7 +412,7 @@
       ],
       "family": "move",
       "id": "move.shape-morph",
-      "last_used_at": null,
+      "last_used_at": "2026-11-22T22:19:45+00:00",
       "proof_clip": "out/proof-v211-motion-registry-3.mp4",
       "proof_note": "on screen in proof-v211-motion-registry-3 (moves: shape-morph, cross-dissolve, rack-focus)",
       "props_key": "moves",
@@ -421,7 +421,7 @@
         "16:9"
       ],
       "status": "implemented",
-      "use_count": 0,
+      "use_count": 1,
       "use_for": [
         "effect",
         "shape change"
@@ -441,7 +441,7 @@
       ],
       "family": "move",
       "id": "move.cross-dissolve",
-      "last_used_at": "2026-11-22T21:48:13+00:00",
+      "last_used_at": "2026-11-22T22:23:17+00:00",
       "proof_clip": "out/proof-v211-motion-registry-3.mp4",
       "proof_note": "on screen in proof-v211-motion-registry-3 (moves: shape-morph, cross-dissolve, rack-focus)",
       "props_key": "moves",
@@ -450,7 +450,7 @@
         "16:9"
       ],
       "status": "implemented",
-      "use_count": 1,
+      "use_count": 2,
       "use_for": [
         "transition",
         "soft scene change"
@@ -470,7 +470,7 @@
       ],
       "family": "move",
       "id": "move.rack-focus",
-      "last_used_at": "2026-11-22T21:53:43+00:00",
+      "last_used_at": "2026-11-22T22:33:28+00:00",
       "proof_clip": "out/proof-v211-motion-registry-3.mp4",
       "proof_note": "on screen in proof-v211-motion-registry-3 (moves: shape-morph, cross-dissolve, rack-focus)",
       "props_key": "moves",
@@ -479,7 +479,7 @@
         "16:9"
       ],
       "status": "implemented",
-      "use_count": 1,
+      "use_count": 2,
       "use_for": [
         "effect",
         "focus pull"
@@ -499,14 +499,14 @@
       ],
       "family": "canvas",
       "id": "canvas.cut-paper",
-      "last_used_at": null,
+      "last_used_at": "2026-11-22T22:27:02+00:00",
       "proof_clip": "out/proof-v27-canvas-cut-paper.mp4",
       "props_key": "canvasStyle",
       "ratios": [
         "9:16"
       ],
       "status": "implemented",
-      "use_count": 0,
+      "use_count": 1,
       "use_for": [
         "full-frame illustrated look",
         "torn-edge layered sheets"
@@ -552,7 +552,7 @@
       ],
       "family": "explainer",
       "id": "explainer.diagram",
-      "last_used_at": null,
+      "last_used_at": "2026-11-22T22:23:38+00:00",
       "proof_clip": "out/proof-v29-explainer-diagram.mp4",
       "props_key": "style",
       "ratios": [
@@ -562,7 +562,7 @@
         "ideas"
       ],
       "status": "implemented",
-      "use_count": 0,
+      "use_count": 1,
       "use_for": [
         "step-by-step explanation",
         "nodes and edges draw on"
@@ -581,7 +581,7 @@
       ],
       "family": "explainer",
       "id": "explainer.whiteboard",
-      "last_used_at": null,
+      "last_used_at": "2026-11-22T22:33:28+00:00",
       "proof_clip": "out/proof-v29-explainer-whiteboard.mp4",
       "props_key": "style",
       "ratios": [
@@ -591,7 +591,7 @@
         "ideas"
       ],
       "status": "implemented",
-      "use_count": 0,
+      "use_count": 1,
       "use_for": [
         "step-by-step explanation",
         "one open stroke per idea, marker nib rides the tip"
@@ -610,7 +610,7 @@
       ],
       "family": "explainer",
       "id": "explainer.isometric",
-      "last_used_at": null,
+      "last_used_at": "2026-11-22T22:25:40+00:00",
       "proof_clip": "out/proof-v29-explainer-isometric.mp4",
       "props_key": "style",
       "ratios": [
@@ -620,7 +620,7 @@
         "ideas"
       ],
       "status": "implemented",
-      "use_count": 0,
+      "use_count": 1,
       "use_for": [
         "step-by-step explanation",
         "2:1 dimetric blocks stacked bottom-up"
@@ -640,7 +640,7 @@
       ],
       "family": "kinetic",
       "id": "kinetic.word",
-      "last_used_at": "2026-11-22T21:50:04+00:00",
+      "last_used_at": "2026-11-22T22:27:02+00:00",
       "proof_clip": "out/proof-panel-centered.mp4",
       "proof_note": "implicit: the default reveal in all five panel proof clips",
       "props_key": "kinetic",
@@ -649,7 +649,7 @@
         "16:9"
       ],
       "status": "implemented",
-      "use_count": 1,
+      "use_count": 4,
       "use_for": [
         "headline moment",
         "default word-by-word line"
@@ -669,7 +669,7 @@
       ],
       "family": "kinetic",
       "id": "kinetic.char-stagger",
-      "last_used_at": "2026-11-22T21:48:43+00:00",
+      "last_used_at": "2026-11-22T22:25:40+00:00",
       "proof_clip": "out/proof-v210-kinetic-char.mp4",
       "props_key": "kinetic",
       "ratios": [
@@ -677,7 +677,7 @@
         "16:9"
       ],
       "status": "implemented",
-      "use_count": 1,
+      "use_count": 4,
       "use_for": [
         "headline moment",
         "per-character stagger"
@@ -697,7 +697,7 @@
       ],
       "family": "kinetic",
       "id": "kinetic.mask",
-      "last_used_at": "2026-11-22T21:49:39+00:00",
+      "last_used_at": "2026-11-22T22:26:36+00:00",
       "proof_clip": "out/proof-v210-kinetic-mask.mp4",
       "props_key": "kinetic",
       "ratios": [
@@ -705,7 +705,7 @@
         "16:9"
       ],
       "status": "implemented",
-      "use_count": 1,
+      "use_count": 4,
       "use_for": [
         "headline moment",
         "mask reveal"
@@ -725,7 +725,7 @@
       ],
       "family": "kinetic",
       "id": "kinetic.blur",
-      "last_used_at": "2026-11-22T21:48:13+00:00",
+      "last_used_at": "2026-11-22T22:25:19+00:00",
       "proof_clip": "out/proof-v210-kinetic-blur.mp4",
       "props_key": "kinetic",
       "ratios": [
@@ -733,7 +733,7 @@
         "16:9"
       ],
       "status": "implemented",
-      "use_count": 1,
+      "use_count": 4,
       "use_for": [
         "headline moment",
         "blur-in"
@@ -753,7 +753,7 @@
       ],
       "family": "kinetic",
       "id": "kinetic.clip-wipe",
-      "last_used_at": "2026-11-22T21:49:11+00:00",
+      "last_used_at": "2026-11-22T22:26:09+00:00",
       "proof_clip": "out/proof-v210-kinetic-wipe.mp4",
       "props_key": "kinetic",
       "ratios": [
@@ -761,7 +761,7 @@
         "16:9"
       ],
       "status": "implemented",
-      "use_count": 1,
+      "use_count": 4,
       "use_for": [
         "headline moment",
         "clip-path wipe"
@@ -781,7 +781,7 @@
       ],
       "family": "kinetic",
       "id": "kinetic.arc",
-      "last_used_at": "2026-11-22T21:53:43+00:00",
+      "last_used_at": "2026-11-22T22:33:28+00:00",
       "proof_clip": "out/proof-v210-kinetic-path.mp4",
       "props_key": "kinetic",
       "ratios": [
@@ -789,7 +789,7 @@
         "16:9"
       ],
       "status": "implemented",
-      "use_count": 2,
+      "use_count": 5,
       "use_for": [
         "headline moment",
         "text on an arc"
@@ -834,14 +834,14 @@
       ],
       "family": "tiktok",
       "id": "tiktok.fast-cut",
-      "last_used_at": null,
+      "last_used_at": "2026-11-22T22:26:09+00:00",
       "proof_clip": "out/proof-v211-tiktok-fast-cut.mp4",
       "props_key": "tiktokFormat",
       "ratios": [
         "9:16"
       ],
       "status": "implemented",
-      "use_count": 0,
+      "use_count": 1,
       "use_for": [
         "vertical social clip",
         "uneven cuts with punch-in"
@@ -860,14 +860,14 @@
       ],
       "family": "tiktok",
       "id": "tiktok.duet",
-      "last_used_at": null,
+      "last_used_at": "2026-11-22T22:24:03+00:00",
       "proof_clip": "out/proof-v211-tiktok-duet.mp4",
       "props_key": "tiktokFormat",
       "ratios": [
         "9:16"
       ],
       "status": "implemented",
-      "use_count": 0,
+      "use_count": 1,
       "use_for": [
         "vertical social clip",
         "reaction split"
@@ -944,7 +944,7 @@
       ],
       "family": "chart",
       "id": "chart.count-up",
-      "last_used_at": null,
+      "last_used_at": "2026-11-22T22:24:52+00:00",
       "proof_clip": "out/proof-v28-chart.mp4",
       "props_key": "mode",
       "ratios": [
@@ -954,7 +954,7 @@
         "numbers"
       ],
       "status": "implemented",
-      "use_count": 0,
+      "use_count": 4,
       "use_for": [
         "data",
         "bars build one at a time, count-up lands exactly"
@@ -1063,7 +1063,7 @@
       ],
       "family": "product",
       "id": "product.demo",
-      "last_used_at": null,
+      "last_used_at": "2026-11-22T22:25:19+00:00",
       "proof_clip": "out/proof-v28-product.mp4",
       "props_key": "product",
       "ratios": [
@@ -1073,7 +1073,7 @@
         "product"
       ],
       "status": "implemented",
-      "use_count": 0,
+      "use_count": 2,
       "use_for": [
         "product teaser",
         "product-first frame, feature callouts, end card offer"
@@ -1194,8 +1194,8 @@
       "proof_clip": "out/phase1-adm-5-harness.mp4",
       "proof_note": "admission render adm-5 (p1-20261122T214939+0000), critic PASS",
       "critic_pass": true,
-      "last_used_at": "2026-11-22T21:49:39+00:00",
-      "use_count": 1
+      "last_used_at": "2026-11-22T22:26:36+00:00",
+      "use_count": 7
     },
     {
       "id": "font.mono",
@@ -1222,8 +1222,8 @@
       "proof_clip": "out/phase1-adm-5-harness.mp4",
       "proof_note": "admission render adm-5 (p1-20261122T214939+0000), critic PASS",
       "critic_pass": true,
-      "last_used_at": "2026-11-22T21:49:39+00:00",
-      "use_count": 1
+      "last_used_at": "2026-11-22T22:26:36+00:00",
+      "use_count": 7
     },
     {
       "id": "motion.scale",
@@ -1250,8 +1250,8 @@
       "proof_clip": "out/phase1-adm-5-harness.mp4",
       "proof_note": "admission render adm-5 (p1-20261122T214939+0000), critic PASS",
       "critic_pass": true,
-      "last_used_at": "2026-11-22T21:49:39+00:00",
-      "use_count": 1
+      "last_used_at": "2026-11-22T22:33:28+00:00",
+      "use_count": 6
     },
     {
       "id": "variant.kinetic",
@@ -1278,8 +1278,8 @@
       "proof_clip": "out/phase1-adm-6-harness.mp4",
       "proof_note": "admission render adm-6 (p1-20261122T215004+0000), critic PASS",
       "critic_pass": true,
-      "last_used_at": "2026-11-22T21:50:04+00:00",
-      "use_count": 1
+      "last_used_at": "2026-11-22T22:27:02+00:00",
+      "use_count": 7
     },
     {
       "id": "motion.rise",
@@ -1306,8 +1306,8 @@
       "proof_clip": "out/phase1-adm-6-harness.mp4",
       "proof_note": "admission render adm-6 (p1-20261122T215004+0000), critic PASS",
       "critic_pass": true,
-      "last_used_at": "2026-11-22T21:50:04+00:00",
-      "use_count": 1
+      "last_used_at": "2026-11-22T22:26:09+00:00",
+      "use_count": 5
     },
     {
       "id": "font.sans",
@@ -1334,8 +1334,8 @@
       "proof_clip": "out/phase1-adm-7-harness.mp4",
       "proof_note": "admission render adm-7 (p1-20261122T215343+0000), critic PASS",
       "critic_pass": true,
-      "last_used_at": "2026-11-22T21:53:43+00:00",
-      "use_count": 1
+      "last_used_at": "2026-11-22T22:33:28+00:00",
+      "use_count": 7
     },
     {
       "id": "motion.slide",
@@ -1362,8 +1362,8 @@
       "proof_clip": "out/phase1-adm-7-harness.mp4",
       "proof_note": "admission render adm-7 (p1-20261122T215343+0000), critic PASS",
       "critic_pass": true,
-      "last_used_at": "2026-11-22T21:53:43+00:00",
-      "use_count": 1
+      "last_used_at": "2026-11-22T22:26:36+00:00",
+      "use_count": 5
     },
     {
       "id": "move.stagger",
@@ -1392,8 +1392,8 @@
       "proof_clip": "out/phase1-adm-1-harness.mp4",
       "proof_note": "admission render adm-1 (p1-20261122T214743+0000), critic PASS",
       "critic_pass": true,
-      "last_used_at": "2026-11-22T21:47:43+00:00",
-      "use_count": 1
+      "last_used_at": "2026-11-22T22:22:48+00:00",
+      "use_count": 2
     },
     {
       "id": "move.mask-reveal",
@@ -1421,8 +1421,8 @@
       "proof_clip": "out/phase1-adm-1-harness.mp4",
       "proof_note": "admission render adm-1 (p1-20261122T214743+0000), critic PASS",
       "critic_pass": true,
-      "last_used_at": "2026-11-22T21:47:43+00:00",
-      "use_count": 1
+      "last_used_at": "2026-11-22T22:21:56+00:00",
+      "use_count": 2
     },
     {
       "id": "move.kinetic-type",
@@ -1452,8 +1452,8 @@
       "proof_clip": "out/phase1-adm-1-harness.mp4",
       "proof_note": "admission render adm-1 (p1-20261122T214743+0000), critic PASS",
       "critic_pass": true,
-      "last_used_at": "2026-11-22T21:47:43+00:00",
-      "use_count": 1
+      "last_used_at": "2026-11-22T22:21:32+00:00",
+      "use_count": 2
     },
     {
       "id": "move.light-sweep",
@@ -1481,8 +1481,8 @@
       "proof_clip": "out/phase1-adm-2-harness.mp4",
       "proof_note": "admission render adm-2 (p1-20261122T214813+0000), critic PASS",
       "critic_pass": true,
-      "last_used_at": "2026-11-22T21:48:13+00:00",
-      "use_count": 1
+      "last_used_at": "2026-11-22T22:23:38+00:00",
+      "use_count": 2
     },
     {
       "id": "move.pan",
@@ -1510,8 +1510,8 @@
       "proof_clip": "out/phase1-adm-2-harness.mp4",
       "proof_note": "admission render adm-2 (p1-20261122T214813+0000), critic PASS",
       "critic_pass": true,
-      "last_used_at": "2026-11-22T21:48:13+00:00",
-      "use_count": 1
+      "last_used_at": "2026-11-22T22:24:03+00:00",
+      "use_count": 2
     },
     {
       "id": "move.zoom-in",
@@ -1539,8 +1539,8 @@
       "proof_clip": "out/phase1-adm-2-harness.mp4",
       "proof_note": "admission render adm-2 (p1-20261122T214813+0000), critic PASS",
       "critic_pass": true,
-      "last_used_at": "2026-11-22T21:48:13+00:00",
-      "use_count": 1
+      "last_used_at": "2026-11-22T22:24:28+00:00",
+      "use_count": 2
     },
     {
       "id": "move.jump-cut",
@@ -1568,8 +1568,8 @@
       "proof_clip": "out/phase1-adm-3-harness.mp4",
       "proof_note": "admission render adm-3 (p1-20261122T214843+0000), critic PASS",
       "critic_pass": true,
-      "last_used_at": "2026-11-22T21:48:43+00:00",
-      "use_count": 1
+      "last_used_at": "2026-11-22T22:25:19+00:00",
+      "use_count": 2
     },
     {
       "id": "move.match-cut",
@@ -1597,8 +1597,8 @@
       "proof_clip": "out/phase1-adm-3-harness.mp4",
       "proof_note": "admission render adm-3 (p1-20261122T214843+0000), critic PASS",
       "critic_pass": true,
-      "last_used_at": "2026-11-22T21:48:43+00:00",
-      "use_count": 1
+      "last_used_at": "2026-11-22T22:25:40+00:00",
+      "use_count": 2
     },
     {
       "id": "move.whip-pan",
@@ -1626,8 +1626,8 @@
       "proof_clip": "out/phase1-adm-3-harness.mp4",
       "proof_note": "admission render adm-3 (p1-20261122T214843+0000), critic PASS",
       "critic_pass": true,
-      "last_used_at": "2026-11-22T21:48:43+00:00",
-      "use_count": 1
+      "last_used_at": "2026-11-22T22:22:24+00:00",
+      "use_count": 2
     }
   ],
   "generated": "2026-11-22",

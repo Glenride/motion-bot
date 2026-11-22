@@ -1,0 +1,171 @@
+{
+  "version": 1,
+  "hook": "Buy the new field notebook",
+  "lengthSeconds": 12,
+  "palette": {
+    "background": "#FAF5EC",
+    "surface": "#EBE6DE",
+    "accent": "#E97451",
+    "accentDeep": "#974B35",
+    "text": "#1F1A14",
+    "glow": "#E97451",
+    "particle": "#E97451"
+  },
+  "mood": {
+    "tone": "neutral",
+    "pacing": "medium"
+  },
+  "motif": {
+    "type": "orbit",
+    "scene": 0
+  },
+  "scenes": [
+    {
+      "words": [
+        "Buy",
+        "the",
+        "new",
+        "field",
+        "notebook",
+        "Buy",
+        "the",
+        "new",
+        "field",
+        "notebook"
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.08,
+        "fromX": 0,
+        "toX": -26
+      },
+      "transitionOut": "none"
+    },
+    {
+      "words": [
+        "waterproof",
+        "cover"
+      ],
+      "camera": {
+        "fromScale": 1.08,
+        "toScale": 1.0,
+        "fromX": -26,
+        "toX": 22
+      },
+      "transitionOut": "none"
+    },
+    {
+      "words": [
+        "numbered",
+        "pages"
+      ],
+      "camera": {
+        "fromScale": 1.08,
+        "toScale": 1.0,
+        "fromX": -26,
+        "toX": 22
+      },
+      "transitionOut": "none"
+    },
+    {
+      "words": [
+        "lies",
+        "flat"
+      ],
+      "camera": {
+        "fromScale": 1.08,
+        "toScale": 1.0,
+        "fromX": -26,
+        "toX": 22
+      },
+      "transitionOut": "none"
+    },
+    {
+      "words": [
+        "fits",
+        "a",
+        "jacket",
+        "pocket"
+      ],
+      "camera": {
+        "fromScale": 1.08,
+        "toScale": 1.0,
+        "fromX": -26,
+        "toX": 22
+      },
+      "transitionOut": "none"
+    },
+    {
+      "words": [
+        "Buy",
+        "the",
+        "new",
+        "field",
+        "notebook",
+        "Buy",
+        "the",
+        "new",
+        "field",
+        "notebook"
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.14,
+        "fromX": 22,
+        "toX": 0
+      },
+      "transitionOut": "none"
+    }
+  ],
+  "variant": "kinetic",
+  "panel": "word-stack",
+  "font": "serif",
+  "motion": "slide",
+  "kinetic": "char-stagger",
+  "notes": [
+    "label override: background = #FAF5EC",
+    "label override: accent = #E97451",
+    "motif 'orbit' in scene 1",
+    "phase1 route: panel 'word-stack', variant 'kinetic', font 'serif', motion 'slide', kinetic 'char-stagger', move 'cross-dissolve', tiktok '-'",
+    "story: 2 beats",
+    "memory: learned (ponder-2026-11-20): Get his Nov 13 correction into memory verbatim: the corrections list is empty while the record holds a fourth-time correction with a traced mechanism. Record corrections where the Director reads them; a correction that lives only in the daily record is not learned from.",
+    "memory: learned (ponder-2026-11-20): Record critic per-check outcomes in memory, not just the overall (carry-over, third week): a render entry should carry which checks passed and which failed, so the next ponder reads the outcome from memory instead of reopening JSONs.",
+    "memory: learned (ponder-2026-11-20): Watch the next genuine intake now that Strata is back (restarted Nov 20 10:45 ET, verified live) and record what the director does: whether the storyboard comes from the LLM or falls back. Do not simulate an intake; the next real task is the test.",
+    "memory: memory: 20 past renders on record; latest: Panels turn to face the morning",
+    "product demo: product name from the task title (ecommerce trigger matched, no Product: label)",
+    "product demo: 'Buy the new field notebook', 4 feature(s), no offer"
+  ],
+  "phase1": {
+    "picks": {
+      "panel": "panel.word-stack",
+      "variant": "variant.kinetic",
+      "font": "font.serif",
+      "motion": "motion.slide",
+      "kinetic": "kinetic.char-stagger",
+      "move": "move.cross-dissolve",
+      "style": "product.demo",
+      "composition": "ProductDemo",
+      "format": "landscape"
+    },
+    "composition": "ProductDemo",
+    "format": "landscape",
+    "labelled": false,
+    "label": "",
+    "approximation": "",
+    "reason": ""
+  },
+  "move": "cross-dissolve",
+  "product": "Buy the new field notebook",
+  "features": [
+    "waterproof cover",
+    "numbered pages",
+    "lies flat",
+    "fits a jacket pocket"
+  ],
+  "offer": {},
+  "cta": "Buy the new field notebook",
+  "format": "landscape",
+  "skills": [
+    "phase1"
+  ]
+}

@@ -1,0 +1,138 @@
+{
+  "version": 1,
+  "hook": "Words that slide into place",
+  "lengthSeconds": 12,
+  "palette": {
+    "background": "#111827",
+    "surface": "#242A38",
+    "accent": "#FFB02E",
+    "accentDeep": "#A6721E",
+    "text": "#FFFFFF",
+    "glow": "#FFB02E",
+    "particle": "#FFB02E"
+  },
+  "mood": {
+    "tone": "neutral",
+    "pacing": "medium"
+  },
+  "motif": {
+    "type": "orbit",
+    "scene": 1
+  },
+  "scenes": [
+    {
+      "words": [
+        "The",
+        "words",
+        "slide",
+        "in",
+        "one",
+        "at",
+        "a",
+        "time"
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.08,
+        "fromX": 0,
+        "toX": -26
+      },
+      "transitionOut": "wipe"
+    },
+    {
+      "words": [
+        "The",
+        "type",
+        "stays",
+        "clean",
+        "and",
+        "plain"
+      ],
+      "camera": {
+        "fromScale": 1.08,
+        "toScale": 1.0,
+        "fromX": -26,
+        "toX": 22
+      },
+      "transitionOut": "zoom-cut"
+    },
+    {
+      "words": [
+        "The",
+        "frame",
+        "holds",
+        "still",
+        "by",
+        "the",
+        "end"
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.14,
+        "fromX": 22,
+        "toX": 0
+      },
+      "transitionOut": "none"
+    }
+  ],
+  "variant": "orbit",
+  "panel": "centered",
+  "font": "sans",
+  "motion": "slide",
+  "kinetic": "arc",
+  "notes": [
+    "story: 3 beats from story_block",
+    "motif 'orbit' in scene 2",
+    "phase1 route: panel 'centered', variant 'orbit', font 'sans', motion 'slide', kinetic 'arc', move 'rack-focus', tiktok '-'",
+    "memory: learned (ponder-2026-11-20): Get his Nov 13 correction into memory verbatim: the corrections list is empty while the record holds a fourth-time correction with a traced mechanism. Record corrections where the Director reads them; a correction that lives only in the daily record is not learned from.",
+    "memory: learned (ponder-2026-11-20): Record critic per-check outcomes in memory, not just the overall (carry-over, third week): a render entry should carry which checks passed and which failed, so the next ponder reads the outcome from memory instead of reopening JSONs.",
+    "memory: learned (ponder-2026-11-20): Watch the next genuine intake now that Strata is back (restarted Nov 20 10:45 ET, verified live) and record what the director does: whether the storyboard comes from the LLM or falls back. Do not simulate an intake; the next real task is the test.",
+    "memory: memory: 20 past renders on record; latest: Panels turn to face the morning"
+  ],
+  "phase1": {
+    "picks": {
+      "panel": "panel.centered",
+      "variant": "variant.orbit",
+      "font": "font.sans",
+      "motion": "motion.slide",
+      "kinetic": "kinetic.arc",
+      "move": "move.rack-focus",
+      "composition": "Harness",
+      "format": "landscape"
+    },
+    "composition": "Harness",
+    "format": "landscape",
+    "labelled": false,
+    "label": "",
+    "approximation": "",
+    "reason": ""
+  },
+  "move": "rack-focus",
+  "story": {
+    "source": "story_block",
+    "beats": [
+      {
+        "title": "",
+        "start": null,
+        "end": null,
+        "text": "The words slide in one at a time"
+      },
+      {
+        "title": "",
+        "start": null,
+        "end": null,
+        "text": "The type stays clean and plain"
+      },
+      {
+        "title": "",
+        "start": null,
+        "end": null,
+        "text": "The frame holds still by the end"
+      }
+    ]
+  },
+  "format": "landscape",
+  "skills": [
+    "phase1"
+  ]
+}

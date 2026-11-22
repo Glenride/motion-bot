@@ -874,14 +874,21 @@ CANVAS_UNIMPLEMENTED = {"riso", "riso print", "sketchbook",
                         "isometric animation"}
 
 
-def pick_canvas_style(task, notes):
+def pick_canvas_style(task, notes, style=None):
     """Task -> 'cut-paper' | 'crosshatch' | None.
 
     An explicit `Style:` label wins; otherwise the style words in
     the text ("cut paper", "crosshatch ink") pick it. An
     unimplemented style is noted and returns None — never a wrong
     style, never a crash.
+
+    style (Phase 1 route pick) overrides the label/text resolution
+    — without it a router pick of crosshatch renders nothing (the
+    rung falls through) while the record claims crosshatch.
     """
+    if style is not None and style in ("cut-paper", "crosshatch"):
+        notes.append(f"canvas style '{style}' (Phase 1 route pick)")
+        return style
     details = task.get("details") or ""
     text = ((task.get("title") or "") + "\n" + details)
     m = CANVAS_STYLE_RE.search(details)
@@ -1895,7 +1902,7 @@ EXPLAINER_STYLES = {
 }
 
 
-def build_explainer(task, storyboard, draft=False):
+def build_explainer(task, storyboard, draft=False, style=None):
     """Task + storyboard -> Explainer props dict, or None.
 
     Returns None only when the task carries no ideas at all (no
@@ -1903,25 +1910,33 @@ def build_explainer(task, storyboard, draft=False):
     back to the default route. With draft=True (Phase 1
     draft-first), the missing ideas become one clearly marked
     placeholder idea instead of a refusal.
+
+    style (Phase 1 route pick: "diagram" | "whiteboard" |
+    "isometric") overrides the label/default resolution — without
+    it a router pick of isometric renders as diagram (the default)
+    while the record claims isometric (proof run p08, Nov 22).
     """
     title = (task.get("title") or "").strip()
     details = task.get("details") or ""
     labels = parse_labels(details)
     notes = storyboard.setdefault("notes", [])
-    style = None
-    style_label = (labels.get("style") or "").strip().lower()
-    if style_label in EXPLAINER_STYLES:
-        style = EXPLAINER_STYLES[style_label]
-        notes.append(f"explainer style '{style}' (explicit Style: label)")
-    if style is None:
-        low = ((task.get("title") or "") + "\n" + details).lower()
-        if "whiteboard" in low or "scribe" in low:
-            style = "whiteboard"
-        elif "isometric" in low or re.search(r"\biso\b", low):
-            style = "isometric"
-        else:
-            style = "diagram"
-        notes.append(f"explainer style '{style}' (default)")
+    if style is not None and style in ("diagram", "whiteboard", "isometric"):
+        notes.append(f"explainer style '{style}' (Phase 1 route pick)")
+    else:
+        style = None
+        style_label = (labels.get("style") or "").strip().lower()
+        if style_label in EXPLAINER_STYLES:
+            style = EXPLAINER_STYLES[style_label]
+            notes.append(f"explainer style '{style}' (explicit Style: label)")
+        if style is None:
+            low = ((task.get("title") or "") + "\n" + details).lower()
+            if "whiteboard" in low or "scribe" in low:
+                style = "whiteboard"
+            elif "isometric" in low or re.search(r"\biso\b", low):
+                style = "isometric"
+            else:
+                style = "diagram"
+            notes.append(f"explainer style '{style}' (default)")
     lines = _split_list(labels.get("idea") or "")
     if not lines:
         lines = _repeated_lines(details, "idea")

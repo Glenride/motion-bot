@@ -106,6 +106,11 @@ def select_composition(task, storyboard, routed):
             storyboard["unit"] = labels["unit"]
         if labels.get("mode", "").lower() in ("bars", "stats"):
             storyboard["mode"] = labels["mode"].lower()
+        elif style == "chart.stats":
+            # Route pick (LRU), no Mode: label: honor the pick.
+            storyboard["mode"] = "stats"
+        elif style == "chart.count-up":
+            storyboard["mode"] = "bars"
         return composition, codec, notes
 
     if style == "product.demo":
@@ -158,7 +163,8 @@ def select_composition(task, storyboard, routed):
             return "EverestPanels", codec, notes
 
     if style and style.startswith("explainer."):
-        expl = build_explainer(task, storyboard, draft=True)
+        expl = build_explainer(task, storyboard, draft=True,
+                               style=style.split(".", 1)[1])
         if expl:
             storyboard["ideas"] = expl["ideas"]
             storyboard["style"] = expl["style"]

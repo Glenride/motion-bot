@@ -1,0 +1,174 @@
+{
+  "version": 1,
+  "hook": "Shop the winter research bundle",
+  "lengthSeconds": 12,
+  "palette": {
+    "background": "#FAF5EC",
+    "surface": "#EBE6DE",
+    "accent": "#E97451",
+    "accentDeep": "#974B35",
+    "text": "#1F1A14",
+    "glow": "#E97451",
+    "particle": "#E97451"
+  },
+  "mood": {
+    "tone": "neutral",
+    "pacing": "medium"
+  },
+  "motif": {
+    "type": "orbit",
+    "scene": 0
+  },
+  "scenes": [
+    {
+      "words": [
+        "Shop",
+        "the",
+        "winter",
+        "research",
+        "bundle",
+        "Shop",
+        "the",
+        "winter",
+        "research",
+        "bundle"
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.08,
+        "fromX": 0,
+        "toX": -26
+      },
+      "transitionOut": "none"
+    },
+    {
+      "words": [
+        "the",
+        "full",
+        "shortage",
+        "index"
+      ],
+      "camera": {
+        "fromScale": 1.08,
+        "toScale": 1.0,
+        "fromX": -26,
+        "toX": 22
+      },
+      "transitionOut": "none"
+    },
+    {
+      "words": [
+        "the",
+        "weekly",
+        "digest"
+      ],
+      "camera": {
+        "fromScale": 1.08,
+        "toScale": 1.0,
+        "fromX": -26,
+        "toX": 22
+      },
+      "transitionOut": "none"
+    },
+    {
+      "words": [
+        "the",
+        "source",
+        "map"
+      ],
+      "camera": {
+        "fromScale": 1.08,
+        "toScale": 1.0,
+        "fromX": -26,
+        "toX": 22
+      },
+      "transitionOut": "none"
+    },
+    {
+      "words": [
+        "the",
+        "attestation",
+        "log"
+      ],
+      "camera": {
+        "fromScale": 1.08,
+        "toScale": 1.0,
+        "fromX": -26,
+        "toX": 22
+      },
+      "transitionOut": "none"
+    },
+    {
+      "words": [
+        "Shop",
+        "the",
+        "winter",
+        "research",
+        "bundle",
+        "Shop",
+        "the",
+        "winter",
+        "research",
+        "bundle"
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.14,
+        "fromX": 22,
+        "toX": 0
+      },
+      "transitionOut": "none"
+    }
+  ],
+  "variant": "rise",
+  "panel": "word-stack",
+  "font": "mono",
+  "motion": "kinetic",
+  "kinetic": "blur",
+  "notes": [
+    "label override: background = #FAF5EC",
+    "label override: accent = #E97451",
+    "motif 'orbit' in scene 1",
+    "phase1 route: panel 'word-stack', variant 'rise', font 'mono', motion 'kinetic', kinetic 'blur', move 'jump-cut', tiktok '-'",
+    "story: 1 beats",
+    "memory: learned (ponder-2026-11-20): Get his Nov 13 correction into memory verbatim: the corrections list is empty while the record holds a fourth-time correction with a traced mechanism. Record corrections where the Director reads them; a correction that lives only in the daily record is not learned from.",
+    "memory: learned (ponder-2026-11-20): Record critic per-check outcomes in memory, not just the overall (carry-over, third week): a render entry should carry which checks passed and which failed, so the next ponder reads the outcome from memory instead of reopening JSONs.",
+    "memory: learned (ponder-2026-11-20): Watch the next genuine intake now that Strata is back (restarted Nov 20 10:45 ET, verified live) and record what the director does: whether the storyboard comes from the LLM or falls back. Do not simulate an intake; the next real task is the test.",
+    "memory: memory: 20 past renders on record; latest: Panels turn to face the morning",
+    "product demo: product name from the task title (ecommerce trigger matched, no Product: label)",
+    "product demo: 'Shop the winter research bundle', 4 feature(s), no offer"
+  ],
+  "phase1": {
+    "picks": {
+      "panel": "panel.word-stack",
+      "variant": "variant.rise",
+      "font": "font.mono",
+      "motion": "motion.kinetic",
+      "kinetic": "kinetic.blur",
+      "move": "move.jump-cut",
+      "style": "product.demo",
+      "composition": "ProductDemo",
+      "format": "landscape"
+    },
+    "composition": "ProductDemo",
+    "format": "landscape",
+    "labelled": false,
+    "label": "",
+    "approximation": "",
+    "reason": ""
+  },
+  "move": "jump-cut",
+  "product": "Shop the winter research bundle",
+  "features": [
+    "the full shortage index",
+    "the weekly digest",
+    "the source map",
+    "the attestation log"
+  ],
+  "offer": {},
+  "cta": "Shop the winter research bundle",
+  "format": "landscape",
+  "skills": [
+    "phase1"
+  ]
+}

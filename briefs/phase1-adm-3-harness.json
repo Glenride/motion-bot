@@ -1,0 +1,144 @@
+{
+  "version": 1,
+  "hook": "Cut fast, match the motion, whip to the next scene",
+  "lengthSeconds": 12,
+  "palette": {
+    "background": "#111827",
+    "surface": "#242A38",
+    "accent": "#FFB02E",
+    "accentDeep": "#A6721E",
+    "text": "#FFFFFF",
+    "glow": "#FFB02E",
+    "particle": "#FFB02E"
+  },
+  "mood": {
+    "tone": "energetic",
+    "pacing": "fast"
+  },
+  "motif": {
+    "type": "orbit",
+    "scene": 1
+  },
+  "scenes": [
+    {
+      "words": [
+        "The",
+        "edit",
+        "never",
+        "waits"
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.08,
+        "fromX": 0,
+        "toX": -26
+      },
+      "transitionOut": "wipe"
+    },
+    {
+      "words": [
+        "Each",
+        "cut",
+        "lands",
+        "on",
+        "the",
+        "movement"
+      ],
+      "camera": {
+        "fromScale": 1.08,
+        "toScale": 1.0,
+        "fromX": -26,
+        "toX": 22
+      },
+      "transitionOut": "zoom-cut"
+    },
+    {
+      "words": [
+        "The",
+        "camera",
+        "whips",
+        "and",
+        "the",
+        "next",
+        "scene",
+        "is",
+        "already",
+        "there"
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.14,
+        "fromX": 22,
+        "toX": 0
+      },
+      "transitionOut": "none"
+    }
+  ],
+  "variant": "orbit",
+  "panel": "lower-third",
+  "font": "serif",
+  "motion": "kinetic",
+  "kinetic": "char-stagger",
+  "notes": [
+    "story: 3 beats from story_block",
+    "mood 'fast' -> tone energetic, pacing fast",
+    "motif 'orbit' in scene 2",
+    "moves ['jump-cut', 'match-cut', 'whip-pan'] (explicit Moves: label)",
+    "phase1 route: panel 'lower-third', variant 'orbit', font 'serif', motion 'kinetic', kinetic 'char-stagger', move 'dolly-in', tiktok '-'",
+    "memory: learned (ponder-2026-11-20): Get his Nov 13 correction into memory verbatim: the corrections list is empty while the record holds a fourth-time correction with a traced mechanism. Record corrections where the Director reads them; a correction that lives only in the daily record is not learned from.",
+    "memory: learned (ponder-2026-11-20): Record critic per-check outcomes in memory, not just the overall (carry-over, third week): a render entry should carry which checks passed and which failed, so the next ponder reads the outcome from memory instead of reopening JSONs.",
+    "memory: learned (ponder-2026-11-20): Watch the next genuine intake now that Strata is back (restarted Nov 20 10:45 ET, verified live) and record what the director does: whether the storyboard comes from the LLM or falls back. Do not simulate an intake; the next real task is the test.",
+    "memory: memory: 20 past renders on record; latest: Panels turn to face the morning"
+  ],
+  "phase1": {
+    "picks": {
+      "panel": "panel.lower-third",
+      "variant": "variant.orbit",
+      "font": "font.serif",
+      "motion": "motion.kinetic",
+      "kinetic": "kinetic.char-stagger",
+      "move": "move.dolly-in",
+      "composition": "Harness",
+      "format": "landscape"
+    },
+    "composition": "Harness",
+    "format": "landscape",
+    "labelled": false,
+    "label": "",
+    "approximation": "",
+    "reason": ""
+  },
+  "move": "dolly-in",
+  "moves": [
+    "jump-cut",
+    "match-cut",
+    "whip-pan"
+  ],
+  "story": {
+    "source": "story_block",
+    "beats": [
+      {
+        "title": "",
+        "start": null,
+        "end": null,
+        "text": "The edit never waits"
+      },
+      {
+        "title": "",
+        "start": null,
+        "end": null,
+        "text": "Each cut lands on the movement"
+      },
+      {
+        "title": "",
+        "start": null,
+        "end": null,
+        "text": "The camera whips and the next scene is already there"
+      }
+    ]
+  },
+  "format": "landscape",
+  "skills": [
+    "phase1"
+  ]
+}

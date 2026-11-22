@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "hook": "Nobody reads the manual, so we filmed it",
+  "lengthSeconds": 12,
+  "palette": {
+    "background": "#111827",
+    "surface": "#242A38",
+    "accent": "#FFB02E",
+    "accentDeep": "#A6721E",
+    "text": "#FFFFFF",
+    "glow": "#FFB02E",
+    "particle": "#FFB02E"
+  },
+  "mood": {
+    "tone": "neutral",
+    "pacing": "medium"
+  },
+  "motif": {
+    "type": "orbit",
+    "scene": 0
+  },
+  "scenes": [
+    {
+      "words": [
+        "Nobody",
+        "reads",
+        "the",
+        "manual,",
+        "so",
+        "we",
+        "filmed",
+        "it"
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.08,
+        "fromX": 0,
+        "toX": -26
+      },
+      "transitionOut": "none"
+    }
+  ],
+  "variant": "orbit",
+  "panel": "card",
+  "font": "sans",
+  "motion": "rise",
+  "kinetic": "clip-wipe",
+  "notes": [
+    "motif 'orbit' in scene 1",
+    "phase1 route: panel 'card', variant 'orbit', font 'sans', motion 'rise', kinetic 'clip-wipe', move 'impact-shake', tiktok '-'",
+    "story: 3 beats",
+    "memory: learned (ponder-2026-11-20): Get his Nov 13 correction into memory verbatim: the corrections list is empty while the record holds a fourth-time correction with a traced mechanism. Record corrections where the Director reads them; a correction that lives only in the daily record is not learned from.",
+    "memory: learned (ponder-2026-11-20): Record critic per-check outcomes in memory, not just the overall (carry-over, third week): a render entry should carry which checks passed and which failed, so the next ponder reads the outcome from memory instead of reopening JSONs.",
+    "memory: learned (ponder-2026-11-20): Watch the next genuine intake now that Strata is back (restarted Nov 20 10:45 ET, verified live) and record what the director does: whether the storyboard comes from the LLM or falls back. Do not simulate an intake; the next real task is the test.",
+    "memory: memory: 20 past renders on record; latest: Panels turn to face the morning"
+  ],
+  "phase1": {
+    "picks": {
+      "panel": "panel.card",
+      "variant": "variant.orbit",
+      "font": "font.sans",
+      "motion": "motion.rise",
+      "kinetic": "kinetic.clip-wipe",
+      "move": "move.impact-shake",
+      "style": "tiktok.fast-cut",
+      "composition": "Vertical",
+      "format": "vertical"
+    },
+    "composition": "Vertical",
+    "format": "vertical",
+    "labelled": false,
+    "label": "",
+    "approximation": "",
+    "reason": ""
+  },
+  "move": "impact-shake",
+  "tiktokFormat": "fast-cut",
+  "format": "vertical",
+  "skills": [
+    "phase1"
+  ]
+}
