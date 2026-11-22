@@ -1,1 +1,391 @@
-{"generated":"2026-11-22","items":[{"admission":"render one proof brief with variant=kinetic and critic PASS, then register","family":"variant","id":"variant.kinetic","nearest":"variant.orbit","reason":"implemented code, no proof clip with Critic PASS on file","status":"implemented-unproven"},{"admission":"render one proof brief with variant=sweep and critic PASS, then register","family":"variant","id":"variant.sweep","nearest":"variant.orbit","reason":"implemented code, no proof clip with Critic PASS on file","status":"implemented-unproven"},{"admission":"render one proof brief with variant=rise and critic PASS, then register","family":"variant","id":"variant.rise","nearest":"variant.orbit","reason":"implemented code, no proof clip with Critic PASS on file","status":"implemented-unproven"},{"admission":"render one proof brief with motion=slide and critic PASS, then register","family":"motion","id":"motion.slide","nearest":"motion.kinetic","reason":"implemented code, no proof clip with Critic PASS on file","status":"implemented-unproven"},{"admission":"render one proof brief with motion=scale and critic PASS, then register","family":"motion","id":"motion.scale","nearest":"motion.kinetic","reason":"implemented code, no proof clip with Critic PASS on file","status":"implemented-unproven"},{"admission":"render one proof brief with motion=rise and critic PASS, then register","family":"motion","id":"motion.rise","nearest":"motion.kinetic","reason":"implemented code, no proof clip with Critic PASS on file","status":"implemented-unproven"},{"admission":"render one proof brief with font=sans and critic PASS, then register","family":"font","id":"font.sans","nearest":"font.serif","reason":"implemented code, no proof clip with Critic PASS on file","status":"implemented-unproven"},{"admission":"render one proof brief with font=mono and critic PASS, then register","family":"font","id":"font.mono","nearest":"font.serif","reason":"implemented code, no proof clip with Critic PASS on file","status":"implemented-unproven"},{"admission":"render one proof brief with moves including stagger and critic PASS, then register","family":"move","id":"move.stagger","nearest":"move.pop-in","reason":"implemented code; the three v2.11 family clips exercise only 9 of 18 moves on screen","status":"implemented-unproven"},{"admission":"render one proof brief with moves including mask-reveal and critic PASS, then register","family":"move","id":"move.mask-reveal","nearest":"move.mask-transition","reason":"implemented code; the three v2.11 family clips exercise only 9 of 18 moves on screen","status":"implemented-unproven"},{"admission":"render one proof brief with moves including kinetic-type and critic PASS, then register","family":"move","id":"move.kinetic-type","nearest":"move.typewriter","reason":"implemented code; the three v2.11 family clips exercise only 9 of 18 moves on screen","status":"implemented-unproven"},{"admission":"render one proof brief with moves including light-sweep and critic PASS, then register","family":"move","id":"move.light-sweep","nearest":"move.impact-shake","reason":"implemented code; the three v2.11 family clips exercise only 9 of 18 moves on screen","status":"implemented-unproven"},{"admission":"render one proof brief with moves including pan and critic PASS, then register","family":"move","id":"move.pan","nearest":"move.dolly-in","reason":"implemented code; the three v2.11 family clips exercise only 9 of 18 moves on screen","status":"implemented-unproven"},{"admission":"render one proof brief with moves including zoom-in and critic PASS, then register","family":"move","id":"move.zoom-in","nearest":"move.dolly-in","reason":"implemented code; the three v2.11 family clips exercise only 9 of 18 moves on screen","status":"implemented-unproven"},{"admission":"render one proof brief with moves including jump-cut and critic PASS, then register","family":"move","id":"move.jump-cut","nearest":"move.cross-dissolve","reason":"implemented code; the three v2.11 family clips exercise only 9 of 18 moves on screen","status":"implemented-unproven"},{"admission":"render one proof brief with moves including match-cut and critic PASS, then register","family":"move","id":"move.match-cut","nearest":"move.mask-transition","reason":"implemented code; the three v2.11 family clips exercise only 9 of 18 moves on screen","status":"implemented-unproven"},{"admission":"render one proof brief with moves including whip-pan and critic PASS, then register","family":"move","id":"move.whip-pan","nearest":"move.cross-dissolve","reason":"implemented code; the three v2.11 family clips exercise only 9 of 18 moves on screen","status":"implemented-unproven"},{"admission":"Phase 2: craft a brief carrying the category's own numbers, render, critic PASS, then register","family":"everest","id":"everest.prompts-results","nearest":"everest.product-ui","reason":"implemented code, no proof clip with Critic PASS on file","status":"implemented-unproven"},{"admission":"Phase 2: craft a brief carrying the category's own numbers, render, critic PASS, then register","family":"everest","id":"everest.agents-workflows","nearest":"everest.product-ui","reason":"implemented code, no proof clip with Critic PASS on file","status":"implemented-unproven"},{"admission":"Phase 2: craft a brief carrying the category's own numbers, render, critic PASS, then register","family":"everest","id":"everest.comparisons","nearest":"everest.models-benchmarks","reason":"implemented code, no proof clip with Critic PASS on file","status":"implemented-unproven"},{"admission":"Phase 2: craft a brief carrying the category's own numbers, render, critic PASS, then register","family":"everest","id":"everest.launch-news","nearest":"everest.product-ui","reason":"implemented code, no proof clip with Critic PASS on file","status":"implemented-unproven"},{"admission":"Phase 2: craft a brief carrying the category's own numbers, render, critic PASS, then register","family":"everest","id":"everest.pricing-limits","nearest":"everest.models-benchmarks","reason":"implemented code, no proof clip with Critic PASS on file","status":"implemented-unproven"},{"admission":"Phase 2: craft a brief carrying the category's own numbers, render, critic PASS, then register","family":"everest","id":"everest.lower-thirds","nearest":"lower-third.strap","reason":"implemented code, no proof clip with Critic PASS on file","status":"implemented-unproven"},{"admission":"Phase 2: craft a brief carrying the category's own numbers, render, critic PASS, then register","family":"everest","id":"everest.usage-cost","nearest":"everest.models-benchmarks","reason":"implemented code, no proof clip with Critic PASS on file","status":"implemented-unproven"},{"admission":"Phase 2: craft a brief carrying the category's own numbers, render, critic PASS, then register","family":"everest","id":"everest.evidence-quotes","nearest":"everest.product-ui","reason":"implemented code, no proof clip with Critic PASS on file","status":"implemented-unproven"},{"admission":"Phase 2: render a proof clip with critic PASS, then register","family":"base","id":"base.synthwave","nearest":"panel.centered","reason":"implemented composition (src/Synthwave.tsx); proof-v23-synthwave.mp4 exists with no critic file","status":"implemented-unproven"},{"admission":"Phase 2: render a proof clip with critic PASS, then register","family":"base","id":"base.generic","nearest":"panel.centered","reason":"implemented composition (src/Generic.tsx); no proof clip with Critic PASS on file","status":"implemented-unproven"},{"admission":"Phase 2: render a proof clip with critic PASS, then register","family":"base","id":"base.signalwood","nearest":"panel.centered","reason":"implemented composition (src/Signalwood.tsx); signalwood-proof.mp4 exists with no critic file","status":"implemented-unproven"},{"admission":"Phase 2: render a proof clip with critic PASS, then register","family":"base","id":"base.motion-test","nearest":"panel.centered","reason":"implemented composition (src/MotionTest.tsx); task-161-motion-test.mp4 exists with no critic file","status":"implemented-unproven"},{"family":"move","id":"move.unbuilt.#004-line-draw","nearest":"move.mask-reveal","reason":"needs a path-draw primitive per chart line; not built (src/harness/motionRegistry.tsx NOT_IMPLEMENTED_MOVES)","status":"named-not-built"},{"family":"move","id":"move.unbuilt.#010-overshoot","nearest":"move.pop-in","reason":"overshoot easing exists (motionDesign overshoot); no standalone gauge-needle move built","status":"named-not-built"},{"family":"move","id":"move.unbuilt.#016-parallax","nearest":"move.dolly-in","reason":"parallax layers exist (ParallaxChip, motionDesign PARALLAX); no named multi-layer scene move built","status":"named-not-built"},{"family":"move","id":"move.unbuilt.#018-shape-transition","nearest":"move.shape-morph","reason":"four diagonal bands sweep; DiagonalWipe is one band - the four-band variant is not built","status":"named-not-built"},{"family":"move","id":"move.unbuilt.#020-zoom-through","nearest":"move.zoom-in","reason":"accelerating zoom into an object and through it; needs a through-object scale pass, not built","status":"named-not-built"},{"family":"move","id":"move.unbuilt.#030-orbit-arc-shot","nearest":"move.dolly-in","reason":"circle around the subject; needs a 3D orbit rig, not built","status":"named-not-built"},{"family":"move","id":"move.unbuilt.#037-slow-motion","nearest":null,"reason":"retiming real action; code-drawn type has no action to slow","status":"named-not-built"},{"family":"move","id":"move.unbuilt.#038-speed-ramp","nearest":null,"reason":"mid-shot speed change; same retiming limit as slow motion","status":"named-not-built"},{"family":"move","id":"move.unbuilt.#040-freeze-frame","nearest":null,"reason":"pausing real action; code-drawn type has no action to freeze","status":"named-not-built"},{"family":"move","id":"move.unbuilt.#046-smash-cut","nearest":"move.jump-cut","reason":"abrupt cut to a contrasting scene; a cut needs a second scene's content, not a move","status":"named-not-built"},{"family":"move","id":"move.unbuilt.#177-low-angle","nearest":null,"reason":"camera angle; code-drawn scenes have no camera height","status":"named-not-built"},{"family":"move","id":"move.unbuilt.#178-high-angle","nearest":null,"reason":"camera angle; same limit as low angle","status":"named-not-built"},{"family":"move","id":"move.unbuilt.#180-over-the-shoulder","nearest":null,"reason":"framing with two people; no cast in code-drawn scenes","status":"named-not-built"},{"family":"move","id":"move.unbuilt.#183-establishing-shot","nearest":null,"reason":"a wide opening shot of a place; needs a place to show","status":"named-not-built"},{"family":"move","id":"move.unbuilt.#184-extreme-close-up","nearest":null,"reason":"fill the frame with one detail; needs a detail subject","status":"named-not-built"},{"family":"move","id":"move.unbuilt.#185-insert-shot","nearest":null,"reason":"cut in to a detail, then back; needs a detail subject","status":"named-not-built"},{"family":"move","id":"move.unbuilt.#187-fade-to-black","nearest":"move.cross-dissolve","reason":"1 s fade to black then in; not built - the dip is trivial but unproven, so it stays unshipped","status":"named-not-built"},{"family":"move","id":"move.unbuilt.#192-montage","nearest":null,"reason":"a run of short shots condensing time; a sequence, not one move","status":"named-not-built"},{"family":"move","id":"move.unbuilt.#049-modal-dialog","nearest":"everest.product-ui","reason":"UI pack: a product-UI scene needs the brief's own screen","status":"named-not-built"},{"family":"move","id":"move.unbuilt.#056-toast-notification","nearest":"everest.product-ui","reason":"UI pack: same limit as modal dialog","status":"named-not-built"},{"family":"move","id":"move.unbuilt.#058-carousel","nearest":"everest.product-ui","reason":"UI pack: same limit as modal dialog","status":"named-not-built"},{"family":"move","id":"move.unbuilt.#060-segmented-control","nearest":"everest.product-ui","reason":"UI pack: same limit as modal dialog","status":"named-not-built"},{"family":"move","id":"move.unbuilt.#061-filter-chips","nearest":"everest.product-ui","reason":"UI pack: same limit as modal dialog","status":"named-not-built"},{"family":"move","id":"move.unbuilt.#069-skeleton-screen","nearest":"everest.product-ui","reason":"UI pack: same limit as modal dialog","status":"named-not-built"},{"family":"move","id":"move.unbuilt.#070-spinner","nearest":"everest.product-ui","reason":"UI pack: same limit as modal dialog","status":"named-not-built"},{"family":"move","id":"move.unbuilt.#071-badge","nearest":"everest.product-ui","reason":"UI pack: same limit as modal dialog","status":"named-not-built"},{"family":"move","id":"move.unbuilt.#097-#120-photo-pack","nearest":null,"reason":"24 lighting / lens / tone looks - words for a look description, never code","status":"named-not-built"},{"family":"move","id":"move.unbuilt.other-catalog-ids","nearest":null,"reason":"149 further IDs across the 8 packs are never named in the skill file; unimplemented","status":"named-not-built"},{"family":"canvas","id":"canvas.riso","nearest":"canvas.cut-paper","reason":"named upstream style, not implemented as Remotion code","status":"named-not-built"},{"family":"canvas","id":"canvas.sketchbook","nearest":"canvas.crosshatch","reason":"named upstream style, not implemented as Remotion code","status":"named-not-built"},{"family":"canvas","id":"canvas.math","nearest":"canvas.cut-paper","reason":"named upstream style, not implemented as Remotion code","status":"named-not-built"},{"family":"canvas","id":"canvas.pixel","nearest":"canvas.cut-paper","reason":"named upstream style, not implemented as Remotion code","status":"named-not-built"},{"family":"canvas","id":"canvas.isometric","nearest":"explainer.isometric","reason":"named upstream style, not implemented as Remotion code. Note: Explainer isometric IS built - a different system.","status":"named-not-built"},{"family":"tiktok","id":"tiktok.caption-led","nearest":"tiktok.hook-first","reason":"needs real Whisper word timestamps; the skill forbids faking them by even-splitting","status":"named-not-built"},{"family":"tiktok","id":"tiktok.countdown","nearest":"tiktok.fast-cut","reason":"its own composition shape; not built","status":"named-not-built"},{"family":"everest","id":"everest.broll-frames","nearest":null,"reason":"DROPPED, not deferred: every pattern needs real footage or a real app screenshot; a code-drawn fake of a real app is what the skill forbids","status":"dropped"},{"family":"kinetic","id":"kinetic.variable-font","nearest":"kinetic.char-stagger","reason":"DROPPED: no variable font on the render host (iMac fc-list 2026-11-20: zero variable matches; Liberation fonts are static weights)","status":"dropped"},{"family":"motion-design","id":"after-effects","nearest":null,"reason":"DROPPED: expressions, MOGRTs, Render Queue/AME, ExtendScript. Motion Bot renders in Remotion, not AE.","status":"dropped"},{"family":"motion-design","id":"logo.camel-sphere-mark","nearest":"motion-design.logo-reveal","reason":"NOT built: no SVG asset available to the renderer. LogoReveal draws a generic sphere + orbit ring instead.","status":"named-not-built"},{"family":"what-if","id":"whatif.voiceover","nearest":null,"reason":"NOT wired: ElevenLabs voiceover needs a key; WhatIf ships silent","status":"named-not-built"}],"note":"Phase 1 backlog (Video Bot PRD Section 7). Items here are NEVER registry entries and the Router never selects them directly. When a brief names one, the Router drafts with the item's nearest implemented entry and flags it as an approximation. Arithmetic flag, carried verbatim from src/harness/motionRegistry.tsx: the NOT_IMPLEMENTED_MOVES list has 26 named entries + the 24-look photo pack + 149 remaining IDs = 199, which exceeds the doc's 174 unbuilt (192 - 18). The list entries are authoritative as names; the 192/174 totals come from the packs doc. Do not silently reconcile.","version":1}
+{
+  "generated": "2026-11-22",
+  "items": [
+    {
+      "admission": "render one proof brief with variant=sweep and critic PASS, then register",
+      "family": "variant",
+      "id": "variant.sweep",
+      "nearest": "variant.orbit",
+      "reason": "implemented code, no proof clip with Critic PASS on file",
+      "status": "implemented-unproven"
+    },
+    {
+      "admission": "Phase 2: craft a brief carrying the category's own numbers, render, critic PASS, then register",
+      "family": "everest",
+      "id": "everest.prompts-results",
+      "nearest": "everest.product-ui",
+      "reason": "implemented code, no proof clip with Critic PASS on file",
+      "status": "implemented-unproven"
+    },
+    {
+      "admission": "Phase 2: craft a brief carrying the category's own numbers, render, critic PASS, then register",
+      "family": "everest",
+      "id": "everest.agents-workflows",
+      "nearest": "everest.product-ui",
+      "reason": "implemented code, no proof clip with Critic PASS on file",
+      "status": "implemented-unproven"
+    },
+    {
+      "admission": "Phase 2: craft a brief carrying the category's own numbers, render, critic PASS, then register",
+      "family": "everest",
+      "id": "everest.comparisons",
+      "nearest": "everest.models-benchmarks",
+      "reason": "implemented code, no proof clip with Critic PASS on file",
+      "status": "implemented-unproven"
+    },
+    {
+      "admission": "Phase 2: craft a brief carrying the category's own numbers, render, critic PASS, then register",
+      "family": "everest",
+      "id": "everest.launch-news",
+      "nearest": "everest.product-ui",
+      "reason": "implemented code, no proof clip with Critic PASS on file",
+      "status": "implemented-unproven"
+    },
+    {
+      "admission": "Phase 2: craft a brief carrying the category's own numbers, render, critic PASS, then register",
+      "family": "everest",
+      "id": "everest.pricing-limits",
+      "nearest": "everest.models-benchmarks",
+      "reason": "implemented code, no proof clip with Critic PASS on file",
+      "status": "implemented-unproven"
+    },
+    {
+      "admission": "Phase 2: craft a brief carrying the category's own numbers, render, critic PASS, then register",
+      "family": "everest",
+      "id": "everest.lower-thirds",
+      "nearest": "lower-third.strap",
+      "reason": "implemented code, no proof clip with Critic PASS on file",
+      "status": "implemented-unproven"
+    },
+    {
+      "admission": "Phase 2: craft a brief carrying the category's own numbers, render, critic PASS, then register",
+      "family": "everest",
+      "id": "everest.usage-cost",
+      "nearest": "everest.models-benchmarks",
+      "reason": "implemented code, no proof clip with Critic PASS on file",
+      "status": "implemented-unproven"
+    },
+    {
+      "admission": "Phase 2: craft a brief carrying the category's own numbers, render, critic PASS, then register",
+      "family": "everest",
+      "id": "everest.evidence-quotes",
+      "nearest": "everest.product-ui",
+      "reason": "implemented code, no proof clip with Critic PASS on file",
+      "status": "implemented-unproven"
+    },
+    {
+      "admission": "Phase 2: render a proof clip with critic PASS, then register",
+      "family": "base",
+      "id": "base.synthwave",
+      "nearest": "panel.centered",
+      "reason": "implemented composition (src/Synthwave.tsx); proof-v23-synthwave.mp4 exists with no critic file",
+      "status": "implemented-unproven"
+    },
+    {
+      "admission": "Phase 2: render a proof clip with critic PASS, then register",
+      "family": "base",
+      "id": "base.generic",
+      "nearest": "panel.centered",
+      "reason": "implemented composition (src/Generic.tsx); no proof clip with Critic PASS on file",
+      "status": "implemented-unproven"
+    },
+    {
+      "admission": "Phase 2: render a proof clip with critic PASS, then register",
+      "family": "base",
+      "id": "base.signalwood",
+      "nearest": "panel.centered",
+      "reason": "implemented composition (src/Signalwood.tsx); signalwood-proof.mp4 exists with no critic file",
+      "status": "implemented-unproven"
+    },
+    {
+      "admission": "Phase 2: render a proof clip with critic PASS, then register",
+      "family": "base",
+      "id": "base.motion-test",
+      "nearest": "panel.centered",
+      "reason": "implemented composition (src/MotionTest.tsx); task-161-motion-test.mp4 exists with no critic file",
+      "status": "implemented-unproven"
+    },
+    {
+      "family": "move",
+      "id": "move.unbuilt.#004-line-draw",
+      "nearest": "move.mask-reveal",
+      "reason": "needs a path-draw primitive per chart line; not built (src/harness/motionRegistry.tsx NOT_IMPLEMENTED_MOVES)",
+      "status": "named-not-built"
+    },
+    {
+      "family": "move",
+      "id": "move.unbuilt.#010-overshoot",
+      "nearest": "move.pop-in",
+      "reason": "overshoot easing exists (motionDesign overshoot); no standalone gauge-needle move built",
+      "status": "named-not-built"
+    },
+    {
+      "family": "move",
+      "id": "move.unbuilt.#016-parallax",
+      "nearest": "move.dolly-in",
+      "reason": "parallax layers exist (ParallaxChip, motionDesign PARALLAX); no named multi-layer scene move built",
+      "status": "named-not-built"
+    },
+    {
+      "family": "move",
+      "id": "move.unbuilt.#018-shape-transition",
+      "nearest": "move.shape-morph",
+      "reason": "four diagonal bands sweep; DiagonalWipe is one band - the four-band variant is not built",
+      "status": "named-not-built"
+    },
+    {
+      "family": "move",
+      "id": "move.unbuilt.#020-zoom-through",
+      "nearest": "move.zoom-in",
+      "reason": "accelerating zoom into an object and through it; needs a through-object scale pass, not built",
+      "status": "named-not-built"
+    },
+    {
+      "family": "move",
+      "id": "move.unbuilt.#030-orbit-arc-shot",
+      "nearest": "move.dolly-in",
+      "reason": "circle around the subject; needs a 3D orbit rig, not built",
+      "status": "named-not-built"
+    },
+    {
+      "family": "move",
+      "id": "move.unbuilt.#037-slow-motion",
+      "nearest": null,
+      "reason": "retiming real action; code-drawn type has no action to slow",
+      "status": "named-not-built"
+    },
+    {
+      "family": "move",
+      "id": "move.unbuilt.#038-speed-ramp",
+      "nearest": null,
+      "reason": "mid-shot speed change; same retiming limit as slow motion",
+      "status": "named-not-built"
+    },
+    {
+      "family": "move",
+      "id": "move.unbuilt.#040-freeze-frame",
+      "nearest": null,
+      "reason": "pausing real action; code-drawn type has no action to freeze",
+      "status": "named-not-built"
+    },
+    {
+      "family": "move",
+      "id": "move.unbuilt.#046-smash-cut",
+      "nearest": "move.jump-cut",
+      "reason": "abrupt cut to a contrasting scene; a cut needs a second scene's content, not a move",
+      "status": "named-not-built"
+    },
+    {
+      "family": "move",
+      "id": "move.unbuilt.#177-low-angle",
+      "nearest": null,
+      "reason": "camera angle; code-drawn scenes have no camera height",
+      "status": "named-not-built"
+    },
+    {
+      "family": "move",
+      "id": "move.unbuilt.#178-high-angle",
+      "nearest": null,
+      "reason": "camera angle; same limit as low angle",
+      "status": "named-not-built"
+    },
+    {
+      "family": "move",
+      "id": "move.unbuilt.#180-over-the-shoulder",
+      "nearest": null,
+      "reason": "framing with two people; no cast in code-drawn scenes",
+      "status": "named-not-built"
+    },
+    {
+      "family": "move",
+      "id": "move.unbuilt.#183-establishing-shot",
+      "nearest": null,
+      "reason": "a wide opening shot of a place; needs a place to show",
+      "status": "named-not-built"
+    },
+    {
+      "family": "move",
+      "id": "move.unbuilt.#184-extreme-close-up",
+      "nearest": null,
+      "reason": "fill the frame with one detail; needs a detail subject",
+      "status": "named-not-built"
+    },
+    {
+      "family": "move",
+      "id": "move.unbuilt.#185-insert-shot",
+      "nearest": null,
+      "reason": "cut in to a detail, then back; needs a detail subject",
+      "status": "named-not-built"
+    },
+    {
+      "family": "move",
+      "id": "move.unbuilt.#187-fade-to-black",
+      "nearest": "move.cross-dissolve",
+      "reason": "1 s fade to black then in; not built - the dip is trivial but unproven, so it stays unshipped",
+      "status": "named-not-built"
+    },
+    {
+      "family": "move",
+      "id": "move.unbuilt.#192-montage",
+      "nearest": null,
+      "reason": "a run of short shots condensing time; a sequence, not one move",
+      "status": "named-not-built"
+    },
+    {
+      "family": "move",
+      "id": "move.unbuilt.#049-modal-dialog",
+      "nearest": "everest.product-ui",
+      "reason": "UI pack: a product-UI scene needs the brief's own screen",
+      "status": "named-not-built"
+    },
+    {
+      "family": "move",
+      "id": "move.unbuilt.#056-toast-notification",
+      "nearest": "everest.product-ui",
+      "reason": "UI pack: same limit as modal dialog",
+      "status": "named-not-built"
+    },
+    {
+      "family": "move",
+      "id": "move.unbuilt.#058-carousel",
+      "nearest": "everest.product-ui",
+      "reason": "UI pack: same limit as modal dialog",
+      "status": "named-not-built"
+    },
+    {
+      "family": "move",
+      "id": "move.unbuilt.#060-segmented-control",
+      "nearest": "everest.product-ui",
+      "reason": "UI pack: same limit as modal dialog",
+      "status": "named-not-built"
+    },
+    {
+      "family": "move",
+      "id": "move.unbuilt.#061-filter-chips",
+      "nearest": "everest.product-ui",
+      "reason": "UI pack: same limit as modal dialog",
+      "status": "named-not-built"
+    },
+    {
+      "family": "move",
+      "id": "move.unbuilt.#069-skeleton-screen",
+      "nearest": "everest.product-ui",
+      "reason": "UI pack: same limit as modal dialog",
+      "status": "named-not-built"
+    },
+    {
+      "family": "move",
+      "id": "move.unbuilt.#070-spinner",
+      "nearest": "everest.product-ui",
+      "reason": "UI pack: same limit as modal dialog",
+      "status": "named-not-built"
+    },
+    {
+      "family": "move",
+      "id": "move.unbuilt.#071-badge",
+      "nearest": "everest.product-ui",
+      "reason": "UI pack: same limit as modal dialog",
+      "status": "named-not-built"
+    },
+    {
+      "family": "move",
+      "id": "move.unbuilt.#097-#120-photo-pack",
+      "nearest": null,
+      "reason": "24 lighting / lens / tone looks - words for a look description, never code",
+      "status": "named-not-built"
+    },
+    {
+      "family": "move",
+      "id": "move.unbuilt.other-catalog-ids",
+      "nearest": null,
+      "reason": "149 further IDs across the 8 packs are never named in the skill file; unimplemented",
+      "status": "named-not-built"
+    },
+    {
+      "family": "canvas",
+      "id": "canvas.riso",
+      "nearest": "canvas.cut-paper",
+      "reason": "named upstream style, not implemented as Remotion code",
+      "status": "named-not-built"
+    },
+    {
+      "family": "canvas",
+      "id": "canvas.sketchbook",
+      "nearest": "canvas.crosshatch",
+      "reason": "named upstream style, not implemented as Remotion code",
+      "status": "named-not-built"
+    },
+    {
+      "family": "canvas",
+      "id": "canvas.math",
+      "nearest": "canvas.cut-paper",
+      "reason": "named upstream style, not implemented as Remotion code",
+      "status": "named-not-built"
+    },
+    {
+      "family": "canvas",
+      "id": "canvas.pixel",
+      "nearest": "canvas.cut-paper",
+      "reason": "named upstream style, not implemented as Remotion code",
+      "status": "named-not-built"
+    },
+    {
+      "family": "canvas",
+      "id": "canvas.isometric",
+      "nearest": "explainer.isometric",
+      "reason": "named upstream style, not implemented as Remotion code. Note: Explainer isometric IS built - a different system.",
+      "status": "named-not-built"
+    },
+    {
+      "family": "tiktok",
+      "id": "tiktok.caption-led",
+      "nearest": "tiktok.hook-first",
+      "reason": "needs real Whisper word timestamps; the skill forbids faking them by even-splitting",
+      "status": "named-not-built"
+    },
+    {
+      "family": "tiktok",
+      "id": "tiktok.countdown",
+      "nearest": "tiktok.fast-cut",
+      "reason": "its own composition shape; not built",
+      "status": "named-not-built"
+    },
+    {
+      "family": "everest",
+      "id": "everest.broll-frames",
+      "nearest": null,
+      "reason": "DROPPED, not deferred: every pattern needs real footage or a real app screenshot; a code-drawn fake of a real app is what the skill forbids",
+      "status": "dropped"
+    },
+    {
+      "family": "kinetic",
+      "id": "kinetic.variable-font",
+      "nearest": "kinetic.char-stagger",
+      "reason": "DROPPED: no variable font on the render host (iMac fc-list 2026-11-20: zero variable matches; Liberation fonts are static weights)",
+      "status": "dropped"
+    },
+    {
+      "family": "motion-design",
+      "id": "after-effects",
+      "nearest": null,
+      "reason": "DROPPED: expressions, MOGRTs, Render Queue/AME, ExtendScript. Motion Bot renders in Remotion, not AE.",
+      "status": "dropped"
+    },
+    {
+      "family": "motion-design",
+      "id": "logo.camel-sphere-mark",
+      "nearest": "motion-design.logo-reveal",
+      "reason": "NOT built: no SVG asset available to the renderer. LogoReveal draws a generic sphere + orbit ring instead.",
+      "status": "named-not-built"
+    },
+    {
+      "family": "what-if",
+      "id": "whatif.voiceover",
+      "nearest": null,
+      "reason": "NOT wired: ElevenLabs voiceover needs a key; WhatIf ships silent",
+      "status": "named-not-built"
+    }
+  ],
+  "note": "Phase 1 backlog (Video Bot PRD Section 7). Items here are NEVER registry entries and the Router never selects them directly. When a brief names one, the Router drafts with the item's nearest implemented entry and flags it as an approximation. Arithmetic flag, carried verbatim from src/harness/motionRegistry.tsx: the NOT_IMPLEMENTED_MOVES list has 26 named entries + the 24-look photo pack + 149 remaining IDs = 199, which exceeds the doc's 174 unbuilt (192 - 18). The list entries are authoritative as names; the 192/174 totals come from the packs doc. Do not silently reconcile.",
+  "version": 1
+}

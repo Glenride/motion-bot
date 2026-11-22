@@ -1,1 +1,1636 @@
-{"entries":[{"component":"src/Vertical.tsx Vertical / src/Harness.tsx Harness","composition":"Vertical","content_fit":["general"],"critic_pass":true,"duration_s":[3,60],"family":"panel","id":"panel.centered","last_used_at":null,"proof_clip":"out/proof-panel-centered.mp4","props_key":"panel","ratios":["9:16","16:9"],"status":"implemented","use_count":0,"use_for":["layout structure","default centered words"]},{"component":"src/Vertical.tsx Vertical / src/Harness.tsx Harness","composition":"Vertical","content_fit":["general"],"critic_pass":true,"duration_s":[3,60],"family":"panel","id":"panel.split","last_used_at":null,"proof_clip":"out/proof-panel-split.mp4","props_key":"panel","ratios":["9:16","16:9"],"status":"implemented","use_count":0,"use_for":["layout structure","two-zone split"]},{"component":"src/Vertical.tsx Vertical / src/Harness.tsx Harness","composition":"Vertical","content_fit":["general"],"critic_pass":true,"duration_s":[3,60],"family":"panel","id":"panel.card","last_used_at":null,"proof_clip":"out/proof-panel-card.mp4","props_key":"panel","ratios":["9:16","16:9"],"status":"implemented","use_count":0,"use_for":["layout structure","card-framed words"]},{"component":"src/Vertical.tsx Vertical / src/Harness.tsx Harness","composition":"Vertical","content_fit":["general"],"critic_pass":true,"duration_s":[3,60],"family":"panel","id":"panel.lower-third","last_used_at":null,"proof_clip":"out/proof-panel-lower-third.mp4","props_key":"panel","ratios":["9:16","16:9"],"status":"implemented","use_count":0,"use_for":["layout structure","words low with space above"]},{"component":"src/Vertical.tsx Vertical / src/Harness.tsx Harness","composition":"Vertical","content_fit":["general"],"critic_pass":true,"duration_s":[3,60],"family":"panel","id":"panel.word-stack","last_used_at":null,"proof_clip":"out/proof-panel-word-stack.mp4","props_key":"panel","ratios":["9:16","16:9"],"status":"implemented","use_count":0,"use_for":["layout structure","stacked words, staggered rise"]},{"component":"src/Vertical.tsx Vertical / src/Harness.tsx Harness","composition":"Vertical","content_fit":["general"],"critic_pass":true,"duration_s":[3,60],"family":"variant","id":"variant.orbit","last_used_at":null,"proof_clip":"out/proof-v212-harness-391.mp4","props_key":"variant","ratios":["9:16","16:9"],"status":"implemented","use_count":0,"use_for":["background motion","drifting-dot field"]},{"component":"src/harness/primitives.tsx KineticLine","composition":"Vertical","content_fit":["general"],"critic_pass":true,"duration_s":[3,60],"family":"motion","id":"motion.kinetic","last_used_at":null,"proof_clip":"out/proof-panel-centered.mp4","proof_note":"implicit: the default motion in all five panel proof clips","props_key":"motion","ratios":["9:16","16:9"],"status":"implemented","use_count":0,"use_for":["word entry","default kinetic word-by-word"]},{"component":"src/harness/primitives.tsx FONTS.serif","composition":"Vertical","content_fit":["general"],"critic_pass":true,"duration_s":[3,60],"family":"font","id":"font.serif","last_used_at":null,"proof_clip":"out/proof-panel-centered.mp4","proof_note":"implicit: the default font in all five panel proof clips","props_key":"font","ratios":["9:16","16:9"],"status":"implemented","use_count":0,"use_for":["typeface","default serif stack"]},{"component":"src/harness/motionRegistry.tsx PopInLine","composition":"Vertical","content_fit":["general","headline","emphasis"],"critic_pass":true,"duration_s":[3,60],"family":"move","id":"move.pop-in","last_used_at":null,"proof_clip":"out/proof-v211-motion-registry.mp4","proof_note":"on screen in proof-v211-motion-registry (moves: pop-in, mask-transition, dolly-in)","props_key":"moves","ratios":["9:16","16:9"],"status":"implemented","use_count":0,"use_for":["entrance","reveal"]},{"component":"src/harness/motionRegistry.tsx transitionForMove","composition":"Vertical","content_fit":["general","transition"],"critic_pass":true,"duration_s":[3,60],"family":"move","id":"move.mask-transition","last_used_at":null,"proof_clip":"out/proof-v211-motion-registry.mp4","proof_note":"on screen in proof-v211-motion-registry (moves: pop-in, mask-transition, dolly-in)","props_key":"moves","ratios":["9:16","16:9"],"status":"implemented","use_count":0,"use_for":["transition","growing-circle scene change"]},{"component":"src/harness/motionRegistry.tsx moveCamera","composition":"Vertical","content_fit":["general","emphasis"],"critic_pass":true,"duration_s":[3,60],"family":"move","id":"move.dolly-in","last_used_at":null,"proof_clip":"out/proof-v211-motion-registry.mp4","proof_note":"on screen in proof-v211-motion-registry (moves: pop-in, mask-transition, dolly-in)","props_key":"moves","ratios":["9:16","16:9"],"status":"implemented","use_count":0,"use_for":["camera","slow push-in"]},{"component":"src/harness/motionRegistry.tsx TypewriterLine","composition":"Vertical","content_fit":["general","headline","emphasis"],"critic_pass":true,"duration_s":[3,60],"family":"move","id":"move.typewriter","last_used_at":null,"proof_clip":"out/proof-v211-motion-registry-2.mp4","proof_note":"on screen in proof-v211-motion-registry-2 (moves: typewriter, count-up, impact-shake); also proof-v213-harness-typewriter.mp4","props_key":"moves","ratios":["9:16","16:9"],"status":"implemented","use_count":0,"use_for":["entrance","reveal","typed words"]},{"component":"src/harness/motionRegistry.tsx CountUpLine","composition":"Vertical","content_fit":["general","numbers","headline"],"critic_pass":true,"duration_s":[3,60],"family":"move","id":"move.count-up","last_used_at":null,"proof_clip":"out/proof-v211-motion-registry-2.mp4","proof_note":"on screen in proof-v211-motion-registry-2 (counts to the brief's own 1,280)","props_key":"moves","ratios":["9:16","16:9"],"status":"implemented","use_count":0,"use_for":["entrance","reveal","number counts to the brief's own figure"]},{"component":"src/harness/motionRegistry.tsx ImpactShake","composition":"Vertical","content_fit":["general","emphasis"],"critic_pass":true,"duration_s":[3,60],"family":"move","id":"move.impact-shake","last_used_at":null,"proof_clip":"out/proof-v211-motion-registry-2.mp4","proof_note":"on screen in proof-v211-motion-registry-2 (moves: typewriter, count-up, impact-shake)","props_key":"moves","ratios":["9:16","16:9"],"status":"implemented","use_count":0,"use_for":["effect","emphasis hit"]},{"component":"src/harness/motionRegistry.tsx ShapeMorphMark","composition":"Vertical","content_fit":["general","emphasis","transition"],"critic_pass":true,"duration_s":[3,60],"family":"move","id":"move.shape-morph","last_used_at":null,"proof_clip":"out/proof-v211-motion-registry-3.mp4","proof_note":"on screen in proof-v211-motion-registry-3 (moves: shape-morph, cross-dissolve, rack-focus)","props_key":"moves","ratios":["9:16","16:9"],"status":"implemented","use_count":0,"use_for":["effect","shape change"]},{"component":"src/harness/motionRegistry.tsx transitionForMove","composition":"Vertical","content_fit":["general","transition"],"critic_pass":true,"duration_s":[3,60],"family":"move","id":"move.cross-dissolve","last_used_at":null,"proof_clip":"out/proof-v211-motion-registry-3.mp4","proof_note":"on screen in proof-v211-motion-registry-3 (moves: shape-morph, cross-dissolve, rack-focus)","props_key":"moves","ratios":["9:16","16:9"],"status":"implemented","use_count":0,"use_for":["transition","soft scene change"]},{"component":"src/harness/motionRegistry.tsx RackFocus","composition":"Vertical","content_fit":["general","emphasis"],"critic_pass":true,"duration_s":[3,60],"family":"move","id":"move.rack-focus","last_used_at":null,"proof_clip":"out/proof-v211-motion-registry-3.mp4","proof_note":"on screen in proof-v211-motion-registry-3 (moves: shape-morph, cross-dissolve, rack-focus)","props_key":"moves","ratios":["9:16","16:9"],"status":"implemented","use_count":0,"use_for":["effect","focus pull"]},{"component":"src/CanvasStyles.tsx CanvasStyles","composition":"CanvasStyles","content_fit":["general","canvas"],"critic_pass":true,"duration_s":[3,60],"family":"canvas","id":"canvas.cut-paper","last_used_at":null,"proof_clip":"out/proof-v27-canvas-cut-paper.mp4","props_key":"canvasStyle","ratios":["9:16"],"status":"implemented","use_count":0,"use_for":["full-frame illustrated look","torn-edge layered sheets"]},{"component":"src/CanvasStyles.tsx CanvasStyles","composition":"CanvasStyles","content_fit":["general","canvas"],"critic_pass":true,"duration_s":[3,60],"family":"canvas","id":"canvas.crosshatch","last_used_at":null,"proof_clip":"out/proof-v27-canvas-crosshatch.mp4","props_key":"canvasStyle","ratios":["9:16"],"status":"implemented","use_count":0,"use_for":["full-frame illustrated look","crosshatch ink with sketch underline"]},{"component":"src/Explainer.tsx Explainer","composition":"Explainer","content_fit":["explain"],"critic_pass":true,"duration_s":[3,60],"family":"explainer","id":"explainer.diagram","last_used_at":null,"proof_clip":"out/proof-v29-explainer-diagram.mp4","props_key":"style","ratios":["16:9"],"requires":["ideas"],"status":"implemented","use_count":0,"use_for":["step-by-step explanation","nodes and edges draw on"]},{"component":"src/Explainer.tsx Explainer","composition":"Explainer","content_fit":["explain"],"critic_pass":true,"duration_s":[3,60],"family":"explainer","id":"explainer.whiteboard","last_used_at":null,"proof_clip":"out/proof-v29-explainer-whiteboard.mp4","props_key":"style","ratios":["16:9"],"requires":["ideas"],"status":"implemented","use_count":0,"use_for":["step-by-step explanation","one open stroke per idea, marker nib rides the tip"]},{"component":"src/Explainer.tsx Explainer","composition":"Explainer","content_fit":["explain"],"critic_pass":true,"duration_s":[3,60],"family":"explainer","id":"explainer.isometric","last_used_at":null,"proof_clip":"out/proof-v29-explainer-isometric.mp4","props_key":"style","ratios":["16:9"],"requires":["ideas"],"status":"implemented","use_count":0,"use_for":["step-by-step explanation","2:1 dimetric blocks stacked bottom-up"]},{"component":"src/harness/primitives.tsx KineticLine","composition":"Vertical","content_fit":["general","headline"],"critic_pass":true,"duration_s":[3,60],"family":"kinetic","id":"kinetic.word","last_used_at":null,"proof_clip":"out/proof-panel-centered.mp4","proof_note":"implicit: the default reveal in all five panel proof clips","props_key":"kinetic","ratios":["9:16","16:9"],"status":"implemented","use_count":0,"use_for":["headline moment","default word-by-word line"]},{"component":"src/harness/primitives.tsx CharStaggerLine","composition":"Vertical","content_fit":["general","headline"],"critic_pass":true,"duration_s":[3,60],"family":"kinetic","id":"kinetic.char-stagger","last_used_at":null,"proof_clip":"out/proof-v210-kinetic-char.mp4","props_key":"kinetic","ratios":["9:16","16:9"],"status":"implemented","use_count":0,"use_for":["headline moment","per-character stagger"]},{"component":"src/harness/primitives.tsx MaskRevealLine","composition":"Vertical","content_fit":["general","headline"],"critic_pass":true,"duration_s":[3,60],"family":"kinetic","id":"kinetic.mask","last_used_at":null,"proof_clip":"out/proof-v210-kinetic-mask.mp4","props_key":"kinetic","ratios":["9:16","16:9"],"status":"implemented","use_count":0,"use_for":["headline moment","mask reveal"]},{"component":"src/harness/primitives.tsx BlurInLine","composition":"Vertical","content_fit":["general","headline"],"critic_pass":true,"duration_s":[3,60],"family":"kinetic","id":"kinetic.blur","last_used_at":null,"proof_clip":"out/proof-v210-kinetic-blur.mp4","props_key":"kinetic","ratios":["9:16","16:9"],"status":"implemented","use_count":0,"use_for":["headline moment","blur-in"]},{"component":"src/harness/primitives.tsx ClipWipeLine","composition":"Vertical","content_fit":["general","headline"],"critic_pass":true,"duration_s":[3,60],"family":"kinetic","id":"kinetic.clip-wipe","last_used_at":null,"proof_clip":"out/proof-v210-kinetic-wipe.mp4","props_key":"kinetic","ratios":["9:16","16:9"],"status":"implemented","use_count":0,"use_for":["headline moment","clip-path wipe"]},{"component":"src/harness/primitives.tsx ArcText","composition":"Vertical","content_fit":["general","headline"],"critic_pass":true,"duration_s":[3,60],"family":"kinetic","id":"kinetic.arc","last_used_at":null,"proof_clip":"out/proof-v210-kinetic-path.mp4","props_key":"kinetic","ratios":["9:16","16:9"],"status":"implemented","use_count":0,"use_for":["headline moment","text on an arc"]},{"component":"src/TikTokFormats.tsx via Vertical","composition":"Vertical","content_fit":["vertical-social"],"critic_pass":true,"duration_s":[3,60],"family":"tiktok","id":"tiktok.hook-first","last_used_at":null,"proof_clip":"out/proof-v211-tiktok-hook-first.mp4","props_key":"tiktokFormat","ratios":["9:16"],"status":"implemented","use_count":0,"use_for":["vertical social clip","hook in the first second"]},{"component":"src/TikTokFormats.tsx via Vertical","composition":"Vertical","content_fit":["vertical-social"],"critic_pass":true,"duration_s":[3,60],"family":"tiktok","id":"tiktok.fast-cut","last_used_at":null,"proof_clip":"out/proof-v211-tiktok-fast-cut.mp4","props_key":"tiktokFormat","ratios":["9:16"],"status":"implemented","use_count":0,"use_for":["vertical social clip","uneven cuts with punch-in"]},{"component":"src/TikTokFormats.tsx via Vertical","composition":"Vertical","content_fit":["vertical-social"],"critic_pass":true,"duration_s":[3,60],"family":"tiktok","id":"tiktok.duet","last_used_at":null,"proof_clip":"out/proof-v211-tiktok-duet.mp4","props_key":"tiktokFormat","ratios":["9:16"],"status":"implemented","use_count":0,"use_for":["vertical social clip","reaction split"]},{"component":"src/EverestPanels.tsx EverestPanels","composition":"EverestPanels","content_fit":["everest"],"critic_pass":true,"duration_s":[3,60],"family":"everest","id":"everest.product-ui","last_used_at":null,"proof_clip":"out/proof-v28-everest-product-ui.mp4","props_key":"category","ratios":["16:9"],"requires":["category inputs"],"status":"implemented","use_count":0,"use_for":["agent UI panel","typed prompt, tool calls, step chips"]},{"component":"src/EverestPanels.tsx EverestPanels","composition":"EverestPanels","content_fit":["everest"],"critic_pass":true,"duration_s":[3,60],"family":"everest","id":"everest.models-benchmarks","last_used_at":null,"proof_clip":"out/proof-v28-everest-benchmarks.mp4","props_key":"category","ratios":["16:9"],"requires":["numbers"],"status":"implemented","use_count":0,"use_for":["benchmark panel","bars grow, old to new score with delta"]},{"component":"src/Chart.tsx Chart mode=bars","composition":"Chart","content_fit":["numbers"],"critic_pass":true,"duration_s":[3,60],"family":"chart","id":"chart.count-up","last_used_at":null,"proof_clip":"out/proof-v28-chart.mp4","props_key":"mode","ratios":["16:9"],"requires":["numbers"],"status":"implemented","use_count":0,"use_for":["data","bars build one at a time, count-up lands exactly"]},{"component":"src/Chart.tsx Chart mode=stats","composition":"Chart","content_fit":["numbers"],"critic_pass":true,"duration_s":[3,60],"family":"chart","id":"chart.stats","last_used_at":null,"proof_clip":"out/proof-v28-chart-stats.mp4","props_key":"mode","ratios":["16:9"],"requires":["numbers"],"status":"implemented","use_count":0,"use_for":["data","stat cards, one number at a time"]},{"component":"src/D3Chart.tsx D3Chart","composition":"D3Chart","content_fit":["numbers"],"critic_pass":true,"duration_s":[3,60],"family":"chart","id":"chart.d3","last_used_at":null,"proof_clip":"out/proof-v28-d3chart.mp4","props_key":"mode","ratios":["16:9"],"requires":["numbers"],"status":"implemented","use_count":0,"use_for":["data","D3-scaled bars, same count-up rules"]},{"component":"src/AdTemplate.tsx AdTemplate","composition":"AdTemplate","content_fit":["ad"],"critic_pass":true,"duration_s":[15,30],"family":"ad","id":"ad.template","last_used_at":null,"proof_clip":"out/proof-v27-ad.mp4","props_key":"variant","ratios":["9:16"],"requires":["hook","benefit","proof","cta"],"status":"implemented","use_count":0,"use_for":["ad","5-beat hook to CTA with one test field"]},{"component":"src/ProductDemo.tsx ProductDemo","composition":"ProductDemo","content_fit":["product"],"critic_pass":true,"duration_s":[12,30],"family":"product","id":"product.demo","last_used_at":null,"proof_clip":"out/proof-v28-product.mp4","props_key":"product","ratios":["16:9"],"requires":["product"],"status":"implemented","use_count":0,"use_for":["product teaser","product-first frame, feature callouts, end card offer"]},{"component":"src/LowerThird.tsx LowerThirdOverlay","composition":"LowerThird","content_fit":["name-card"],"critic_pass":true,"duration_s":[1,60],"family":"lower-third","id":"lower-third.strap","last_used_at":null,"proof_clip":"out/proof-v210-lower-third-vertical.mp4","props_key":"name","ratios":["16:9"],"requires":["name"],"status":"implemented","use_count":0,"use_for":["name card","name and role strap with keyword pills"]},{"component":"src/BRoll.tsx BRoll","composition":"BRoll","content_fit":["broll"],"critic_pass":true,"duration_s":[3,60],"family":"broll","id":"broll.cut-on-noun","last_used_at":null,"proof_clip":"out/proof-v27-broll.mp4","props_key":"segments","ratios":["16:9"],"requires":["beats"],"status":"implemented","use_count":0,"use_for":["talking head","cuts on the noun, keyword overlay at the noun"]},{"component":"src/WhatIf.tsx WhatIf","composition":"WhatIf","content_fit":["whatif"],"critic_pass":true,"duration_s":[15,25],"family":"what-if","id":"whatif.rig","last_used_at":null,"proof_clip":"out/proof-v211-whatif.mp4","props_key":"whatif","ratios":["9:16"],"requires":["power","demos","fact","question"],"status":"implemented","use_count":0,"use_for":["what-if episode","stick-figure rig, three escalating demos, one real fact"]}],"generated":"2026-11-22","note":"Phase 1 Style Registry (Video Bot PRD Section 2). One machine-readable file; the only inventory of implemented styles. An entry exists ONLY when working render code exists behind it AND a proof clip with a Critic PASS is on file in out/. Named-but-unbuilt items live in style_backlog.json, never here. last_used_at / use_count are written by phase1_history.py after every render. Proof clips are repo-relative paths under out/.","version":1}
+{
+  "entries": [
+    {
+      "component": "src/Vertical.tsx Vertical / src/Harness.tsx Harness",
+      "composition": "Vertical",
+      "content_fit": [
+        "general"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "panel",
+      "id": "panel.centered",
+      "last_used_at": "2026-11-22T21:53:43+00:00",
+      "proof_clip": "out/proof-panel-centered.mp4",
+      "props_key": "panel",
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "status": "implemented",
+      "use_count": 2,
+      "use_for": [
+        "layout structure",
+        "default centered words"
+      ]
+    },
+    {
+      "component": "src/Vertical.tsx Vertical / src/Harness.tsx Harness",
+      "composition": "Vertical",
+      "content_fit": [
+        "general"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "panel",
+      "id": "panel.split",
+      "last_used_at": "2026-11-22T21:49:11+00:00",
+      "proof_clip": "out/proof-panel-split.mp4",
+      "props_key": "panel",
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "status": "implemented",
+      "use_count": 1,
+      "use_for": [
+        "layout structure",
+        "two-zone split"
+      ]
+    },
+    {
+      "component": "src/Vertical.tsx Vertical / src/Harness.tsx Harness",
+      "composition": "Vertical",
+      "content_fit": [
+        "general"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "panel",
+      "id": "panel.card",
+      "last_used_at": "2026-11-22T21:50:04+00:00",
+      "proof_clip": "out/proof-panel-card.mp4",
+      "props_key": "panel",
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "status": "implemented",
+      "use_count": 2,
+      "use_for": [
+        "layout structure",
+        "card-framed words"
+      ]
+    },
+    {
+      "component": "src/Vertical.tsx Vertical / src/Harness.tsx Harness",
+      "composition": "Vertical",
+      "content_fit": [
+        "general"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "panel",
+      "id": "panel.lower-third",
+      "last_used_at": "2026-11-22T21:48:43+00:00",
+      "proof_clip": "out/proof-panel-lower-third.mp4",
+      "props_key": "panel",
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "status": "implemented",
+      "use_count": 1,
+      "use_for": [
+        "layout structure",
+        "words low with space above"
+      ]
+    },
+    {
+      "component": "src/Vertical.tsx Vertical / src/Harness.tsx Harness",
+      "composition": "Vertical",
+      "content_fit": [
+        "general"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "panel",
+      "id": "panel.word-stack",
+      "last_used_at": "2026-11-22T21:49:39+00:00",
+      "proof_clip": "out/proof-panel-word-stack.mp4",
+      "props_key": "panel",
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "status": "implemented",
+      "use_count": 1,
+      "use_for": [
+        "layout structure",
+        "stacked words, staggered rise"
+      ]
+    },
+    {
+      "component": "src/Vertical.tsx Vertical / src/Harness.tsx Harness",
+      "composition": "Vertical",
+      "content_fit": [
+        "general"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "variant",
+      "id": "variant.orbit",
+      "last_used_at": "2026-11-22T21:53:43+00:00",
+      "proof_clip": "out/proof-v212-harness-391.mp4",
+      "props_key": "variant",
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "status": "implemented",
+      "use_count": 4,
+      "use_for": [
+        "background motion",
+        "drifting-dot field"
+      ]
+    },
+    {
+      "component": "src/harness/primitives.tsx KineticLine",
+      "composition": "Vertical",
+      "content_fit": [
+        "general"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "motion",
+      "id": "motion.kinetic",
+      "last_used_at": "2026-11-22T21:48:43+00:00",
+      "proof_clip": "out/proof-panel-centered.mp4",
+      "proof_note": "implicit: the default motion in all five panel proof clips",
+      "props_key": "motion",
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "status": "implemented",
+      "use_count": 3,
+      "use_for": [
+        "word entry",
+        "default kinetic word-by-word"
+      ]
+    },
+    {
+      "component": "src/harness/primitives.tsx FONTS.serif",
+      "composition": "Vertical",
+      "content_fit": [
+        "general"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "font",
+      "id": "font.serif",
+      "last_used_at": "2026-11-22T21:50:04+00:00",
+      "proof_clip": "out/proof-panel-centered.mp4",
+      "proof_note": "implicit: the default font in all five panel proof clips",
+      "props_key": "font",
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "status": "implemented",
+      "use_count": 4,
+      "use_for": [
+        "typeface",
+        "default serif stack"
+      ]
+    },
+    {
+      "component": "src/harness/motionRegistry.tsx PopInLine",
+      "composition": "Vertical",
+      "content_fit": [
+        "general",
+        "headline",
+        "emphasis"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "move",
+      "id": "move.pop-in",
+      "last_used_at": "2026-11-22T21:50:04+00:00",
+      "proof_clip": "out/proof-v211-motion-registry.mp4",
+      "proof_note": "on screen in proof-v211-motion-registry (moves: pop-in, mask-transition, dolly-in)",
+      "props_key": "moves",
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "status": "implemented",
+      "use_count": 1,
+      "use_for": [
+        "entrance",
+        "reveal"
+      ]
+    },
+    {
+      "component": "src/harness/motionRegistry.tsx transitionForMove",
+      "composition": "Vertical",
+      "content_fit": [
+        "general",
+        "transition"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "move",
+      "id": "move.mask-transition",
+      "last_used_at": "2026-11-22T21:49:39+00:00",
+      "proof_clip": "out/proof-v211-motion-registry.mp4",
+      "proof_note": "on screen in proof-v211-motion-registry (moves: pop-in, mask-transition, dolly-in)",
+      "props_key": "moves",
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "status": "implemented",
+      "use_count": 1,
+      "use_for": [
+        "transition",
+        "growing-circle scene change"
+      ]
+    },
+    {
+      "component": "src/harness/motionRegistry.tsx moveCamera",
+      "composition": "Vertical",
+      "content_fit": [
+        "general",
+        "emphasis"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "move",
+      "id": "move.dolly-in",
+      "last_used_at": "2026-11-22T21:48:43+00:00",
+      "proof_clip": "out/proof-v211-motion-registry.mp4",
+      "proof_note": "on screen in proof-v211-motion-registry (moves: pop-in, mask-transition, dolly-in)",
+      "props_key": "moves",
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "status": "implemented",
+      "use_count": 1,
+      "use_for": [
+        "camera",
+        "slow push-in"
+      ]
+    },
+    {
+      "component": "src/harness/motionRegistry.tsx TypewriterLine",
+      "composition": "Vertical",
+      "content_fit": [
+        "general",
+        "headline",
+        "emphasis"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "move",
+      "id": "move.typewriter",
+      "last_used_at": null,
+      "proof_clip": "out/proof-v211-motion-registry-2.mp4",
+      "proof_note": "on screen in proof-v211-motion-registry-2 (moves: typewriter, count-up, impact-shake); also proof-v213-harness-typewriter.mp4",
+      "props_key": "moves",
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "status": "implemented",
+      "use_count": 0,
+      "use_for": [
+        "entrance",
+        "reveal",
+        "typed words"
+      ]
+    },
+    {
+      "component": "src/harness/motionRegistry.tsx CountUpLine",
+      "composition": "Vertical",
+      "content_fit": [
+        "general",
+        "numbers",
+        "headline"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "move",
+      "id": "move.count-up",
+      "last_used_at": "2026-11-22T21:47:43+00:00",
+      "proof_clip": "out/proof-v211-motion-registry-2.mp4",
+      "proof_note": "on screen in proof-v211-motion-registry-2 (counts to the brief's own 1,280)",
+      "props_key": "moves",
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "status": "implemented",
+      "use_count": 1,
+      "use_for": [
+        "entrance",
+        "reveal",
+        "number counts to the brief's own figure"
+      ]
+    },
+    {
+      "component": "src/harness/motionRegistry.tsx ImpactShake",
+      "composition": "Vertical",
+      "content_fit": [
+        "general",
+        "emphasis"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "move",
+      "id": "move.impact-shake",
+      "last_used_at": "2026-11-22T21:49:11+00:00",
+      "proof_clip": "out/proof-v211-motion-registry-2.mp4",
+      "proof_note": "on screen in proof-v211-motion-registry-2 (moves: typewriter, count-up, impact-shake)",
+      "props_key": "moves",
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "status": "implemented",
+      "use_count": 1,
+      "use_for": [
+        "effect",
+        "emphasis hit"
+      ]
+    },
+    {
+      "component": "src/harness/motionRegistry.tsx ShapeMorphMark",
+      "composition": "Vertical",
+      "content_fit": [
+        "general",
+        "emphasis",
+        "transition"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "move",
+      "id": "move.shape-morph",
+      "last_used_at": null,
+      "proof_clip": "out/proof-v211-motion-registry-3.mp4",
+      "proof_note": "on screen in proof-v211-motion-registry-3 (moves: shape-morph, cross-dissolve, rack-focus)",
+      "props_key": "moves",
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "status": "implemented",
+      "use_count": 0,
+      "use_for": [
+        "effect",
+        "shape change"
+      ]
+    },
+    {
+      "component": "src/harness/motionRegistry.tsx transitionForMove",
+      "composition": "Vertical",
+      "content_fit": [
+        "general",
+        "transition"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "move",
+      "id": "move.cross-dissolve",
+      "last_used_at": "2026-11-22T21:48:13+00:00",
+      "proof_clip": "out/proof-v211-motion-registry-3.mp4",
+      "proof_note": "on screen in proof-v211-motion-registry-3 (moves: shape-morph, cross-dissolve, rack-focus)",
+      "props_key": "moves",
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "status": "implemented",
+      "use_count": 1,
+      "use_for": [
+        "transition",
+        "soft scene change"
+      ]
+    },
+    {
+      "component": "src/harness/motionRegistry.tsx RackFocus",
+      "composition": "Vertical",
+      "content_fit": [
+        "general",
+        "emphasis"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "move",
+      "id": "move.rack-focus",
+      "last_used_at": "2026-11-22T21:53:43+00:00",
+      "proof_clip": "out/proof-v211-motion-registry-3.mp4",
+      "proof_note": "on screen in proof-v211-motion-registry-3 (moves: shape-morph, cross-dissolve, rack-focus)",
+      "props_key": "moves",
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "status": "implemented",
+      "use_count": 1,
+      "use_for": [
+        "effect",
+        "focus pull"
+      ]
+    },
+    {
+      "component": "src/CanvasStyles.tsx CanvasStyles",
+      "composition": "CanvasStyles",
+      "content_fit": [
+        "general",
+        "canvas"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "canvas",
+      "id": "canvas.cut-paper",
+      "last_used_at": null,
+      "proof_clip": "out/proof-v27-canvas-cut-paper.mp4",
+      "props_key": "canvasStyle",
+      "ratios": [
+        "9:16"
+      ],
+      "status": "implemented",
+      "use_count": 0,
+      "use_for": [
+        "full-frame illustrated look",
+        "torn-edge layered sheets"
+      ]
+    },
+    {
+      "component": "src/CanvasStyles.tsx CanvasStyles",
+      "composition": "CanvasStyles",
+      "content_fit": [
+        "general",
+        "canvas"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "canvas",
+      "id": "canvas.crosshatch",
+      "last_used_at": null,
+      "proof_clip": "out/proof-v27-canvas-crosshatch.mp4",
+      "props_key": "canvasStyle",
+      "ratios": [
+        "9:16"
+      ],
+      "status": "implemented",
+      "use_count": 0,
+      "use_for": [
+        "full-frame illustrated look",
+        "crosshatch ink with sketch underline"
+      ]
+    },
+    {
+      "component": "src/Explainer.tsx Explainer",
+      "composition": "Explainer",
+      "content_fit": [
+        "explain"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "explainer",
+      "id": "explainer.diagram",
+      "last_used_at": null,
+      "proof_clip": "out/proof-v29-explainer-diagram.mp4",
+      "props_key": "style",
+      "ratios": [
+        "16:9"
+      ],
+      "requires": [
+        "ideas"
+      ],
+      "status": "implemented",
+      "use_count": 0,
+      "use_for": [
+        "step-by-step explanation",
+        "nodes and edges draw on"
+      ]
+    },
+    {
+      "component": "src/Explainer.tsx Explainer",
+      "composition": "Explainer",
+      "content_fit": [
+        "explain"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "explainer",
+      "id": "explainer.whiteboard",
+      "last_used_at": null,
+      "proof_clip": "out/proof-v29-explainer-whiteboard.mp4",
+      "props_key": "style",
+      "ratios": [
+        "16:9"
+      ],
+      "requires": [
+        "ideas"
+      ],
+      "status": "implemented",
+      "use_count": 0,
+      "use_for": [
+        "step-by-step explanation",
+        "one open stroke per idea, marker nib rides the tip"
+      ]
+    },
+    {
+      "component": "src/Explainer.tsx Explainer",
+      "composition": "Explainer",
+      "content_fit": [
+        "explain"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "explainer",
+      "id": "explainer.isometric",
+      "last_used_at": null,
+      "proof_clip": "out/proof-v29-explainer-isometric.mp4",
+      "props_key": "style",
+      "ratios": [
+        "16:9"
+      ],
+      "requires": [
+        "ideas"
+      ],
+      "status": "implemented",
+      "use_count": 0,
+      "use_for": [
+        "step-by-step explanation",
+        "2:1 dimetric blocks stacked bottom-up"
+      ]
+    },
+    {
+      "component": "src/harness/primitives.tsx KineticLine",
+      "composition": "Vertical",
+      "content_fit": [
+        "general",
+        "headline"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "kinetic",
+      "id": "kinetic.word",
+      "last_used_at": "2026-11-22T21:50:04+00:00",
+      "proof_clip": "out/proof-panel-centered.mp4",
+      "proof_note": "implicit: the default reveal in all five panel proof clips",
+      "props_key": "kinetic",
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "status": "implemented",
+      "use_count": 1,
+      "use_for": [
+        "headline moment",
+        "default word-by-word line"
+      ]
+    },
+    {
+      "component": "src/harness/primitives.tsx CharStaggerLine",
+      "composition": "Vertical",
+      "content_fit": [
+        "general",
+        "headline"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "kinetic",
+      "id": "kinetic.char-stagger",
+      "last_used_at": "2026-11-22T21:48:43+00:00",
+      "proof_clip": "out/proof-v210-kinetic-char.mp4",
+      "props_key": "kinetic",
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "status": "implemented",
+      "use_count": 1,
+      "use_for": [
+        "headline moment",
+        "per-character stagger"
+      ]
+    },
+    {
+      "component": "src/harness/primitives.tsx MaskRevealLine",
+      "composition": "Vertical",
+      "content_fit": [
+        "general",
+        "headline"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "kinetic",
+      "id": "kinetic.mask",
+      "last_used_at": "2026-11-22T21:49:39+00:00",
+      "proof_clip": "out/proof-v210-kinetic-mask.mp4",
+      "props_key": "kinetic",
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "status": "implemented",
+      "use_count": 1,
+      "use_for": [
+        "headline moment",
+        "mask reveal"
+      ]
+    },
+    {
+      "component": "src/harness/primitives.tsx BlurInLine",
+      "composition": "Vertical",
+      "content_fit": [
+        "general",
+        "headline"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "kinetic",
+      "id": "kinetic.blur",
+      "last_used_at": "2026-11-22T21:48:13+00:00",
+      "proof_clip": "out/proof-v210-kinetic-blur.mp4",
+      "props_key": "kinetic",
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "status": "implemented",
+      "use_count": 1,
+      "use_for": [
+        "headline moment",
+        "blur-in"
+      ]
+    },
+    {
+      "component": "src/harness/primitives.tsx ClipWipeLine",
+      "composition": "Vertical",
+      "content_fit": [
+        "general",
+        "headline"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "kinetic",
+      "id": "kinetic.clip-wipe",
+      "last_used_at": "2026-11-22T21:49:11+00:00",
+      "proof_clip": "out/proof-v210-kinetic-wipe.mp4",
+      "props_key": "kinetic",
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "status": "implemented",
+      "use_count": 1,
+      "use_for": [
+        "headline moment",
+        "clip-path wipe"
+      ]
+    },
+    {
+      "component": "src/harness/primitives.tsx ArcText",
+      "composition": "Vertical",
+      "content_fit": [
+        "general",
+        "headline"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "kinetic",
+      "id": "kinetic.arc",
+      "last_used_at": "2026-11-22T21:53:43+00:00",
+      "proof_clip": "out/proof-v210-kinetic-path.mp4",
+      "props_key": "kinetic",
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "status": "implemented",
+      "use_count": 2,
+      "use_for": [
+        "headline moment",
+        "text on an arc"
+      ]
+    },
+    {
+      "component": "src/TikTokFormats.tsx via Vertical",
+      "composition": "Vertical",
+      "content_fit": [
+        "vertical-social"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "tiktok",
+      "id": "tiktok.hook-first",
+      "last_used_at": null,
+      "proof_clip": "out/proof-v211-tiktok-hook-first.mp4",
+      "props_key": "tiktokFormat",
+      "ratios": [
+        "9:16"
+      ],
+      "status": "implemented",
+      "use_count": 0,
+      "use_for": [
+        "vertical social clip",
+        "hook in the first second"
+      ]
+    },
+    {
+      "component": "src/TikTokFormats.tsx via Vertical",
+      "composition": "Vertical",
+      "content_fit": [
+        "vertical-social"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "tiktok",
+      "id": "tiktok.fast-cut",
+      "last_used_at": null,
+      "proof_clip": "out/proof-v211-tiktok-fast-cut.mp4",
+      "props_key": "tiktokFormat",
+      "ratios": [
+        "9:16"
+      ],
+      "status": "implemented",
+      "use_count": 0,
+      "use_for": [
+        "vertical social clip",
+        "uneven cuts with punch-in"
+      ]
+    },
+    {
+      "component": "src/TikTokFormats.tsx via Vertical",
+      "composition": "Vertical",
+      "content_fit": [
+        "vertical-social"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "tiktok",
+      "id": "tiktok.duet",
+      "last_used_at": null,
+      "proof_clip": "out/proof-v211-tiktok-duet.mp4",
+      "props_key": "tiktokFormat",
+      "ratios": [
+        "9:16"
+      ],
+      "status": "implemented",
+      "use_count": 0,
+      "use_for": [
+        "vertical social clip",
+        "reaction split"
+      ]
+    },
+    {
+      "component": "src/EverestPanels.tsx EverestPanels",
+      "composition": "EverestPanels",
+      "content_fit": [
+        "everest"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "everest",
+      "id": "everest.product-ui",
+      "last_used_at": null,
+      "proof_clip": "out/proof-v28-everest-product-ui.mp4",
+      "props_key": "category",
+      "ratios": [
+        "16:9"
+      ],
+      "requires": [
+        "category inputs"
+      ],
+      "status": "implemented",
+      "use_count": 0,
+      "use_for": [
+        "agent UI panel",
+        "typed prompt, tool calls, step chips"
+      ]
+    },
+    {
+      "component": "src/EverestPanels.tsx EverestPanels",
+      "composition": "EverestPanels",
+      "content_fit": [
+        "everest"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "everest",
+      "id": "everest.models-benchmarks",
+      "last_used_at": null,
+      "proof_clip": "out/proof-v28-everest-benchmarks.mp4",
+      "props_key": "category",
+      "ratios": [
+        "16:9"
+      ],
+      "requires": [
+        "numbers"
+      ],
+      "status": "implemented",
+      "use_count": 0,
+      "use_for": [
+        "benchmark panel",
+        "bars grow, old to new score with delta"
+      ]
+    },
+    {
+      "component": "src/Chart.tsx Chart mode=bars",
+      "composition": "Chart",
+      "content_fit": [
+        "numbers"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "chart",
+      "id": "chart.count-up",
+      "last_used_at": null,
+      "proof_clip": "out/proof-v28-chart.mp4",
+      "props_key": "mode",
+      "ratios": [
+        "16:9"
+      ],
+      "requires": [
+        "numbers"
+      ],
+      "status": "implemented",
+      "use_count": 0,
+      "use_for": [
+        "data",
+        "bars build one at a time, count-up lands exactly"
+      ]
+    },
+    {
+      "component": "src/Chart.tsx Chart mode=stats",
+      "composition": "Chart",
+      "content_fit": [
+        "numbers"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "chart",
+      "id": "chart.stats",
+      "last_used_at": null,
+      "proof_clip": "out/proof-v28-chart-stats.mp4",
+      "props_key": "mode",
+      "ratios": [
+        "16:9"
+      ],
+      "requires": [
+        "numbers"
+      ],
+      "status": "implemented",
+      "use_count": 0,
+      "use_for": [
+        "data",
+        "stat cards, one number at a time"
+      ]
+    },
+    {
+      "component": "src/D3Chart.tsx D3Chart",
+      "composition": "D3Chart",
+      "content_fit": [
+        "numbers"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "chart",
+      "id": "chart.d3",
+      "last_used_at": null,
+      "proof_clip": "out/proof-v28-d3chart.mp4",
+      "props_key": "mode",
+      "ratios": [
+        "16:9"
+      ],
+      "requires": [
+        "numbers"
+      ],
+      "status": "implemented",
+      "use_count": 0,
+      "use_for": [
+        "data",
+        "D3-scaled bars, same count-up rules"
+      ]
+    },
+    {
+      "component": "src/AdTemplate.tsx AdTemplate",
+      "composition": "AdTemplate",
+      "content_fit": [
+        "ad"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        15,
+        30
+      ],
+      "family": "ad",
+      "id": "ad.template",
+      "last_used_at": null,
+      "proof_clip": "out/proof-v27-ad.mp4",
+      "props_key": "variant",
+      "ratios": [
+        "9:16"
+      ],
+      "requires": [
+        "hook",
+        "benefit",
+        "proof",
+        "cta"
+      ],
+      "status": "implemented",
+      "use_count": 0,
+      "use_for": [
+        "ad",
+        "5-beat hook to CTA with one test field"
+      ]
+    },
+    {
+      "component": "src/ProductDemo.tsx ProductDemo",
+      "composition": "ProductDemo",
+      "content_fit": [
+        "product"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        12,
+        30
+      ],
+      "family": "product",
+      "id": "product.demo",
+      "last_used_at": null,
+      "proof_clip": "out/proof-v28-product.mp4",
+      "props_key": "product",
+      "ratios": [
+        "16:9"
+      ],
+      "requires": [
+        "product"
+      ],
+      "status": "implemented",
+      "use_count": 0,
+      "use_for": [
+        "product teaser",
+        "product-first frame, feature callouts, end card offer"
+      ]
+    },
+    {
+      "component": "src/LowerThird.tsx LowerThirdOverlay",
+      "composition": "LowerThird",
+      "content_fit": [
+        "name-card"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        1,
+        60
+      ],
+      "family": "lower-third",
+      "id": "lower-third.strap",
+      "last_used_at": null,
+      "proof_clip": "out/proof-v210-lower-third-vertical.mp4",
+      "props_key": "name",
+      "ratios": [
+        "16:9"
+      ],
+      "requires": [
+        "name"
+      ],
+      "status": "implemented",
+      "use_count": 0,
+      "use_for": [
+        "name card",
+        "name and role strap with keyword pills"
+      ]
+    },
+    {
+      "component": "src/BRoll.tsx BRoll",
+      "composition": "BRoll",
+      "content_fit": [
+        "broll"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        3,
+        60
+      ],
+      "family": "broll",
+      "id": "broll.cut-on-noun",
+      "last_used_at": null,
+      "proof_clip": "out/proof-v27-broll.mp4",
+      "props_key": "segments",
+      "ratios": [
+        "16:9"
+      ],
+      "requires": [
+        "beats"
+      ],
+      "status": "implemented",
+      "use_count": 0,
+      "use_for": [
+        "talking head",
+        "cuts on the noun, keyword overlay at the noun"
+      ]
+    },
+    {
+      "component": "src/WhatIf.tsx WhatIf",
+      "composition": "WhatIf",
+      "content_fit": [
+        "whatif"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        15,
+        25
+      ],
+      "family": "what-if",
+      "id": "whatif.rig",
+      "last_used_at": null,
+      "proof_clip": "out/proof-v211-whatif.mp4",
+      "props_key": "whatif",
+      "ratios": [
+        "9:16"
+      ],
+      "requires": [
+        "power",
+        "demos",
+        "fact",
+        "question"
+      ],
+      "status": "implemented",
+      "use_count": 0,
+      "use_for": [
+        "what-if episode",
+        "stick-figure rig, three escalating demos, one real fact"
+      ]
+    },
+    {
+      "id": "variant.rise",
+      "family": "variant",
+      "component": "src/Vertical.tsx Vertical / src/Harness.tsx Harness",
+      "composition": "Vertical",
+      "props_key": "variant",
+      "use_for": [
+        "background motion",
+        "drifting-dot field"
+      ],
+      "content_fit": [
+        "general"
+      ],
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "duration_s": [
+        3,
+        60
+      ],
+      "status": "implemented",
+      "proof_clip": "out/phase1-adm-5-harness.mp4",
+      "proof_note": "admission render adm-5 (p1-20261122T214939+0000), critic PASS",
+      "critic_pass": true,
+      "last_used_at": "2026-11-22T21:49:39+00:00",
+      "use_count": 1
+    },
+    {
+      "id": "font.mono",
+      "family": "font",
+      "component": "src/harness/primitives.tsx FONTS.serif",
+      "composition": "Vertical",
+      "props_key": "font",
+      "use_for": [
+        "typeface",
+        "default serif stack"
+      ],
+      "content_fit": [
+        "general"
+      ],
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "duration_s": [
+        3,
+        60
+      ],
+      "status": "implemented",
+      "proof_clip": "out/phase1-adm-5-harness.mp4",
+      "proof_note": "admission render adm-5 (p1-20261122T214939+0000), critic PASS",
+      "critic_pass": true,
+      "last_used_at": "2026-11-22T21:49:39+00:00",
+      "use_count": 1
+    },
+    {
+      "id": "motion.scale",
+      "family": "motion",
+      "component": "src/harness/primitives.tsx KineticLine",
+      "composition": "Vertical",
+      "props_key": "motion",
+      "use_for": [
+        "word entry",
+        "default kinetic word-by-word"
+      ],
+      "content_fit": [
+        "general"
+      ],
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "duration_s": [
+        3,
+        60
+      ],
+      "status": "implemented",
+      "proof_clip": "out/phase1-adm-5-harness.mp4",
+      "proof_note": "admission render adm-5 (p1-20261122T214939+0000), critic PASS",
+      "critic_pass": true,
+      "last_used_at": "2026-11-22T21:49:39+00:00",
+      "use_count": 1
+    },
+    {
+      "id": "variant.kinetic",
+      "family": "variant",
+      "component": "src/Vertical.tsx Vertical / src/Harness.tsx Harness",
+      "composition": "Vertical",
+      "props_key": "variant",
+      "use_for": [
+        "background motion",
+        "drifting-dot field"
+      ],
+      "content_fit": [
+        "general"
+      ],
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "duration_s": [
+        3,
+        60
+      ],
+      "status": "implemented",
+      "proof_clip": "out/phase1-adm-6-harness.mp4",
+      "proof_note": "admission render adm-6 (p1-20261122T215004+0000), critic PASS",
+      "critic_pass": true,
+      "last_used_at": "2026-11-22T21:50:04+00:00",
+      "use_count": 1
+    },
+    {
+      "id": "motion.rise",
+      "family": "motion",
+      "component": "src/harness/primitives.tsx KineticLine",
+      "composition": "Vertical",
+      "props_key": "motion",
+      "use_for": [
+        "word entry",
+        "default kinetic word-by-word"
+      ],
+      "content_fit": [
+        "general"
+      ],
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "duration_s": [
+        3,
+        60
+      ],
+      "status": "implemented",
+      "proof_clip": "out/phase1-adm-6-harness.mp4",
+      "proof_note": "admission render adm-6 (p1-20261122T215004+0000), critic PASS",
+      "critic_pass": true,
+      "last_used_at": "2026-11-22T21:50:04+00:00",
+      "use_count": 1
+    },
+    {
+      "id": "font.sans",
+      "family": "font",
+      "component": "src/harness/primitives.tsx FONTS.serif",
+      "composition": "Vertical",
+      "props_key": "font",
+      "use_for": [
+        "typeface",
+        "default serif stack"
+      ],
+      "content_fit": [
+        "general"
+      ],
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "duration_s": [
+        3,
+        60
+      ],
+      "status": "implemented",
+      "proof_clip": "out/phase1-adm-7-harness.mp4",
+      "proof_note": "admission render adm-7 (p1-20261122T215343+0000), critic PASS",
+      "critic_pass": true,
+      "last_used_at": "2026-11-22T21:53:43+00:00",
+      "use_count": 1
+    },
+    {
+      "id": "motion.slide",
+      "family": "motion",
+      "component": "src/harness/primitives.tsx KineticLine",
+      "composition": "Vertical",
+      "props_key": "motion",
+      "use_for": [
+        "word entry",
+        "default kinetic word-by-word"
+      ],
+      "content_fit": [
+        "general"
+      ],
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "duration_s": [
+        3,
+        60
+      ],
+      "status": "implemented",
+      "proof_clip": "out/phase1-adm-7-harness.mp4",
+      "proof_note": "admission render adm-7 (p1-20261122T215343+0000), critic PASS",
+      "critic_pass": true,
+      "last_used_at": "2026-11-22T21:53:43+00:00",
+      "use_count": 1
+    },
+    {
+      "id": "move.stagger",
+      "family": "move",
+      "component": "src/harness/motionRegistry.tsx PopInLine",
+      "composition": "Vertical",
+      "props_key": "moves",
+      "use_for": [
+        "entrance",
+        "reveal"
+      ],
+      "content_fit": [
+        "general",
+        "headline",
+        "emphasis"
+      ],
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "duration_s": [
+        3,
+        60
+      ],
+      "status": "implemented",
+      "proof_clip": "out/phase1-adm-1-harness.mp4",
+      "proof_note": "admission render adm-1 (p1-20261122T214743+0000), critic PASS",
+      "critic_pass": true,
+      "last_used_at": "2026-11-22T21:47:43+00:00",
+      "use_count": 1
+    },
+    {
+      "id": "move.mask-reveal",
+      "family": "move",
+      "component": "src/harness/motionRegistry.tsx transitionForMove",
+      "composition": "Vertical",
+      "props_key": "moves",
+      "use_for": [
+        "transition",
+        "growing-circle scene change"
+      ],
+      "content_fit": [
+        "general",
+        "transition"
+      ],
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "duration_s": [
+        3,
+        60
+      ],
+      "status": "implemented",
+      "proof_clip": "out/phase1-adm-1-harness.mp4",
+      "proof_note": "admission render adm-1 (p1-20261122T214743+0000), critic PASS",
+      "critic_pass": true,
+      "last_used_at": "2026-11-22T21:47:43+00:00",
+      "use_count": 1
+    },
+    {
+      "id": "move.kinetic-type",
+      "family": "move",
+      "component": "src/harness/motionRegistry.tsx TypewriterLine",
+      "composition": "Vertical",
+      "props_key": "moves",
+      "use_for": [
+        "entrance",
+        "reveal",
+        "typed words"
+      ],
+      "content_fit": [
+        "general",
+        "headline",
+        "emphasis"
+      ],
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "duration_s": [
+        3,
+        60
+      ],
+      "status": "implemented",
+      "proof_clip": "out/phase1-adm-1-harness.mp4",
+      "proof_note": "admission render adm-1 (p1-20261122T214743+0000), critic PASS",
+      "critic_pass": true,
+      "last_used_at": "2026-11-22T21:47:43+00:00",
+      "use_count": 1
+    },
+    {
+      "id": "move.light-sweep",
+      "family": "move",
+      "component": "src/harness/motionRegistry.tsx ImpactShake",
+      "composition": "Vertical",
+      "props_key": "moves",
+      "use_for": [
+        "effect",
+        "emphasis hit"
+      ],
+      "content_fit": [
+        "general",
+        "emphasis"
+      ],
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "duration_s": [
+        3,
+        60
+      ],
+      "status": "implemented",
+      "proof_clip": "out/phase1-adm-2-harness.mp4",
+      "proof_note": "admission render adm-2 (p1-20261122T214813+0000), critic PASS",
+      "critic_pass": true,
+      "last_used_at": "2026-11-22T21:48:13+00:00",
+      "use_count": 1
+    },
+    {
+      "id": "move.pan",
+      "family": "move",
+      "component": "src/harness/motionRegistry.tsx moveCamera",
+      "composition": "Vertical",
+      "props_key": "moves",
+      "use_for": [
+        "camera",
+        "slow push-in"
+      ],
+      "content_fit": [
+        "general",
+        "emphasis"
+      ],
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "duration_s": [
+        3,
+        60
+      ],
+      "status": "implemented",
+      "proof_clip": "out/phase1-adm-2-harness.mp4",
+      "proof_note": "admission render adm-2 (p1-20261122T214813+0000), critic PASS",
+      "critic_pass": true,
+      "last_used_at": "2026-11-22T21:48:13+00:00",
+      "use_count": 1
+    },
+    {
+      "id": "move.zoom-in",
+      "family": "move",
+      "component": "src/harness/motionRegistry.tsx moveCamera",
+      "composition": "Vertical",
+      "props_key": "moves",
+      "use_for": [
+        "camera",
+        "slow push-in"
+      ],
+      "content_fit": [
+        "general",
+        "emphasis"
+      ],
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "duration_s": [
+        3,
+        60
+      ],
+      "status": "implemented",
+      "proof_clip": "out/phase1-adm-2-harness.mp4",
+      "proof_note": "admission render adm-2 (p1-20261122T214813+0000), critic PASS",
+      "critic_pass": true,
+      "last_used_at": "2026-11-22T21:48:13+00:00",
+      "use_count": 1
+    },
+    {
+      "id": "move.jump-cut",
+      "family": "move",
+      "component": "src/harness/motionRegistry.tsx transitionForMove",
+      "composition": "Vertical",
+      "props_key": "moves",
+      "use_for": [
+        "transition",
+        "soft scene change"
+      ],
+      "content_fit": [
+        "general",
+        "transition"
+      ],
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "duration_s": [
+        3,
+        60
+      ],
+      "status": "implemented",
+      "proof_clip": "out/phase1-adm-3-harness.mp4",
+      "proof_note": "admission render adm-3 (p1-20261122T214843+0000), critic PASS",
+      "critic_pass": true,
+      "last_used_at": "2026-11-22T21:48:43+00:00",
+      "use_count": 1
+    },
+    {
+      "id": "move.match-cut",
+      "family": "move",
+      "component": "src/harness/motionRegistry.tsx transitionForMove",
+      "composition": "Vertical",
+      "props_key": "moves",
+      "use_for": [
+        "transition",
+        "growing-circle scene change"
+      ],
+      "content_fit": [
+        "general",
+        "transition"
+      ],
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "duration_s": [
+        3,
+        60
+      ],
+      "status": "implemented",
+      "proof_clip": "out/phase1-adm-3-harness.mp4",
+      "proof_note": "admission render adm-3 (p1-20261122T214843+0000), critic PASS",
+      "critic_pass": true,
+      "last_used_at": "2026-11-22T21:48:43+00:00",
+      "use_count": 1
+    },
+    {
+      "id": "move.whip-pan",
+      "family": "move",
+      "component": "src/harness/motionRegistry.tsx transitionForMove",
+      "composition": "Vertical",
+      "props_key": "moves",
+      "use_for": [
+        "transition",
+        "soft scene change"
+      ],
+      "content_fit": [
+        "general",
+        "transition"
+      ],
+      "ratios": [
+        "9:16",
+        "16:9"
+      ],
+      "duration_s": [
+        3,
+        60
+      ],
+      "status": "implemented",
+      "proof_clip": "out/phase1-adm-3-harness.mp4",
+      "proof_note": "admission render adm-3 (p1-20261122T214843+0000), critic PASS",
+      "critic_pass": true,
+      "last_used_at": "2026-11-22T21:48:43+00:00",
+      "use_count": 1
+    }
+  ],
+  "generated": "2026-11-22",
+  "note": "Phase 1 Style Registry (Video Bot PRD Section 2). One machine-readable file; the only inventory of implemented styles. An entry exists ONLY when working render code exists behind it AND a proof clip with a Critic PASS is on file in out/. Named-but-unbuilt items live in style_backlog.json, never here. last_used_at / use_count are written by phase1_history.py after every render. Proof clips are repo-relative paths under out/.",
+  "version": 1
+}

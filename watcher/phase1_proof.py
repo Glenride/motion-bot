@@ -455,9 +455,12 @@ def run_brief(brief_path, tag, dry_run=False):
 def admit_entries(tag):
     """After an admission run: every forced pick that is not yet in
     the registry and whose run PASSED the critic gets a registry
-    entry. Descriptive fields copy from the nearest sibling entry
-    (the backlog item's 'nearest'); proof_clip + critic_pass come
-    from this run. Backlog items are removed as they are admitted."""
+    entry — plus every per-scene move in the run's storyboard
+    (a Moves: label proves each listed move on screen; the moves
+    live in the storyboard, not the picks dict). Descriptive fields
+    copy from the nearest sibling entry (the backlog item's
+    'nearest'); proof_clip + critic_pass come from this run.
+    Backlog items are removed as they are admitted."""
     registry = hist.load_registry()
     by_id = {e.get("id"): e for e in registry.get("entries", [])}
     backlog = json.loads(
@@ -465,15 +468,24 @@ def admit_entries(tag):
     backlog_by_id = {i.get("id"): i for i in backlog.get("items", [])}
     admitted = []
     for run in hist.load_history():
-        if run.get("tag") != tag or not run.get("forced"):
+        if run.get("tag") != tag:
             continue
         if (run.get("critic") or {}).get("overall") != "PASS":
             log(f"  admission SKIP {run.get('brief_id')}: critic "
                 f"{(run.get('critic') or {}).get('overall')}")
             continue
         picks = run.get("picks") or {}
-        for entry_id in [v for v in picks.values()
-                         if isinstance(v, str) and "." in v]:
+        candidates = [v for v in picks.values()
+                      if isinstance(v, str) and "." in v]
+        # Per-scene moves live in the storyboard, not the picks.
+        sb_name = run.get("storyboard") or ""
+        if sb_name:
+            sb_path = REPO / "briefs" / sb_name
+            if sb_path.exists():
+                sb = json.loads(sb_path.read_text())
+                for m in sb.get("moves") or []:
+                    candidates.append(f"move.{m}")
+        for entry_id in candidates:
             if entry_id in by_id:
                 continue
             item = backlog_by_id.get(entry_id)
@@ -657,11 +669,18 @@ def main(argv):
                     help="route + storyboard only, no iMac render")
     ap.add_argument("--admission", action="store_true",
                     help="admit forced picks to the registry on PASS")
+    ap.add_argument("--admit-only", action="store_true",
+                    help="admit from existing history for the tag, no renders")
     ap.add_argument("--report", action="store_true",
                     help="evaluate acceptance from history and exit")
     ap.add_argument("--no-sync", action="store_true",
                     help="skip the src/ sync to the iMac")
     args = ap.parse_args(argv)
+
+    if args.admit_only:
+        admitted = admit_entries(args.tag)
+        log(f"admitted to registry: {admitted or 'none'}")
+        return 0
 
     if args.report:
         report, results = evaluate_report(args.tag if args.tag else None)
