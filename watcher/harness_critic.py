@@ -211,7 +211,17 @@ def sample_times(storyboard, duration):
     else:
         per = duration / n
         times = [round((i + 0.5) * per, 2) for i in range(n)]
-    times.append(round(max(0.5, duration - 0.5), 2))
+    # Last-frame sample: it verifies the clip's end, but when it
+    # lands <1s after the previous midpoint it measures almost
+    # nothing — a designed hold (ProductDemo end card, Chart hold)
+    # reads near-identical over 0.5s, and the pair can only produce
+    # a false frames_differ FAIL (proof run p02/p07, Nov 22: 0.46
+    # over the 11.0s-vs-11.5s pair). Drop it then; every scene is
+    # still sampled at its midpoint, and the threshold (2.0) is
+    # unchanged.
+    last = round(max(0.5, duration - 0.5), 2)
+    if not times or last - times[-1] >= 1.0:
+        times.append(last)
     return sorted(set(t for t in times if t < duration))
 
 
