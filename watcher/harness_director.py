@@ -669,12 +669,16 @@ def pick_tiktok_format(task, notes):
 WHATIF_PROPS = {"mug", "phone", "crosswalk", "slice", "stair", "quiz", "cookie", "none"}
 
 
-def build_whatif(task, storyboard):
+def build_whatif(task, storyboard, draft=False):
     """Task + its storyboard -> what-if dict for the WhatIf rung,
     or None. Returns None without Power + 3 Demo lines + Fact —
     those tasks keep the default route, craft notes only, never
-    an invented fact, demo, or number. The length clamps to the
-    skill's 15–25 s (default 20 s). Scenes carry durationSeconds
+    an invented fact, demo, or number. With draft=True (Phase 1
+    draft-first), the missing inputs become clearly marked
+    placeholders instead of a refusal: the draft renders, the
+    delivery note lists every placeholder, and the user corrects
+    the values or tells the bot to re-render. The length clamps to
+    the skill's 15–25 s (default 20 s). Scenes carry durationSeconds
     so the critic samples each beat at its midpoint."""
     details = task.get("details") or ""
     labels = parse_labels(details)
@@ -685,7 +689,25 @@ def build_whatif(task, storyboard):
     question = (labels.get("question") or "").strip()
     demo_lines = _repeated_lines(details, "demo")
     if not power or len(demo_lines) < 3 or not fact or not question:
-        return None
+        if not draft:
+            return None
+        notes = storyboard.setdefault("notes", [])
+        if not power:
+            power = "[POWER NEEDED]"
+            notes.append("what-if draft: no Power: label — placeholder "
+                         "power, add a Power: line to replace it")
+        while len(demo_lines) < 3:
+            demo_lines.append(f"[DEMO {len(demo_lines) + 1} NEEDED]")
+            notes.append("what-if draft: a Demo: line is missing — "
+                         "placeholder demo, add Demo: lines to replace it")
+        if not fact:
+            fact = "[FACT NEEDED]"
+            notes.append("what-if draft: no Fact: label — placeholder "
+                         "fact, add a real fact with a number to replace it")
+        if not question:
+            question = "[QUESTION NEEDED]"
+            notes.append("what-if draft: no Question: label — "
+                         "placeholder question, add one to replace it")
     power_word = power.split()[0].capitalize()
     demos = []
     for line in demo_lines[:3]:
@@ -945,11 +967,18 @@ def parse_story(details):
     return [s for s in sentences if len(s.split()) >= 3]
 
 
-def build_storyboard(task):
+def build_storyboard(task, route=None):
     """Mission Control task dict -> storyboard dict (Harness props).
 
     task needs `title` (the hook) and `details` (free text + labels).
     Raises ValueError on an empty title — the watcher blocks those.
+
+    route (Phase 1): a Phase 1 router record (phase1_router.route)
+    overrides the task-id rotation picks — panel, variant, font,
+    motion, kinetic, move, tiktokFormat come from the registry
+    instead of the pick_* functions. route=None (default) keeps
+    the live watcher's behaviour exactly: the watcher calls
+    build_storyboard(task) unchanged.
     """
     title = (task.get("title") or "").strip()
     details = task.get("details") or ""
@@ -1029,15 +1058,50 @@ def build_storyboard(task):
                               if i < len(scene_texts) - 1 else "none"),
         })
 
-    variant = pick_variant(task, notes)
-    panel = pick_panel(task, notes)
-    font = pick_font(task, notes)
-    motion = pick_motion(task, notes)
-    kinetic = pick_kinetic(task, notes)
-    bpm = pick_bpm(task, notes)
-    move = pick_move(task, notes)
-    moves = pick_moves(task, notes)
-    tiktok_format = pick_tiktok_format(task, notes)
+    if route is not None:
+        # Phase 1 route override: the registry picks replace the
+        # task-id rotation. IDs carry their family prefix
+        # ("panel.centered"); the storyboard keeps the bare names
+        # the renderers expect. bpm still comes from the brief.
+        def _bare(rid, default):
+            if not rid:
+                return default
+            return rid.split(".", 1)[1] if "." in rid else rid
+        variant = _bare(route.get("variant"), "orbit")
+        panel = _bare(route.get("panel"), "centered")
+        font = _bare(route.get("font"), "serif")
+        motion = _bare(route.get("motion"), "kinetic")
+        kinetic = _bare(route.get("kinetic"), "word")
+        bpm = pick_bpm(task, notes)
+        move = _bare(route.get("move"), None) or None
+        # Per-scene Moves: labels still pass through in route mode:
+        # the router picks one default move, but an explicit Moves:
+        # list cycles per scene (how the v2.11 clips proved the
+        # move families). No label means no moves prop at all.
+        moves = pick_moves(task, notes)
+        tiktok_format = _bare(route.get("tiktokFormat"), None) or None
+        notes.append("phase1 route: panel '{}', variant '{}', font '{}', "
+                     "motion '{}', kinetic '{}', move '{}', tiktok '{}'".format(
+                         panel, variant, font, motion, kinetic,
+                         move or "-", tiktok_format or "-"))
+        if route.get("labelled"):
+            notes.append("phase1: labelled override — '{}'".format(
+                route.get("label") or ""))
+        if route.get("approximation"):
+            notes.append("phase1: APPROXIMATION — '{}' is not built; "
+                         "nearest implemented entry '{}' used, not the "
+                         "labelled style".format(
+                             route.get("approximation"), route.get("style") or ""))
+    else:
+        variant = pick_variant(task, notes)
+        panel = pick_panel(task, notes)
+        font = pick_font(task, notes)
+        motion = pick_motion(task, notes)
+        kinetic = pick_kinetic(task, notes)
+        bpm = pick_bpm(task, notes)
+        move = pick_move(task, notes)
+        moves = pick_moves(task, notes)
+        tiktok_format = pick_tiktok_format(task, notes)
     legacy_story = parse_story(details)
     if legacy_story and not story_beats:
         notes.append(f"story: {len(legacy_story)} beats")
@@ -1066,6 +1130,23 @@ def build_storyboard(task):
         "kinetic": kinetic,
         "notes": notes,
     }
+    if route is not None:
+        # Phase 1 record: the proof harness and the history log read
+        # this, never the model's memory. The router record is flat
+        # (panel/variant/... at top level); the picks stored here
+        # are the same flat fields.
+        storyboard["phase1"] = {
+            "picks": {k: route.get(k) for k in
+                      ("panel", "variant", "font", "motion", "kinetic",
+                       "move", "style", "composition", "format")
+                      if route.get(k) is not None},
+            "composition": route.get("composition", ""),
+            "format": route.get("format", ""),
+            "labelled": bool(route.get("labelled")),
+            "label": route.get("label") or "",
+            "approximation": route.get("approximation") or "",
+            "reason": route.get("reason") or "",
+        }
     if bpm is not None:
         storyboard["bpm"] = bpm
     # Named moves (v2.11, motion-prompt registry): Move: / Moves:
@@ -1347,6 +1428,18 @@ def parse_data_rows(details):
     return rows if len(rows) >= 2 else []
 
 
+def draft_data_rows(details):
+    """Phase 1 draft-first: a Chart brief with no parseable numbers
+    still gets a draft. Two placeholder bars at value 0, labelled
+    [VALUE 1 NEEDED] / [VALUE 2 NEEDED] — the flat bars and the
+    labels say on screen that the numbers are missing, and no
+    figure is invented. The delivery note tells the user to add
+    `Data:` rows and re-render. Distinct labels (not two identical
+    ones) so React keys stay unique."""
+    return [{"label": "[VALUE 1 NEEDED]", "value": 0},
+            {"label": "[VALUE 2 NEEDED]", "value": 0}]
+
+
 def _split_list(value):
     """A `Features:` / `Steps:` / `Pills:` value -> [items]."""
     return [p.strip() for p in re.split(r"[;,]", value or "") if p.strip()]
@@ -1382,8 +1475,15 @@ def _money(value):
 # text, was/now, code, and deadline only from explicit labels. A
 # was/now pair renders only when now < was — a bad row shows no
 # price drop at all. Returns None when there is no product to demo.
-def build_product_demo(task, storyboard, ecommerce_matched=False):
-    """Task + storyboard -> ProductDemo props dict, or None."""
+def build_product_demo(task, storyboard, ecommerce_matched=False, draft=False):
+    """Task + storyboard -> ProductDemo props dict, or None.
+
+    With draft=True (Phase 1 draft-first), a demo with no features
+    renders one clearly marked placeholder feature instead of
+    returning None — the draft ships, the delivery note names the
+    missing feature, and the user corrects it or re-renders. Money
+    is never invented: offer, was/now, code and deadline come only
+    from explicit labels, in draft or not."""
     title = (task.get("title") or "").strip()
     details = task.get("details") or ""
     labels = parse_labels(details)
@@ -1405,6 +1505,11 @@ def build_product_demo(task, storyboard, ecommerce_matched=False):
         if features:
             notes.append("product demo: features from story beats 2+ "
                          "(no Features:/Feature: label)")
+    if not features and draft:
+        features = ["[FEATURE NEEDED]"]
+        notes.append("product demo draft: no features in the brief — "
+                     "placeholder feature, add Features: lines to "
+                     "replace it")
     features = features[:4]
     offer = {}
     was = _money(labels.get("was"))
@@ -1534,12 +1639,17 @@ def _parse_receipt(details):
     return receipt
 
 
-def build_everest_panel(task, storyboard, matched_packs):
+def build_everest_panel(task, storyboard, matched_packs, draft=False):
     """Task + storyboard + matched everest-* packs -> panel props.
 
     Returns None when the selected category cannot be rendered
     without inventing data (reason in storyboard['notes']) — the
-    watcher then falls back to the default route.
+    watcher then falls back to the default route. With draft=True
+    (Phase 1 draft-first), the missing inputs become clearly
+    marked placeholders instead of a refusal: numbers render as 0
+    with a [VALUE NEEDED]-style label, never as an invented
+    figure presented as real. The delivery note lists every
+    placeholder.
     """
     title = (task.get("title") or "").strip()
     details = task.get("details") or ""
@@ -1593,10 +1703,16 @@ def build_everest_panel(task, storyboard, matched_packs):
                          "old": float(m.group(2)),
                          "new": float(m.group(3))})
         if not bars:
-            notes.append("everest DROPPED: models-benchmarks needs "
-                         "`Benchmark: <label> <old> -> <new>` lines — "
-                         "no numbers in the task, none invented")
-            return None
+            if not draft:
+                notes.append("everest DROPPED: models-benchmarks needs "
+                             "`Benchmark: <label> <old> -> <new>` lines — "
+                             "no numbers in the task, none invented")
+                return None
+            bars = [{"label": "[BENCHMARK NEEDED]", "old": 0, "new": 0}]
+            notes.append("everest draft: models-benchmarks has no "
+                         "Benchmark: lines — placeholder bar at 0 with "
+                         "a [BENCHMARK NEEDED] label, add Benchmark: "
+                         "lines to replace it")
         panel["bars"] = bars
         notes.append(f"everest 'models-benchmarks': {len(bars)} bar(s)")
     elif category == "comparisons":
@@ -1608,12 +1724,19 @@ def build_everest_panel(task, storyboard, matched_packs):
                          "right": rm.group(3).strip(),
                          "winner": (rm.group(4) or "right").strip().lower()})
         if not m or not rows:
-            notes.append("everest DROPPED: comparisons needs "
-                         "`Compare: <A> vs <B>` plus `Row: <label> | "
-                         "<left> | <right> | <left|right>` lines")
-            return None
-        panel["comparison"] = {"left": m.group(1).strip(),
-                               "right": m.group(2).strip(), "rows": rows}
+            if not draft:
+                notes.append("everest DROPPED: comparisons needs "
+                             "`Compare: <A> vs <B>` plus `Row: <label> | "
+                             "<left> | <right> | <left|right>` lines")
+                return None
+            m = None
+            rows = [{"label": "[ROW NEEDED]", "left": "—",
+                     "right": "—", "winner": "right"}]
+            notes.append("everest draft: comparisons has no Compare:/"
+                         "Row: lines — placeholder comparison, add "
+                         "Compare: and Row: lines to replace it")
+        panel["comparison"] = {"left": m.group(1).strip() if m else "[OPTION A NEEDED]",
+                               "right": m.group(2).strip() if m else "[OPTION B NEEDED]", "rows": rows}
         notes.append(f"everest 'comparisons': {m.group(1).strip()} vs "
                      f"{m.group(2).strip()}, {len(rows)} row(s)")
     elif category == "launch-news":
@@ -1621,10 +1744,15 @@ def build_everest_panel(task, storyboard, matched_packs):
                 or (labels.get("product") or "").strip()
                 or (labels.get("project") or "").strip())
         if not name:
-            notes.append("everest DROPPED: launch-news needs a "
-                         "`Name:` / `Product:` / `Project:` label — "
-                         "no name to launch")
-            return None
+            if not draft:
+                notes.append("everest DROPPED: launch-news needs a "
+                             "`Name:` / `Product:` / `Project:` label — "
+                             "no name to launch")
+                return None
+            name = "[NAME NEEDED]"
+            notes.append("everest draft: launch-news has no Name:/"
+                         "Product:/Project: label — placeholder name, "
+                         "add one to replace it")
         panel["name"] = name
         if (labels.get("version") or "").strip():
             panel["version"] = labels["version"].strip()
@@ -1640,10 +1768,16 @@ def build_everest_panel(task, storyboard, matched_packs):
         now = _money(labels.get("now"))
         receipt = _parse_receipt(details)
         if not tiers and not (was is not None and now is not None) and not receipt:
-            notes.append("everest DROPPED: pricing-limits needs "
-                         "`Tier:` lines, a `Was:`/`Now:` pair, or a "
-                         "`Receipt:` line — no prices in the task")
-            return None
+            if not draft:
+                notes.append("everest DROPPED: pricing-limits needs "
+                             "`Tier:` lines, a `Was:`/`Now:` pair, or a "
+                             "`Receipt:` line — no prices in the task")
+                return None
+            tiers = [{"name": "[TIER NEEDED]", "price": "[PRICE NEEDED]",
+                      "note": "", "recommended": False}]
+            notes.append("everest draft: pricing-limits has no Tier:/"
+                         "Was:/Now:/Receipt: lines — placeholder tier, "
+                         "add Tier: lines to replace it")
         if tiers:
             panel["tiers"] = tiers
         if was is not None and now is not None and now < was:
@@ -1657,9 +1791,13 @@ def build_everest_panel(task, storyboard, matched_packs):
     elif category == "lower-thirds":
         name = (labels.get("name") or "").strip()
         if not name:
-            notes.append("everest DROPPED: lower-thirds needs a "
-                         "`Name:` label")
-            return None
+            if not draft:
+                notes.append("everest DROPPED: lower-thirds needs a "
+                             "`Name:` label")
+                return None
+            name = "[NAME NEEDED]"
+            notes.append("everest draft: lower-thirds has no Name: "
+                         "label — placeholder name, add one to replace it")
         panel["name"] = name
         if (labels.get("role") or "").strip():
             panel["role"] = labels["role"].strip()
@@ -1672,10 +1810,22 @@ def build_everest_panel(task, storyboard, matched_packs):
     elif category == "usage-cost":
         m = USAGE_RE.search(details)
         if not m:
-            notes.append("everest DROPPED: usage-cost needs a "
-                         "`Usage: <used>/<cap>` line — no cap in the "
-                         "task")
-            return None
+            if not draft:
+                notes.append("everest DROPPED: usage-cost needs a "
+                             "`Usage: <used>/<cap>` line — no cap in the "
+                             "task")
+                return None
+            usage = {"used": 0, "cap": 0, "label": "[CAP NEEDED]"}
+            panel["usage"] = usage
+            notes.append("everest draft: usage-cost has no Usage: line "
+                         "— placeholder 0/0 with a [CAP NEEDED] label "
+                         "(the 0 cap is a stand-in so the bar math "
+                         "renders; add a Usage: <used>/<cap> line to "
+                         "replace it)")
+            panel["scenes"] = [
+                {"words": title.split(), "camera": CAMERA_MOVES[0],
+                 "transitionOut": "none"}]
+            return panel
         usage = {"used": float(m.group(1)), "cap": float(m.group(2))}
         reset = (labels.get("reset") or "").strip()
         if reset:
@@ -1690,9 +1840,14 @@ def build_everest_panel(task, storyboard, matched_packs):
     elif category == "evidence-quotes":
         quote = (labels.get("quote") or "").strip()
         if not quote:
-            notes.append("everest DROPPED: evidence-quotes needs a "
-                         "`Quote:` label — no supplied quote to card")
-            return None
+            if not draft:
+                notes.append("everest DROPPED: evidence-quotes needs a "
+                             "`Quote:` label — no supplied quote to card")
+                return None
+            quote = "[QUOTE NEEDED]"
+            notes.append("everest draft: evidence-quotes has no Quote: "
+                         "label — placeholder quote, add a Quote: label "
+                         "to replace it")
         panel["quote"] = quote
         if (labels.get("highlight") or "").strip():
             panel["highlight"] = labels["highlight"].strip()
@@ -1740,12 +1895,14 @@ EXPLAINER_STYLES = {
 }
 
 
-def build_explainer(task, storyboard):
+def build_explainer(task, storyboard, draft=False):
     """Task + storyboard -> Explainer props dict, or None.
 
     Returns None only when the task carries no ideas at all (no
     story beats, no Idea:/Step: labels) — the watcher then falls
-    back to the default route.
+    back to the default route. With draft=True (Phase 1
+    draft-first), the missing ideas become one clearly marked
+    placeholder idea instead of a refusal.
     """
     title = (task.get("title") or "").strip()
     details = task.get("details") or ""
@@ -1780,9 +1937,14 @@ def build_explainer(task, storyboard):
             notes.append("explainer ideas from story beats "
                          "(no Idea:/Step: label)")
     if not lines:
-        notes.append("explainer DROPPED: no ideas — no story beats "
-                     "and no Idea:/Step: label, nothing to explain")
-        return None
+        if not draft:
+            notes.append("explainer DROPPED: no ideas — no story beats "
+                         "and no Idea:/Step: label, nothing to explain")
+            return None
+        lines = ["[IDEA NEEDED] — add an Idea: line or story beats"]
+        notes.append("explainer draft: no ideas in the brief — "
+                     "placeholder idea, add Idea: lines or story beats "
+                     "to replace it")
     lines = lines[:4]
     ideas = [{"title": " ".join(l.split()[:2]),
               "line": l.strip()} for l in lines]

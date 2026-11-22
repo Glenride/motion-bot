@@ -866,12 +866,15 @@ export const EverestPanels: React.FC<EverestPanelsProps> = (props) => {
   // reset countdown (caps only from the brief).
   if (category === "usage-cost") {
     const usage = props.usage ?? EVEREST_DEFAULTS.usage;
-    const pct = Math.max(0, Math.min(100, (usage.used / usage.cap) * 100));
+    // A 0 cap is the Phase 1 draft placeholder ([CAP NEEDED]) — guard
+    // the division and the at-cap banner so it renders 0% with no
+    // "Limit reached" banner instead of NaN. Real caps are > 0.
+    const pct = usage.cap > 0 ? Math.max(0, Math.min(100, (usage.used / usage.cap) * 100)) : 0;
     const fillP = interpolate(frame, [20, 110], [0, 1], {
       extrapolateLeft: "clamp",
       extrapolateRight: "clamp",
     });
-    const atCap = usage.used >= usage.cap;
+    const atCap = usage.cap > 0 && usage.used >= usage.cap;
     const bannerP = atCap
       ? interpolate(frame, [120, 132], [0, 1], {
           extrapolateLeft: "clamp",

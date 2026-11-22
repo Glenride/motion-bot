@@ -17,6 +17,11 @@ Harness render:
   6. No self-mention: "Motion Bot" / "Untitled Project" must appear
      nowhere — checked in the storyboard text AND by OCR (tesseract)
      on the sampled frames.
+  8. Variety (Phase 1): same panel-and-motion pair as the previous
+     render, or a cooldown breach (pair in the last 5 renders, or
+     one family taking more than 2 of the last 5), FAILs. Runs only
+     when --picks is supplied (the Phase 1 path); the live watcher
+     passes no picks and the check SKIPs.
 
 OCR runs locally when tesseract exists; otherwise it runs on the iMac
 render host against the iMac copy of the MP4 (tesseract is installed
@@ -28,6 +33,8 @@ Usage:
       [--imac-mp4 ~/projects/motion-bot/out/<name>.mp4]
       [--srt <subtitles.srt>]   # narrated clips: global caption sidecar
       [--out <critic.json>]
+      [--picks <router-picks.json>] [--history <history.jsonl>]
+          # Phase 1 variety gate (Check 8); omitted = SKIP
 Prints a JSON report to stdout and writes it to --out (default:
 out/<mp4-stem>.critic.json next to the mp4). Exit 0 on PASS, 1 on FAIL.
 
@@ -259,12 +266,70 @@ def _distinctive_words(text):
     return seen
 
 
-def critic(mp4_path, storyboard, imac_mp4=None, srt_path=None):
+def check_variety(picks, runs=None):
+    """Phase 1 variety gate (PRD Check 8).
+
+    picks: router record with panel + effective entry (picks['entry']
+    when present) + style + labelled flag. runs: recent run records
+    (defaults to the last 5 in history.jsonl). A labelled override
+    is exempt by design (SKIP). Otherwise FAIL when the pair repeats
+    the previous render or anywhere in the last 5, or the primary
+    style family already takes 2 of the last 5. The caller re-picks
+    on FAIL (max 3 re-picks per run); the re-pick and the FAIL are
+    both written to the History log by the caller.
+    """
+    try:
+        from phase1_history import (recent_runs, effective_entry,
+                                    primary_family_of, COOLDOWN_WINDOW,
+                                    FAMILY_CAP)
+    except Exception as exc:
+        return {"status": "SKIP",
+                "detail": f"phase1_history unavailable ({exc})"}
+    if picks.get("labelled"):
+        return {"status": "SKIP",
+                "detail": "labelled override — exempt from rotation"}
+    if runs is None:
+        runs = recent_runs(COOLDOWN_WINDOW)
+    panel = picks.get("panel") or ""
+    entry = picks.get("entry") or effective_entry(picks)
+    family = (picks.get("style") or "default").split(".")[0]
+    if runs:
+        prev = runs[-1]
+        prev_picks = prev.get("picks") or {}
+        if (prev_picks.get("panel") == panel
+                and effective_entry(prev_picks) == entry):
+            return {"status": "FAIL",
+                    "detail": (f"same panel-and-motion pair as the "
+                               f"previous render: {panel} + {entry}")}
+        for run in runs:
+            rp = run.get("picks") or {}
+            if (rp.get("panel") == panel
+                    and effective_entry(rp) == entry):
+                return {"status": "FAIL",
+                        "detail": (f"pair {panel} + {entry} repeats "
+                                   f"within the last {len(runs)} renders")}
+    fam_count = sum(1 for run in runs
+                    if primary_family_of(run) == family)
+    if fam_count >= FAMILY_CAP:
+        return {"status": "FAIL",
+                "detail": (f"family '{family}' already takes {fam_count} "
+                           f"of the last {len(runs)} renders "
+                           f"(cap {FAMILY_CAP})")}
+    return {"status": "PASS",
+            "detail": (f"pair {panel} + {entry} not in the last "
+                       f"{len(runs)} renders; family '{family}' at "
+                       f"{fam_count}/{len(runs)}")}
+
+
+def critic(mp4_path, storyboard, imac_mp4=None, srt_path=None,
+           picks=None, runs=None):
     """Verify a clip. Narrated storyboards (narrated:true) skip the
     palette/contrast checks (stock footage has no palette) and gain
     two checks of their own: audio_present (real voiceover, not a
     silent track) and captions_present (the SRT sidecar has cues).
-    srt_path is the global subtitles.srt pulled back with the MP4."""
+    srt_path is the global subtitles.srt pulled back with the MP4.
+    picks (Phase 1 router record) runs the variety gate; without it
+    the gate SKIPs and the live watcher is unchanged."""
     mp4_path = Path(mp4_path)
     narrated = bool(storyboard.get("narrated"))
     report = {"mp4": str(mp4_path), "checks": {}, "overall": "FAIL"}
@@ -471,6 +536,18 @@ def critic(mp4_path, storyboard, imac_mp4=None, srt_path=None):
         "detail": f"banned strings in storyboard text: {hits or 'none'}",
     }
 
+    # 8. Variety gate (Phase 1, PRD Check 8): same panel-and-motion
+    # pair as the previous render, or a cooldown breach, FAILs.
+    # No picks supplied (live watcher) means SKIP — the gate only
+    # runs on the Phase 1 path.
+    if picks is None:
+        checks["variety"] = {
+            "status": "SKIP",
+            "detail": "no Phase 1 picks supplied (live watcher path)",
+        }
+    else:
+        checks["variety"] = check_variety(picks, runs)
+
     report["overall"] = (
         "PASS" if all(c["status"] in ("PASS", "SKIP")
                       for c in checks.values()) else "FAIL"
@@ -486,6 +563,8 @@ def main(argv):
     imac_mp4 = None
     srt_path = None
     out_path = None
+    picks = None
+    runs = None
     i = 3
     while i < len(argv):
         if argv[i] == "--imac-mp4" and i + 1 < len(argv):
@@ -497,10 +576,21 @@ def main(argv):
         elif argv[i] == "--out" and i + 1 < len(argv):
             out_path = Path(argv[i + 1])
             i += 2
+        elif argv[i] == "--picks" and i + 1 < len(argv):
+            # Phase 1 router record (JSON): runs the variety gate.
+            picks = json.loads(Path(argv[i + 1]).read_text())
+            i += 2
+        elif argv[i] == "--history" and i + 1 < len(argv):
+            # Phase 1 history log (JSONL) the gate reads; defaults
+            # to the watcher's history.jsonl when omitted.
+            runs = [json.loads(line) for line in
+                    Path(argv[i + 1]).read_text().splitlines()
+                    if line.strip()]
+            i += 2
         else:
             i += 1
     storyboard = json.loads(Path(storyboard_path).read_text())
-    report = critic(mp4, storyboard, imac_mp4, srt_path)
+    report = critic(mp4, storyboard, imac_mp4, srt_path, picks, runs)
     if out_path is None:
         # task-161-harness.mp4 -> task-161-harness.critic.json
         out_path = Path(str(mp4).replace(".mp4", ".critic.json"))

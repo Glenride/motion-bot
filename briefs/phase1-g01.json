@@ -1,0 +1,1 @@
+{"details":"A plain brief used to force a repeat pick on purpose. The gate test runs it twice: once as a deliberate repeat, once re-picked.","expect":{"gate":true},"gate":true,"id":"g01","title":"The gate test brief"}
