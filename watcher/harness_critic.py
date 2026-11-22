@@ -582,10 +582,12 @@ def main(argv):
             i += 2
         elif argv[i] == "--history" and i + 1 < len(argv):
             # Phase 1 history log (JSONL) the gate reads; defaults
-            # to the watcher's history.jsonl when omitted.
-            runs = [json.loads(line) for line in
-                    Path(argv[i + 1]).read_text().splitlines()
-                    if line.strip()]
+            # to the watcher's history.jsonl when omitted. A missing
+            # file is an empty history (cold start), never a crash.
+            hist_path = Path(argv[i + 1])
+            runs = ([json.loads(line) for line in
+                     hist_path.read_text().splitlines()
+                     if line.strip()] if hist_path.exists() else [])
             i += 2
         else:
             i += 1
