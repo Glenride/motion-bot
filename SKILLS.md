@@ -618,3 +618,46 @@ the task-391 palette fails palette_present (light field
 18–23%) — the landscape gradient between far-apart colors
 leaves most pixels >30 from both; a no-wash control measured
 19–24%, so it is pre-existing, not v2.10 (see HARNESS.md).
+
+## Engine lane — HyperFrames / huashu-motion (2026-11-23, label-only)
+
+A second render engine beside Remotion. The watcher renders these
+on this VM (no iMac hop) via `watcher/render_engine.py`.
+
+- **Use:** add `engine: hyperframes` or `engine: huashu-motion`
+  (`engine: huashu` works too) to the brief details. Label-only —
+  the router never auto-picks an engine; a task without the label
+  takes the normal Harness route.
+- **Router:** `watcher/phase1_router.py` Step 1, `ENGINE_RE`;
+  registry entries `engine.hyperframes` (HyperFrames, 10s) and
+  `engine.huashu-motion` (HuashuMotion, 9s), family `engine`,
+  1280x720 landscape only.
+- **What renders:** HyperFrames — blank scaffold with the hook as
+  the headline, fast blur-in + slow y-drift, burnt-sienna bar
+  sweeping the full 10 s. huashu — blank template with title /
+  subtitle variables set from the brief, end card recaps the hook
+  big. Both go through skill_verify + the Critic + history +
+  mark_done, same as Harness; any engine failure falls back to
+  Harness, a critic STRUCTURAL failure blocks the task.
+- **No telemetry, ever:** every subprocess runs with
+  `HYPERFRAMES_NO_TELEMETRY=1` / `DO_NOT_TRACK=1`, the
+  `hyperframes events` usage beacon is never run, and
+  `hyperframes telemetry disable` is recorded in
+  `~/.hyperframes/config.json` (user's word, Nov 23, 2026).
+  The skill files still carry the beacon instruction; this module
+  is the override.
+- **Environment (verified Nov 23, 2026):** Chrome Headless Shell
+  lives in `.hyperframes-cache/` (repo root, gitignored); `/tmp`
+  is a 512M tmpfs so TMPDIR points under the workspace cache;
+  huashu needs `OM_CHROME` pointed at the Headless Shell because
+  the Hatch Chrome exits with a WebGL domain policy error.
+- **Known limitations:** huashu blank's stat beat shows its
+  template-default 100 until the brief carries a real number
+  (statLabel is set from the brief's first non-label line); both
+  lanes are landscape 1280x720 only, no vertical, no narration,
+  no B-roll; `reverse-any-video` and `style-sampling` are
+  HyperFrames Pro skills (installed, not wired).
+
+Proof (VM, critic PASS each): `out/proof-engine-hyperframes.mp4`
+(10.0s, diff 5.1), `out/proof-engine-huashu.mp4` (9.0s, diff 8.19);
+briefs `briefs/proof-engine-{hyperframes,huashu}.json`.

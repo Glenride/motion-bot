@@ -1168,6 +1168,127 @@ def main():
             if rendered:
                 continue
 
+            # --- Engine route (HyperFrames / huashu-motion, VM render) ---
+            # Label-only: `engine: hyperframes` or `engine: huashu-motion`
+            # in the brief details. Renders on this VM via
+            # watcher/render_engine.py (no iMac hop, no telemetry).
+            # Any failure falls back to the Harness route; a critic
+            # STRUCTURAL failure blocks the task, same as Harness.
+            rendered = False
+            if composition != "Signalwood":
+                try:
+                    from render_engine import (  # noqa: E402
+                        ENGINE_DURATIONS, engine_storyboard, render_engine)
+                    _eroute = phase1_route(task)
+                    _engine = _eroute.get("engine")
+                    if _engine:
+                        _edetails = task.get("details") or ""
+                        _esub = ""
+                        for _line in _edetails.splitlines():
+                            _line = _line.strip()
+                            if _line and not re.match(
+                                    r"(?i)^[A-Za-z][A-Za-z ]*:", _line):
+                                _esub = _line
+                                break
+                        _estoryboard = engine_storyboard(
+                            _engine, title, _esub)
+                        _esb_name = f"{slug}-engine.json"
+                        _esb_path = REPO / "briefs" / _esb_name
+                        _esb_path.write_text(
+                            json.dumps(_estoryboard, indent=2) + "\n")
+                        entry["brief"] = str(_esb_path)
+                        entry["composition"] = _eroute.get("composition")
+                        entry["engine"] = _engine
+                        entry["format"] = "landscape"
+                        _emp4_path = render_engine(
+                            _engine, title, _esub, slug)
+                        _emp4_name = _emp4_path.name
+                        entry["mp4"] = str(_emp4_path)
+                        _esverify = skill_verify(str(_emp4_path), {
+                            "width": 1280, "height": 720,
+                            "min_duration_s": ENGINE_DURATIONS[_engine] - 1.0})
+                        entry["skill_verify"] = _esverify
+                        if not _esverify["structural_ok"]:
+                            raise RuntimeError(
+                                "critic structural FAIL (skill_verify: "
+                                + "; ".join(_esverify["mismatches"]) + ")")
+                        _ecritic = run_critic(
+                            _emp4_path, _esb_path, f"out/{_emp4_name}",
+                            picks=_eroute)
+                        entry["critic"] = _ecritic.get("overall")
+                        _estructural = [
+                            name for name in CRITIC_STRUCTURAL
+                            if _ecritic.get("checks", {}).get(name, {}).get("status") == "FAIL"
+                        ]
+                        if _estructural:
+                            raise RuntimeError(
+                                "critic structural FAIL ("
+                                + ", ".join(_estructural) + "): "
+                                + critic_summary(_ecritic))
+                        _evariety = _ecritic.get("checks", {}).get("variety", {})
+                        if _evariety.get("status") == "FAIL":
+                            raise RuntimeError(
+                                "critic variety FAIL (Check 8): "
+                                + _evariety.get("detail", ""))
+                        try:
+                            _eapprox = _eroute.get("approximation")
+                            _eapprox_note = (
+                                _eapprox.get("note")
+                                if isinstance(_eapprox, dict) else str(_eapprox or ""))
+                            phase1_append_run({
+                                "brief_id": f"task-{tid}",
+                                "brief_title": title,
+                                "picks": {k: _eroute.get(k) for k in
+                                          ("panel", "variant", "font", "motion",
+                                           "kinetic", "move", "style",
+                                           "composition", "format")
+                                          if _eroute.get(k) is not None},
+                                "critic": {"overall": _ecritic.get("overall"),
+                                           "checks": {k: v.get("status") for k, v in
+                                                      _ecritic.get("checks", {}).items()},
+                                           "summary": critic_summary(_ecritic)},
+                                "labelled": bool(_eroute.get("labelled")),
+                                "label": _eroute.get("label_source") or "",
+                                "approximation": _eapprox_note,
+                                "assumptions": _eroute.get("assumptions", []),
+                                "placeholders": _eroute.get("placeholders", []),
+                                "repicks": [],
+                                "delivery_note": "",
+                                "mp4": _emp4_name,
+                                "storyboard": _esb_name,
+                                "tag": "live",
+                                "composition": _eroute.get("composition"),
+                                "forced": False,
+                                "expect": {},
+                            })
+                        except Exception as _h_e:
+                            log(f"task {tid}: phase1 history append failed: {_h_e}")
+                        _done = mark_done(password, tid, (
+                            f"Motion Bot rendered ({_eroute.get('composition')}, "
+                            f"{ENGINE_DURATIONS[_engine]}s): "
+                            f"out/{_emp4_name} — video file: "
+                            f"~/workspace/repos/motion-bot/out/{_emp4_name} — "
+                            + critic_summary(_ecritic)
+                        ))
+                        entry["outcome"] = ("rendered" if _done
+                                            else "held-by-race (done skipped)")
+                        try:
+                            from memory import record_render as _mem_render
+                            _mem_render(tid, title, "engine", 1,
+                                        _ecritic.get("overall"), _emp4_name)
+                        except Exception:
+                            pass
+                        rendered = True
+                except Exception as e:
+                    if (isinstance(e, RuntimeError)
+                            and (str(e).startswith("critic structural FAIL")
+                                 or str(e).startswith("critic variety FAIL"))):
+                        raise
+                    log(f"task {tid}: engine failed, falling back to Harness: {e}")
+                    entry["engine_fallback"] = str(e)[:300]
+            if rendered:
+                continue
+
             # --- Harness route (default for non-Signalwood tasks) ---
             # Signalwood keeps its bespoke composition; everything else
             # goes through the Director -> Harness, with Generic as the

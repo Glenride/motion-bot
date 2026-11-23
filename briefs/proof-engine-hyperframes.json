@@ -1,0 +1,24 @@
+{
+  "hook": "Engine lane proof",
+  "subtitle": "A film in motion",
+  "engine": "hyperframes",
+  "lengthSeconds": 10,
+  "format": "landscape",
+  "palette": {
+    "background": "#111111",
+    "surface": "#111111",
+    "text": "#FFFFFF",
+    "accent": "#B34A27",
+    "accentDeep": "#7A321B"
+  },
+  "scenes": [
+    {
+      "words": [
+        "Engine",
+        "lane",
+        "proof"
+      ],
+      "durationSeconds": 10
+    }
+  ]
+}

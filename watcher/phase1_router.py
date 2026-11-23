@@ -87,6 +87,10 @@ KINETIC_RE = re.compile(r"(?im)^\s*kinetic\s*[:\-=]\s*([A-Za-z]+)\s*$")
 STYLE_RE = re.compile(r"(?im)^\s*style\s*[:\-=]\s*([A-Za-z\- ]+)\s*$")
 TIKTOK_RE = re.compile(r"(?im)^\s*tiktok\s*[:\-=]\s*([A-Za-z\- ]+)\s*$")
 EVEREST_RE = re.compile(r"(?im)^\s*everest\s*[:\-=]\s*([A-Za-z\- ]+)\s*$")
+ENGINE_RE = re.compile(r"(?im)^\s*engine\s*[:\-=]\s*([A-Za-z\-]+)\s*$")
+ENGINE_IDS = {"hyperframes": "engine.hyperframes",
+              "huashu-motion": "engine.huashu-motion",
+              "huashu": "engine.huashu-motion"}
 CHART_RE = re.compile(r"(?im)^\s*chart\s*[:\-=]\s*([A-Za-z0-9]+)\s*$")
 
 TIKTOK_FORMATS = {"hook-first": "hook-first", "hook first": "hook-first",
@@ -381,6 +385,21 @@ def route(task, beats=None, exclude_ids=None):
             style, style_label = "chart.stats", "Mode: stats"
         elif "chart.count-up" in by_id:
             style, style_label = "chart.count-up", "Data: rows"
+    if style is None:
+        engine_val = _label_value(ENGINE_RE)
+        if engine_val:
+            key = re.sub(r"\s+", " ", engine_val)
+            eid = ENGINE_IDS.get(key)
+            if eid and eid in by_id:
+                style, style_label = eid, f"Engine: {key}"
+                picks["engine"] = ("huashu-motion"
+                                   if eid == "engine.huashu-motion"
+                                   else "hyperframes")
+            elif key:
+                picks["assumptions"].append(
+                    f"Engine '{engine_val}' is not a known engine "
+                    f"(hyperframes, huashu-motion); ignored, normal "
+                    f"route applies.")
     if style is None and (labels.get("product") or "").strip():
         if "product.demo" in by_id:
             style, style_label = "product.demo", "Product: label"

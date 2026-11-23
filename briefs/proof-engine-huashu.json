@@ -1,0 +1,24 @@
+{
+  "hook": "Engine lane proof",
+  "subtitle": "A film in motion",
+  "engine": "huashu-motion",
+  "lengthSeconds": 9,
+  "format": "landscape",
+  "palette": {
+    "background": "#F3EEE4",
+    "surface": "#F3EEE4",
+    "text": "#1D1B18",
+    "accent": "#D9480F",
+    "accentDeep": "#8F2F08"
+  },
+  "scenes": [
+    {
+      "words": [
+        "Engine",
+        "lane",
+        "proof"
+      ],
+      "durationSeconds": 9
+    }
+  ]
+}

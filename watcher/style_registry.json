@@ -40,7 +40,7 @@
       ],
       "family": "panel",
       "id": "panel.split",
-      "last_used_at": "2026-11-22T22:25:40+00:00",
+      "last_used_at": "2026-11-22T23:52:29+00:00",
       "proof_clip": "out/proof-panel-split.mp4",
       "props_key": "panel",
       "ratios": [
@@ -48,7 +48,7 @@
         "16:9"
       ],
       "status": "implemented",
-      "use_count": 5,
+      "use_count": 6,
       "use_for": [
         "layout structure",
         "two-zone split"
@@ -412,7 +412,7 @@
       ],
       "family": "move",
       "id": "move.shape-morph",
-      "last_used_at": "2026-11-22T22:19:45+00:00",
+      "last_used_at": "2026-11-22T23:52:29+00:00",
       "proof_clip": "out/proof-v211-motion-registry-3.mp4",
       "proof_note": "on screen in proof-v211-motion-registry-3 (moves: shape-morph, cross-dissolve, rack-focus)",
       "props_key": "moves",
@@ -421,7 +421,7 @@
         "16:9"
       ],
       "status": "implemented",
-      "use_count": 1,
+      "use_count": 2,
       "use_for": [
         "effect",
         "shape change"
@@ -725,7 +725,7 @@
       ],
       "family": "kinetic",
       "id": "kinetic.blur",
-      "last_used_at": "2026-11-22T22:25:19+00:00",
+      "last_used_at": "2026-11-22T23:52:29+00:00",
       "proof_clip": "out/proof-v210-kinetic-blur.mp4",
       "props_key": "kinetic",
       "ratios": [
@@ -733,7 +733,7 @@
         "16:9"
       ],
       "status": "implemented",
-      "use_count": 4,
+      "use_count": 5,
       "use_for": [
         "headline moment",
         "blur-in"
@@ -808,14 +808,14 @@
       ],
       "family": "tiktok",
       "id": "tiktok.hook-first",
-      "last_used_at": null,
+      "last_used_at": "2026-11-22T23:52:29+00:00",
       "proof_clip": "out/proof-v211-tiktok-hook-first.mp4",
       "props_key": "tiktokFormat",
       "ratios": [
         "9:16"
       ],
       "status": "implemented",
-      "use_count": 0,
+      "use_count": 1,
       "use_for": [
         "vertical social clip",
         "hook in the first second"
@@ -1194,8 +1194,8 @@
       "proof_clip": "out/phase1-adm-5-harness.mp4",
       "proof_note": "admission render adm-5 (p1-20261122T214939+0000), critic PASS",
       "critic_pass": true,
-      "last_used_at": "2026-11-22T22:26:36+00:00",
-      "use_count": 7
+      "last_used_at": "2026-11-22T23:52:29+00:00",
+      "use_count": 8
     },
     {
       "id": "font.mono",
@@ -1222,8 +1222,8 @@
       "proof_clip": "out/phase1-adm-5-harness.mp4",
       "proof_note": "admission render adm-5 (p1-20261122T214939+0000), critic PASS",
       "critic_pass": true,
-      "last_used_at": "2026-11-22T22:26:36+00:00",
-      "use_count": 7
+      "last_used_at": "2026-11-22T23:52:29+00:00",
+      "use_count": 8
     },
     {
       "id": "motion.scale",
@@ -1306,8 +1306,8 @@
       "proof_clip": "out/phase1-adm-6-harness.mp4",
       "proof_note": "admission render adm-6 (p1-20261122T215004+0000), critic PASS",
       "critic_pass": true,
-      "last_used_at": "2026-11-22T22:26:09+00:00",
-      "use_count": 5
+      "last_used_at": "2026-11-22T23:52:29+00:00",
+      "use_count": 6
     },
     {
       "id": "font.sans",
@@ -1628,6 +1628,56 @@
       "critic_pass": true,
       "last_used_at": "2026-11-22T22:22:24+00:00",
       "use_count": 2
+    },
+    {
+      "component": "src/Harness.tsx Harness / watcher/render_engine.py (engine lane: HTML render on the VM, not Remotion)",
+      "composition": "HyperFrames",
+      "content_fit": [
+        "general"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        10,
+        10
+      ],
+      "family": "engine",
+      "id": "engine.hyperframes",
+      "last_used_at": null,
+      "proof_clip": "out/proof-engine-hyperframes.mp4",
+      "props_key": "engine",
+      "ratios": [
+        "16:9"
+      ],
+      "status": "implemented",
+      "use_count": 0,
+      "use_for": [
+        "HTML to MP4 video, web-page compositions, GSAP/Tailwind motion"
+      ]
+    },
+    {
+      "component": "src/Harness.tsx Harness / watcher/render_engine.py (engine lane: HTML render on the VM, not Remotion)",
+      "composition": "HuashuMotion",
+      "content_fit": [
+        "general"
+      ],
+      "critic_pass": true,
+      "duration_s": [
+        9,
+        9
+      ],
+      "family": "engine",
+      "id": "engine.huashu-motion",
+      "last_used_at": null,
+      "proof_clip": "out/proof-engine-huashu.mp4",
+      "props_key": "engine",
+      "ratios": [
+        "16:9"
+      ],
+      "status": "implemented",
+      "use_count": 0,
+      "use_for": [
+        "launch films, title + stat + end-card films as code, music-scored motion"
+      ]
     }
   ],
   "generated": "2026-11-22",
