@@ -276,6 +276,55 @@ def _distinctive_words(text):
     return seen
 
 
+def check_density(storyboard):
+    """Text-density gate (Writer stage, next to Check 8 variety).
+
+    For each scene in storyboard["scenes"] that has `words` or
+    `headline`, the word count is len(headline) + len(support or [])
+    when headline is present, else len(words). FAIL if any scene
+    exceeds 15 words; FAIL if any headline exceeds 6 words — the
+    headline font-size floor: the renderer's fontSizeFor gives
+    >= 76pt at <= 6 words, so a longer headline renders small.
+    SKIP when the storyboard has no word-bearing scenes (e.g.
+    narrated). Standalone (no render needed) so the writer proof
+    can call it directly on a storyboard.
+    """
+    scenes = storyboard.get("scenes") or []
+    word_counts = []
+    headline_over = []
+    for i, scene in enumerate(scenes):
+        if not isinstance(scene, dict):
+            continue
+        headline = scene.get("headline")
+        if headline:
+            support = scene.get("support") or []
+            word_counts.append((i + 1, len(headline) + len(support)))
+            if len(headline) > 6:
+                headline_over.append(i + 1)
+        elif scene.get("words"):
+            word_counts.append((i + 1, len(scene.get("words") or [])))
+    if not word_counts:
+        return {"status": "SKIP",
+                "detail": "no word-bearing scenes (e.g. narrated)"}
+    over = [f"scene {i} ({n} words)" for i, n in word_counts if n > 15]
+    if over or headline_over:
+        bits = []
+        if over:
+            bits.append("over 15 words: " + ", ".join(over))
+        if headline_over:
+            bits.append("headline over 6 words in scene(s): "
+                        + ", ".join(str(s) for s in headline_over))
+        return {"status": "FAIL",
+                "detail": ("; ".join(bits) + " (headline font-size "
+                           "floor: renderer fontSizeFor gives >=76pt "
+                           "at <=6 words)")}
+    return {"status": "PASS",
+            "detail": (f"{len(word_counts)} scene(s), max "
+                       f"{max(n for _, n in word_counts)} words; "
+                       f"headlines <=6 words "
+                       f"(fontSizeFor >=76pt)")}
+
+
 def check_variety(picks, runs=None):
     """Phase 1 variety gate (PRD Check 8).
 
@@ -587,6 +636,12 @@ def critic(mp4_path, storyboard, imac_mp4=None, srt_path=None,
         }
     else:
         checks["variety"] = check_variety(picks, runs)
+
+    # Density gate (Writer stage): no scene over 15 words, no
+    # headline over 6 words. Runs on every storyboard with
+    # word-bearing scenes — the live watcher passes no picks and
+    # the variety gate SKIPs, but density still applies.
+    checks["density"] = check_density(storyboard)
 
     report["overall"] = (
         "PASS" if all(c["status"] in ("PASS", "SKIP")

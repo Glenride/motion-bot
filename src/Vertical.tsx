@@ -51,6 +51,7 @@ import {
 } from "./TikTokFormats";
 import {
   HARNESS_DEFAULTS,
+  sceneWeightsFor,
   type HarnessProps,
   type HarnessScene,
 } from "./Harness";
@@ -296,24 +297,46 @@ const VScene: React.FC<{
   // Hook-first: the hook is on screen at frame 1 — no fade-up.
   const firstFrame = hookPunch ? 0 : 8;
 
+  // Headline/support (Writer stage — mirrors Harness): when the
+  // scene carries a headline it is the big line, at
+  // fontSizeFor(headline.length) (+ hook punch), and the support
+  // line follows smaller (headline size minus 22, floor 32),
+  // muted, entering at ~45% of the scene's frames. Without a
+  // headline, headSize IS baseSize and support is null, so every
+  // branch below reduces to the old slices of scene.words.
+  const hasHeadline = !!scene.headline && scene.headline.length > 0;
+  const headline = hasHeadline ? (scene.headline as string[]) : scene.words;
+  const support = hasHeadline ? (scene.support ?? null) : null;
+  const headSize = hasHeadline
+    ? (variant === "kinetic"
+        ? fontSizeFor(headline.length) + 14
+        : fontSizeFor(headline.length)) + (hookPunch ? 40 : 0)
+    : baseSize;
+  const supportSize = Math.max(32, headSize - 22);
+  const supportFirstFrame = Math.round(sceneFrames * 0.45);
+
   /** Render words with the clip's motion language. A registry
    *  reveal (v2.11) IS the entry for its scene — it replaces the
    *  v2.6 motion choice and the v2.10 kinetic reveal alike. A
    *  Kinetic: reveal (v2.10) IS the entry — it replaces the v2.6
    *  motion choice for that clip; `word` keeps the motion dispatch
-   *  below exactly as before. */
+   *  below exactly as before. `startFrame` overrides the scene's
+   *  default first frame (0 for a hook punch, else 8); callers pass
+   *  a later frame only for a delayed support line. */
   const renderWords = (
     ws: string[],
     size: number,
     color: string,
     align: "center" | "left" = "center",
+    startFrame?: number,
   ) => {
+    const ff = startFrame ?? firstFrame;
     if (sceneMove && sceneMove.kind === "reveal") {
       return (
         <MoveReveal
           move={sceneMove}
           words={ws}
-          firstFrame={firstFrame}
+          firstFrame={ff}
           frame={frame}
           fps={fps}
           fontSize={size}
@@ -330,7 +353,7 @@ const VScene: React.FC<{
         <KineticReveal
           reveal={kinetic}
           words={ws}
-          firstFrame={firstFrame}
+          firstFrame={ff}
           frame={frame}
           fps={fps}
           fontSize={size}
@@ -347,7 +370,7 @@ const VScene: React.FC<{
       return (
         <SlideLines
           words={ws}
-          firstFrame={firstFrame}
+          firstFrame={ff}
           frame={frame}
           fontSize={size}
           color={color}
@@ -360,7 +383,7 @@ const VScene: React.FC<{
       return (
         <ScaleLine
           words={ws}
-          firstFrame={firstFrame}
+          firstFrame={ff}
           frame={frame}
           fontSize={size}
           color={color}
@@ -373,7 +396,7 @@ const VScene: React.FC<{
     return (
       <KineticLine
         words={ws}
-        firstFrame={firstFrame}
+        firstFrame={ff}
         frame={frame}
         fps={fps}
         fontSize={size}
@@ -383,6 +406,95 @@ const VScene: React.FC<{
         fontFamily={fontFamily}
         align={align}
       />
+    );
+  };
+
+  /** A line with the scene's emphasis word in the accent color.
+   *  No headline (old-style scene), no emphasis, or an emphasis
+   *  word not found in the line: exactly one renderWords call, as
+   *  today. Otherwise the line splits into before / emphasis /
+   *  after runs, each through the same dispatch, laid out inline
+   *  with wrapping. */
+  const renderLine = (
+    ws: string[],
+    size: number,
+    color: string,
+    align: "center" | "left" = "center",
+    startFrame?: number,
+  ) => {
+    const em = hasHeadline ? (scene.emphasis ?? null) : null;
+    if (!em) return renderWords(ws, size, color, align, startFrame);
+    const idx = ws.indexOf(em);
+    if (idx === -1) return renderWords(ws, size, color, align, startFrame);
+    const runs: { words: string[]; color: string }[] = [];
+    if (idx > 0) runs.push({ words: ws.slice(0, idx), color });
+    runs.push({ words: [em], color: palette.accent });
+    if (idx < ws.length - 1) runs.push({ words: ws.slice(idx + 1), color });
+    return (
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: align === "left" ? "flex-start" : "center",
+          alignItems: "center",
+        }}
+      >
+        {runs.map((r, i) => (
+          <React.Fragment key={i}>
+            {renderWords(r.words, size, r.color, align, startFrame)}
+          </React.Fragment>
+        ))}
+      </div>
+    );
+  };
+
+  /** The support line: smaller, muted (no muted treatment exists
+   *  in these files — palette text at reduced opacity), entering
+   *  at ~45% of the scene, after the headline. */
+  const renderSupport = (ws: string[], align: "center" | "left" = "center") => (
+    <div style={{ opacity: 0.75 }}>
+      {renderLine(ws, supportSize, palette.text, align, supportFirstFrame)}
+    </div>
+  );
+
+  /** Word-stack runs: the stack is one word per line, so an
+   *  emphasis split is one StackLine per run, stacked in the same
+   *  column — the column reads unchanged. */
+  const renderStackRuns = (ws: string[], size: number, stackFirstFrame: number) => {
+    const em = hasHeadline ? (scene.emphasis ?? null) : null;
+    const idx = em ? ws.indexOf(em) : -1;
+    if (idx === -1 || !em) {
+      return (
+        <StackLine
+          words={ws}
+          firstFrame={stackFirstFrame}
+          frame={frame}
+          fps={fps}
+          fontSize={size}
+          color={palette.text}
+          fontFamily={fontFamily}
+        />
+      );
+    }
+    const runs: { words: string[]; color: string }[] = [];
+    if (idx > 0) runs.push({ words: ws.slice(0, idx), color: palette.text });
+    runs.push({ words: [em], color: palette.accent });
+    if (idx < ws.length - 1) runs.push({ words: ws.slice(idx + 1), color: palette.text });
+    return (
+      <>
+        {runs.map((r, i) => (
+          <StackLine
+            key={i}
+            words={r.words}
+            firstFrame={stackFirstFrame}
+            frame={frame}
+            fps={fps}
+            fontSize={size}
+            color={r.color}
+            fontFamily={fontFamily}
+          />
+        ))}
+      </>
     );
   };
 
@@ -425,8 +537,10 @@ const VScene: React.FC<{
   if (panel === "split") {
     // Hook words huge in the accent at the top, an accent rule, then
     // the supporting line at the bottom. Top/bottom, not centered.
-    const hook = words.slice(0, 2);
-    const rest = words.slice(2);
+    // With a headline, the headline is the top half and the support
+    // line is the bottom half; without one, the old 2-word hook + rest.
+    const hook = hasHeadline ? headline : words.slice(0, 2);
+    const rest = hasHeadline ? (support ?? []) : words.slice(2);
     body = (
       <AbsoluteFill
         style={{
@@ -435,10 +549,18 @@ const VScene: React.FC<{
           padding: "154px 48px 230px 48px",
         }}
       >
-        <div>{renderWords(hook, baseSize + 26, palette.accent, "left")}</div>
+        <div>{renderLine(hook, headSize + 26, palette.accent, "left")}</div>
         <div style={{ width: 140, height: 6, backgroundColor: palette.accent }} />
         {rest.length > 0 ? (
-          <div>{renderWords(rest, Math.max(34, baseSize - 10), palette.text, "left")}</div>
+          <div style={hasHeadline ? { opacity: 0.75 } : undefined}>
+            {renderLine(
+              rest,
+              hasHeadline ? supportSize : Math.max(34, baseSize - 10),
+              palette.text,
+              "left",
+              hasHeadline ? supportFirstFrame : undefined,
+            )}
+          </div>
         ) : null}
       </AbsoluteFill>
     );
@@ -446,7 +568,10 @@ const VScene: React.FC<{
     // Words inside a bordered card on the brief's surface, offset
     // up-left from center, with the first word as a small-caps
     // kicker in the accent. The card is surface, the words are text:
-    // contrast is unchanged from the centered panel.
+    // contrast is unchanged from the centered panel. With a
+    // headline, the headline is the big line and the support line
+    // sits below it, smaller and muted; without one, the old
+    // kicker + rest.
     const kicker = words[0];
     const rest = words.slice(1);
     body = (
@@ -467,7 +592,14 @@ const VScene: React.FC<{
             transform: "translate(-28px, -48px)",
           }}
         >
-          {rest.length > 0 ? (
+          {hasHeadline ? (
+            <>
+              {renderLine(headline, headSize, palette.text)}
+              {support && support.length > 0 ? (
+                <div style={{ marginTop: 18 }}>{renderSupport(support)}</div>
+              ) : null}
+            </>
+          ) : rest.length > 0 ? (
             <>
               <div
                 style={{
@@ -493,7 +625,11 @@ const VScene: React.FC<{
   } else if (panel === "lower-third") {
     // Headline + subhead anchored low, with an accent bar above the
     // headline. The top ~60% of the frame is deliberate negative
-    // space — the opposite of the centered panel.
+    // space — the opposite of the centered panel. With a headline,
+    // it is the hook line and the support line is the rest; without
+    // one, the old half/half split.
+    const ltHead = hasHeadline ? headline : head;
+    const ltTail = hasHeadline ? (support ?? []) : tail;
     body = (
       <AbsoluteFill
         style={{
@@ -510,10 +646,16 @@ const VScene: React.FC<{
             marginBottom: 20,
           }}
         />
-        {renderWords(head, baseSize + 8, palette.text, "left")}
-        {tail.length > 0 ? (
-          <div style={{ marginTop: 14 }}>
-            {renderWords(tail, 34, palette.text, "left")}
+        {renderLine(ltHead, headSize + 8, palette.text, "left")}
+        {ltTail.length > 0 ? (
+          <div style={hasHeadline ? { marginTop: 14, opacity: 0.75 } : { marginTop: 14 }}>
+            {renderLine(
+              ltTail,
+              hasHeadline ? supportSize : 34,
+              palette.text,
+              "left",
+              hasHeadline ? supportFirstFrame : undefined,
+            )}
           </div>
         ) : null}
       </AbsoluteFill>
@@ -521,32 +663,85 @@ const VScene: React.FC<{
   } else if (panel === "word-stack") {
     // One word per line, huge, staggered rise. The stack's motion is
     // inherent: it always uses StackLine, whatever the motion prop
-    // says — the layout and the entry are the same move here.
+    // says — the layout and the entry are the same move here. With
+    // a headline, its first word is the kicker and the remaining
+    // headline words + support are the stack; without one, the whole
+    // word list, as before.
     const stackSize =
       words.length <= 4 ? 96 : words.length <= 6 ? 80 : 64;
-    body = (
-      <AbsoluteFill
-        style={{
-          justifyContent: "center",
-          alignItems: "flex-start",
-          padding: "154px 48px 230px 64px",
-        }}
-      >
-        <StackLine
-          words={words}
-          firstFrame={8}
-          frame={frame}
-          fps={fps}
-          fontSize={stackSize}
-          color={palette.text}
-          fontFamily={fontFamily}
-        />
-      </AbsoluteFill>
-    );
+    if (hasHeadline) {
+      const stackKicker = headline[0];
+      const stackRest = headline.slice(1);
+      const stackRestSize =
+        (stackRest.length + (support?.length ?? 0)) <= 4
+          ? 96
+          : (stackRest.length + (support?.length ?? 0)) <= 6
+            ? 80
+            : 64;
+      body = (
+        <AbsoluteFill
+          style={{
+            justifyContent: "center",
+            alignItems: "flex-start",
+            padding: "154px 48px 230px 64px",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-start",
+            }}
+          >
+            <div
+              style={{
+                fontFamily,
+                fontSize: 24,
+                letterSpacing: 5,
+                color: palette.accent,
+                textTransform: "uppercase",
+                marginBottom: 18,
+              }}
+            >
+              {stackKicker}
+            </div>
+            {stackRest.length > 0 ? renderStackRuns(stackRest, stackRestSize, 8) : null}
+            {support && support.length > 0 ? (
+              <div style={{ opacity: 0.75 }}>
+                {renderStackRuns(support, stackRestSize, supportFirstFrame)}
+              </div>
+            ) : null}
+          </div>
+        </AbsoluteFill>
+      );
+    } else {
+      body = (
+        <AbsoluteFill
+          style={{
+            justifyContent: "center",
+            alignItems: "flex-start",
+            padding: "154px 48px 230px 64px",
+          }}
+        >
+          <StackLine
+            words={words}
+            firstFrame={8}
+            frame={frame}
+            fps={fps}
+            fontSize={stackSize}
+            color={palette.text}
+            fontFamily={fontFamily}
+          />
+        </AbsoluteFill>
+      );
+    }
   } else {
     // centered — the pre-v2.6 layout, unchanged (v2.10: padding is
     // the 9:16 safe area — top 12% / bottom 18% / sides 6% — per the
-    // shot-composition skill, not the old 120/160px).
+    // shot-composition skill, not the old 120/160px). With a
+    // headline, the headline is the big line and the support line
+    // sits below it, smaller and muted; without one, the full word
+    // list.
     body = (
       <AbsoluteFill
         style={{
@@ -555,7 +750,21 @@ const VScene: React.FC<{
           padding: "154px 48px 230px 48px",
         }}
       >
-        {renderWords(words, baseSize, palette.text)}
+        {hasHeadline ? (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 20,
+            }}
+          >
+            {renderLine(headline, headSize, palette.text)}
+            {support && support.length > 0 ? renderSupport(support) : null}
+          </div>
+        ) : (
+          renderWords(words, baseSize, palette.text)
+        )}
         {endCard}
       </AbsoluteFill>
     );
@@ -675,17 +884,22 @@ export const Vertical: React.FC<HarnessProps> = (props) => {
   );
   // Scene timing: hook-first fixes scene 0 at exactly 1 s; fast-cut
   // uses the uneven schedule; otherwise the beat grid / even split.
+  // Weighted split (Writer stage): sceneWeightsFor returns weights
+  // only when every scene carries a positive durationSec; otherwise
+  // the even split, exactly as before.
   const { starts, lengths } =
     tiktokFormat === "hook-first"
       ? hookFirstStarts(durationInFrames, n, fps)
       : tiktokFormat === "fast-cut"
         ? fastCutStarts(durationInFrames, n)
-        : sceneStarts(durationInFrames, n, bpm > 0 ? bpm : undefined, fps);
+        : sceneStarts(durationInFrames, n, bpm > 0 ? bpm : undefined, fps, sceneWeightsFor(scenes));
   // Duet: scenes 0+1 share the first 60% as the split; the rest
-  // split the remaining 40% (hard cut at the format boundary).
+  // split the remaining 40% (hard cut at the format boundary). The
+  // tail's weights follow the same rule, over the tail scenes only.
   const isDuet = tiktokFormat === "duet" && n >= 2;
   const duetFrames = Math.round(durationInFrames * 0.6);
-  const tail = isDuet && n > 2 ? sceneStarts(durationInFrames - duetFrames, n - 2, bpm > 0 ? bpm : undefined, fps) : { starts: [], lengths: [] };
+  const tailScenes = isDuet && n > 2 ? scenes.slice(2) : [];
+  const tail = tailScenes.length > 0 ? sceneStarts(durationInFrames - duetFrames, n - 2, bpm > 0 ? bpm : undefined, fps, sceneWeightsFor(tailScenes)) : { starts: [], lengths: [] };
   const tailStarts = tail.starts.map((s) => s + duetFrames);
   const tailLengths = tail.lengths;
   // Color-motion (v2.10): the frame background drifts in OKLab from

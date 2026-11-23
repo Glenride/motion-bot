@@ -36,6 +36,7 @@ rendered (his standing rule: he hates purple). If the details name one,
 it is ignored and noted in `notes`, never mapped to a hex.
 """
 
+import os
 import re
 
 from concepts import scene_keywords, semantic_keywords
@@ -974,7 +975,52 @@ def parse_story(details):
     return [s for s in sentences if len(s.split()) >= 3]
 
 
-def build_storyboard(task, route=None):
+def _dominant_content_type(beats):
+    """Writer beats -> most frequent content_type (tie -> earliest
+    beat in order). Duplicated from phase1_router (not imported:
+    this module must not import the router)."""
+    if not beats:
+        return None
+    counts = {}
+    for beat in beats:
+        ctype = (beat or {}).get("content_type")
+        if ctype:
+            counts[ctype] = counts.get(ctype, 0) + 1
+    if not counts:
+        return None
+    best = max(counts.values())
+    for beat in beats:
+        if counts.get((beat or {}).get("content_type")) == best:
+            return (beat or {}).get("content_type")
+    return None
+
+
+def _parse_stat_number_local(text):
+    """Fallback stat-number parser (same rules as
+    harness_writer.parse_stat_number, used only when that import
+    fails): first numeric token, handling $, commas, % and x."""
+    if not text:
+        return None
+    for m in re.finditer(r"\$?\d[\d,]*(?:\.\d+)?\s*(?:%|x|X)?", text):
+        if m.start() > 0 and (text[m.start() - 1].isalpha()
+                              or text[m.start() - 1].isdigit()):
+            continue
+        raw = (m.group(0).replace("$", "").replace(",", "")
+               .replace("%", "").replace("x", "").replace("X", "")
+               .strip())
+        try:
+            return float(raw)
+        except ValueError:
+            continue
+    return None
+
+
+def _words_minus_numbers(words, parse_number):
+    """Word list minus any token that parses as a number."""
+    return [w for w in words if parse_number(w) is None]
+
+
+def build_storyboard(task, route=None, beats=None, writer_info=None):
     """Mission Control task dict -> storyboard dict (Harness props).
 
     task needs `title` (the hook) and `details` (free text + labels).
@@ -986,6 +1032,15 @@ def build_storyboard(task, route=None):
     instead of the pick_* functions. route=None (default) keeps
     the live watcher's behaviour exactly: the watcher calls
     build_storyboard(task) unchanged.
+
+    beats (Writer stage): a list of writer beats (harness_writer
+    schema). When present, scenes are built from the beats — one
+    scene per beat, headline + support capped at 15 words — instead
+    of the story/split path, and lengthSeconds is the beats'
+    durations summed. When beats is None the behavior is EXACTLY
+    as before (the writer path is never entered). writer_info is
+    the write_beats info dict (model/endpoint/attempts), recorded
+    under storyboard["writer"].
     """
     title = (task.get("title") or "").strip()
     details = task.get("details") or ""
@@ -993,6 +1048,8 @@ def build_storyboard(task, route=None):
         raise ValueError("empty title: no hook to render")
     labels = parse_labels(details)
     notes = []
+    writer_beats = beats if isinstance(beats, list) and beats else None
+    dominant = _dominant_content_type(writer_beats)
 
     # Story first (remake): the beat sheet / Story: block is the
     # clip's own arc — its beats become scenes, and its header
@@ -1009,6 +1066,21 @@ def build_storyboard(task, route=None):
             notes.append(f"story fps: {story['fps']} (render stays "
                          f"30fps until the Phase 3 kinetic engine)")
 
+    if writer_beats:
+        # Writer path: the beats ARE the story — capped lines, in
+        # order. story["beats"] here feeds scene_texts below and
+        # the storyboard["story"] block at the end, so both read the
+        # capped lines (story-coverage and build_explainer read
+        # these, never the raw task story).
+        story["source"] = "writer"
+        story_beats = [
+            {"text": (b.get("headline") or "").strip()
+             + ((" " + b.get("support").strip())
+                if (b.get("support") or "").strip() else "")}
+            for b in writer_beats]
+        notes.append(f"writer: {len(writer_beats)} beats, dominant "
+                     f"content_type '{dominant}'")
+
     # Length: beat-sheet header first, else Length:/Duration: label,
     # else "Ns" anywhere, 3-60s.
     length = story["duration"]
@@ -1021,6 +1093,10 @@ def build_storyboard(task, route=None):
         length = float(m.group(1)) if m else None
     length_seconds = int(length) if length is not None else 12
     length_seconds = max(3, min(60, length_seconds))
+    if writer_beats:
+        # Writer path: the clip is exactly its beats' durations.
+        length_seconds = max(3, min(60, round(sum(
+            float(b.get("duration_sec") or 0) for b in writer_beats))))
 
     palette = build_palette(details, labels, notes)
     mood = detect_mood(title + " " + details)
@@ -1058,12 +1134,32 @@ def build_storyboard(task, route=None):
 
     scenes = []
     for i, text in enumerate(scene_texts):
-        scenes.append({
+        scene = {
             "words": text.split(),
             "camera": CAMERA_MOVES[i % len(CAMERA_MOVES)],
             "transitionOut": (TRANSITIONS[i % len(TRANSITIONS)]
                               if i < len(scene_texts) - 1 else "none"),
-        })
+        }
+        if writer_beats:
+            # Writer path: one scene per beat, carrying the beat's
+            # own structure so the renderer (and the density check)
+            # read headline + support, not one flat word list.
+            # durationSeconds mirrors duration_sec for the critic's
+            # midpoint sampling.
+            beat = writer_beats[i]
+            duration = float(beat.get("duration_sec") or 0)
+            headline_words = (beat.get("headline") or "").split()
+            support_words = (beat.get("support") or "").split()
+            scene.update({
+                "headline": headline_words,
+                "support": support_words or None,
+                "emphasis": beat.get("emphasis_word") or None,
+                "duration_sec": duration,
+                "durationSeconds": duration,
+                "role": beat.get("role"),
+                "content_type": beat.get("content_type"),
+            })
+        scenes.append(scene)
 
     if route is not None:
         # Phase 1 route override: the registry picks replace the
@@ -1201,6 +1297,59 @@ def build_storyboard(task, route=None):
                 or labels.get("end_card") or "").strip()
     if subtitle:
         storyboard["subtitle"] = subtitle
+    if writer_beats:
+        # Writer provenance: which model wrote the beats, on which
+        # endpoint, in how many attempts — the proof harness and the
+        # history log read this, never the model's memory.
+        _wi = writer_info or {}
+        _endpoint = _wi.get("endpoint") or (
+            os.environ.get("MOTION_BOT_LLM_BASE_URLS",
+                           "http://192.168.1.187:8081/v1")
+            .split(",")[0].strip())
+        storyboard["writer"] = {
+            "model": _wi.get("model") or os.environ.get(
+                "MOTION_BOT_LLM_MODEL", "qwen3.8-flash-next-q2_0"),
+            "endpoint": _endpoint,
+            "attempts": _wi.get("attempts", 1),
+            "content_type": dominant,
+        }
+    if writer_beats and dominant == "stat":
+        # Writer bars: the stat beats ARE the chart data — label +
+        # numeric value in parse_data_rows shape ({label, value}),
+        # so the existing Chart rung renders REAL numbers from the
+        # brief instead of placeholder bars. The bar label is the
+        # stat headline minus its numeric token (support words when
+        # the headline is only the number); the value is
+        # parse_stat_number() of the beat — the same parser the
+        # validator used, so a validated stat beat always yields a
+        # parseable number here.
+        try:
+            from harness_writer import (  # noqa: E402
+                parse_stat_number as _parse_stat,
+            )
+        except Exception:  # noqa: BLE001 - lazy import fallback
+            _parse_stat = _parse_stat_number_local
+        bars = []
+        for beat in writer_beats:
+            if beat.get("content_type") != "stat":
+                continue
+            value = _parse_stat(
+                (beat.get("headline") or "") + " "
+                + (beat.get("support") or ""))
+            if value is None:
+                continue
+            label_words = _words_minus_numbers(
+                (beat.get("headline") or "").split(), _parse_stat)
+            if not label_words:
+                label_words = _words_minus_numbers(
+                    (beat.get("support") or "").split(), _parse_stat)
+            label = " ".join(label_words) or "Value"
+            bars.append({"label": label, "value": value})
+        if bars:
+            storyboard["bars"] = bars
+            notes.append(f"writer bars: {len(bars)} stat bar(s) from "
+                         f"writer beats (real brief numbers, no "
+                         f"placeholders)")
     return storyboard
 
 
@@ -1972,7 +2121,17 @@ def build_explainer(task, storyboard, draft=False, style=None):
                "camera": CAMERA_MOVES[k % len(CAMERA_MOVES)],
                "transitionOut": "none"}
               for k, i in enumerate(ideas)]
-    scenes.append({"words": (title + " " + cta).split(),
+    if storyboard.get("writer"):
+        # Writer path: the end card is capped to <= 15 words (first
+        # 6 words of the title + first 6 of the cta) so writer-path
+        # Explainer clips pass the critic's density check. The
+        # non-writer end card is unchanged.
+        end_words = title.split()[:6] + cta.split()[:6]
+        notes.append("explainer end-card capped to <=15 words "
+                     "(writer beats)")
+    else:
+        end_words = (title + " " + cta).split()
+    scenes.append({"words": end_words,
                    "camera": CAMERA_MOVES[len(ideas) % len(CAMERA_MOVES)],
                    "transitionOut": "none"})
     explainer["scenes"] = scenes

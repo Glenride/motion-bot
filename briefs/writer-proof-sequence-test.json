@@ -1,0 +1,204 @@
+{
+  "version": 1,
+  "hook": "Bake the morning loaf",
+  "lengthSeconds": 12,
+  "palette": {
+    "background": "#D4AF37",
+    "surface": "#D7B547",
+    "accent": "#FFB02E",
+    "accentDeep": "#A6721E",
+    "text": "#1F1A14",
+    "glow": "#FFB02E",
+    "particle": "#FFB02E"
+  },
+  "mood": {
+    "tone": "neutral",
+    "pacing": "medium"
+  },
+  "motif": {
+    "type": "orbit",
+    "scene": 1
+  },
+  "scenes": [
+    {
+      "words": [
+        "Bake",
+        "the",
+        "morning",
+        "loaf"
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.08,
+        "fromX": 0,
+        "toX": -26
+      },
+      "transitionOut": "wipe",
+      "headline": [
+        "Bake",
+        "the",
+        "morning",
+        "loaf"
+      ],
+      "support": null,
+      "emphasis": "loaf",
+      "duration_sec": 3.0,
+      "durationSeconds": 3.0,
+      "role": "hook",
+      "content_type": "statement"
+    },
+    {
+      "words": [
+        "Mix",
+        "flour",
+        "and",
+        "water",
+        "Knead",
+        "until",
+        "smooth"
+      ],
+      "camera": {
+        "fromScale": 1.08,
+        "toScale": 1.0,
+        "fromX": -26,
+        "toX": 22
+      },
+      "transitionOut": "zoom-cut",
+      "headline": [
+        "Mix",
+        "flour",
+        "and",
+        "water"
+      ],
+      "support": [
+        "Knead",
+        "until",
+        "smooth"
+      ],
+      "emphasis": "smooth",
+      "duration_sec": 3.0,
+      "durationSeconds": 3.0,
+      "role": "idea",
+      "content_type": "sequence"
+    },
+    {
+      "words": [
+        "Let",
+        "dough",
+        "rise",
+        "Shape",
+        "and",
+        "score",
+        "top"
+      ],
+      "camera": {
+        "fromScale": 1.0,
+        "toScale": 1.14,
+        "fromX": 22,
+        "toX": 0
+      },
+      "transitionOut": "wipe",
+      "headline": [
+        "Let",
+        "dough",
+        "rise"
+      ],
+      "support": [
+        "Shape",
+        "and",
+        "score",
+        "top"
+      ],
+      "emphasis": "score",
+      "duration_sec": 3.0,
+      "durationSeconds": 3.0,
+      "role": "payoff",
+      "content_type": "sequence"
+    },
+    {
+      "words": [
+        "Bake",
+        "until",
+        "crust",
+        "gold"
+      ],
+      "camera": {
+        "fromScale": 1.05,
+        "toScale": 1.05,
+        "fromX": -15,
+        "toX": 15
+      },
+      "transitionOut": "none",
+      "headline": [
+        "Bake",
+        "until",
+        "crust",
+        "gold"
+      ],
+      "support": null,
+      "emphasis": "gold",
+      "duration_sec": 3.0,
+      "durationSeconds": 3.0,
+      "role": "cta",
+      "content_type": "statement"
+    }
+  ],
+  "variant": "kinetic",
+  "panel": "card",
+  "font": "serif",
+  "motion": "kinetic",
+  "kinetic": "word",
+  "notes": [
+    "writer: 4 beats, dominant content_type 'statement'",
+    "text color adjusted for contrast (>= 3.0)",
+    "color 'gold' -> #D4AF37",
+    "motif 'orbit' in scene 2",
+    "phase1 route: panel 'card', variant 'kinetic', font 'serif', motion 'kinetic', kinetic 'word', move 'typewriter', tiktok '-'",
+    "memory: learned (ponder-2026-11-20): Get his Nov 13 correction into memory verbatim: the corrections list is empty while the record holds a fourth-time correction with a traced mechanism. Record corrections where the Director reads them; a correction that lives only in the daily record is not learned from.",
+    "memory: learned (ponder-2026-11-20): Record critic per-check outcomes in memory, not just the overall (carry-over, third week): a render entry should carry which checks passed and which failed, so the next ponder reads the outcome from memory instead of reopening JSONs.",
+    "memory: learned (ponder-2026-11-20): Watch the next genuine intake now that Strata is back (restarted Nov 20 10:45 ET, verified live) and record what the director does: whether the storyboard comes from the LLM or falls back. Do not simulate an intake; the next real task is the test.",
+    "memory: memory: 21 past renders on record; latest: You are an amazing human with many gifts"
+  ],
+  "phase1": {
+    "picks": {
+      "panel": "panel.card",
+      "variant": "variant.kinetic",
+      "font": "font.serif",
+      "motion": "motion.kinetic",
+      "kinetic": "kinetic.word",
+      "move": "move.typewriter",
+      "composition": "Harness",
+      "format": "landscape"
+    },
+    "composition": "Harness",
+    "format": "landscape",
+    "labelled": false,
+    "label": "",
+    "approximation": "",
+    "reason": ""
+  },
+  "move": "typewriter",
+  "story": {
+    "source": "writer",
+    "beats": [
+      {
+        "text": "Bake the morning loaf"
+      },
+      {
+        "text": "Mix flour and water Knead until smooth"
+      },
+      {
+        "text": "Let dough rise Shape and score top"
+      },
+      {
+        "text": "Bake until crust gold"
+      }
+    ]
+  },
+  "writer": {
+    "model": "qwen3.8-flash-next-q2_0",
+    "endpoint": "http://192.168.1.187:8081/v1",
+    "attempts": 1,
+    "content_type": "statement"
+  }
+}

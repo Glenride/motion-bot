@@ -221,14 +221,46 @@ def _entries_in_family(registry, family):
     return [e for e in registry.get("entries", []) if e.get("family") == family]
 
 
-def route(task, exclude_ids=None):
+def _dominant_content_type(beats):
+    """Writer beats -> most frequent content_type.
+
+    Ties break toward the earliest beat in order. None when no
+    beats or no content_type is set."""
+    if not beats:
+        return None
+    counts = {}
+    for beat in beats:
+        ctype = (beat or {}).get("content_type")
+        if ctype:
+            counts[ctype] = counts.get(ctype, 0) + 1
+    if not counts:
+        return None
+    best = max(counts.values())
+    for beat in beats:
+        if counts.get((beat or {}).get("content_type")) == best:
+            return (beat or {}).get("content_type")
+    return None
+
+
+def route(task, beats=None, exclude_ids=None):
     """Task dict -> pick record (PRD Section 4, Steps 1-3).
 
     task needs `title` (the hook) and `details` (free text + labels).
     `exclude_ids` is a set of registry ids the re-pick must avoid
-    (used after a Check 8 FAIL). Pure function of the task + the
+    (used after a Check 8 FAIL). `beats` (Writer stage) is a list
+    of writer beats: their dominant content_type steers Step 2 fit
+    ahead of rotation — stat -> chart family, sequence/list ->
+    explainer family, statement/quote -> no style pick (plain host)
+    with motion.kinetic + kinetic.word forced. Step 1 label override
+    still wins over everything, and LRU stays only the tiebreaker
+    among styles that fit. Pure function of the task + the
     registry file + the history log: no model calls, no network.
     """
+    # Backward compat: an old positional caller passed exclude_ids
+    # as the second argument (phase1_proof.py).
+    if isinstance(beats, (set, frozenset)):
+        exclude_ids = beats
+        beats = None
     registry = load_registry()
     backlog = load_backlog()
     by_id = registry_by_id(registry)
@@ -240,6 +272,7 @@ def route(task, exclude_ids=None):
     signals = detect_signals(title + "\n" + details, labels, rows)
     history = load_history()
     exclude = set(exclude_ids or [])
+    dominant = _dominant_content_type(beats)
 
     picks = {"labelled": False, "label_source": None,
              "approximation": None, "assumptions": [], "placeholders": []}
@@ -401,9 +434,23 @@ def route(task, exclude_ids=None):
         picks["label_source"] = (picks["label_source"] or "") + f" {style_label}"
 
     # ---- Step 2: content fit (only where no label decided) ----
-    if "style" not in picks:
+    # Writer beats steer fit AHEAD of rotation: the dominant
+    # content_type names the family. stat -> chart, sequence/list ->
+    # explainer, statement/quote -> NO style pick at all (plain
+    # host) — the kinetic-headline mapping below forces the motion.
+    if dominant:
+        picks["content_type"] = dominant
+        picks["assumptions"].append(
+            f"writer beats: dominant content_type '{dominant}'")
+    if "style" not in picks and dominant in ("statement", "quote"):
+        pass  # plain host: no style pick, kinetic headline below
+    elif "style" not in picks:
         fit_families = {SIGNAL_TO_FAMILY[s] for s in signals
                         if SIGNAL_TO_FAMILY.get(s)}
+        if dominant == "stat":
+            fit_families.add("chart")
+        elif dominant in ("sequence", "list"):
+            fit_families.add("explainer")
         fit_entries = [e for e in registry.get("entries", [])
                        if e.get("family") in fit_families
                        and e["id"] not in exclude]
@@ -419,6 +466,15 @@ def route(task, exclude_ids=None):
             approx = _approx("synthwave", "base.synthwave", "synthwave")
             if approx:
                 picks["style"] = approx
+
+    # Kinetic headline: a statement/quote-dominant brief is a plain
+    # host clip whose words ARE the motion — force motion.kinetic +
+    # kinetic.word unless a Step-1 label already set motion/kinetic.
+    if dominant in ("statement", "quote"):
+        if "motion" not in picks:
+            picks["motion"] = "motion.kinetic"
+        if "kinetic" not in picks:
+            picks["kinetic"] = "kinetic.word"
 
     # Format follows the style (vertical compositions) or the signal.
     style_entry = by_id.get(picks.get("style") or "")

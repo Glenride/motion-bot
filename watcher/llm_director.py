@@ -166,8 +166,9 @@ def _parse_json_loose(text):
     raise ValueError("no JSON object in model output")
 
 
-def _call_model(base_url, model, hook, details, timeout, system_extra=""):
-    """One chat-completions call. Returns the raw content string.
+def _call_model_messages(base_url, model, messages, timeout,
+                         max_tokens=4096, temperature=0.7):
+    """One chat-completions call with explicit messages.
 
     NOTE: this LM Studio server rejects response_format json_object
     ("must be 'json_schema' or 'text", 400) — so no response_format
@@ -178,17 +179,13 @@ def _call_model(base_url, model, hook, details, timeout, system_extra=""):
     """
     body = json.dumps({
         "model": model,
-        "messages": [
-            {"role": "system", "content": SYSTEM_PROMPT + system_extra},
-            {"role": "user", "content": USER_TEMPLATE.format(
-                hook=hook, details=details or "(none)")},
-        ],
-        "temperature": 0.7,
+        "messages": messages,
+        "temperature": temperature,
         # 4096, not 1024: glimmer is a reasoning model and its
         # reasoning tokens come out of this same budget — with 1024
-        # the content was truncated to 2 characters ("{\\"", observed
+        # the content was truncated to 2 characters ("{\"", observed
         # 2026-10-28) while the reasoning ate the rest.
-        "max_tokens": 4096,
+        "max_tokens": max_tokens,
     }).encode("utf-8")
     req = urllib.request.Request(
         base_url + "/chat/completions", data=body,
@@ -212,6 +209,17 @@ def _call_model(base_url, model, hook, details, timeout, system_extra=""):
     if reasoning:
         return reasoning
     raise RuntimeError("model returned empty content")
+
+
+def _call_model(base_url, model, hook, details, timeout, system_extra=""):
+    """One chat-completions call (narrated director prompt)."""
+    return _call_model_messages(
+        base_url, model,
+        [{"role": "system", "content": SYSTEM_PROMPT + system_extra},
+         {"role": "user", "content": USER_TEMPLATE.format(
+             hook=hook, details=details or "(none)")},
+         ],
+        timeout)
 
 
 def _validate_and_build(task, model_scenes, model, endpoint):
@@ -367,19 +375,19 @@ if __name__ == "__main__":
     print(json.dumps({"info": info, "storyboard": board}, indent=2))
 
 
-def run_llm_via_imac(task, imac_host, imac_repo, imac_ssh,
-                     imac_rsync_ssh, timeout=420):
-    """Run the LLM Director on the iMac via SSH (VM-side entry).
+def run_module_via_imac(task, module, files, imac_host, imac_repo,
+                        imac_ssh, imac_rsync_ssh, timeout=420,
+                        run_label=None):
+    """Generic iMac module runner (VM-side entry).
 
-    Rsyncs this module + its imports + the taste file + a task.json to
-    <imac_repo>/watcher-llm/, then starts the module DETACHED
-    (nohup, output to watcher-llm/out.json) and polls for the
-    output file. Detached matters: the tsconnect SSH session
-    breaks during long model calls, and a foreground run's result
-    dies with it (observed 2026-10-28: the iMac process outlived
-    the broken session). Returns (storyboard_or_None, info);
-    never raises for model/transport failures — the caller falls
-    back to the deterministic Director.
+    Rsyncs `files` + a task.json to <imac_repo>/watcher-llm/, then
+    starts `module` DETACHED (nohup, output to watcher-llm/out.json)
+    and polls for the output file. Detached matters: the tsconnect
+    SSH session breaks during long model calls, and a foreground
+    run's result dies with it. Returns (result_or_None, info) where
+    result is the module's parsed out.json dict (whatever shape the
+    module prints) and info carries fallback/reason on failure.
+    Never raises for model/transport failures.
     """
     import subprocess
     import tempfile
@@ -400,8 +408,7 @@ def run_llm_via_imac(task, imac_host, imac_repo, imac_ssh,
             tmp_path = Path(tmp)
             (tmp_path / "task.json").write_text(
                 json.dumps(task) + "\n")
-            for name in ("llm_director.py", "concepts.py",
-                         "harness_director.py", "motion_taste.md"):
+            for name in files:
                 r = subprocess.run(
                     ["rsync", "--partial", "-az", "--no-owner",
                      "--no-group", "-e", imac_rsync_ssh,
@@ -437,14 +444,14 @@ def run_llm_via_imac(task, imac_host, imac_repo, imac_ssh,
                 [imac_ssh,
                  f"cd {imac_repo} && rm -f watcher-llm/out.json "
                  f"&& nohup env {env_prefix}python3 "
-                 f"watcher-llm/llm_director.py "
+                 f"watcher-llm/{module} "
                  f"--task-file watcher-llm/task.json "
                  f"> watcher-llm/out.json 2> watcher-llm/err.log "
                  f"< /dev/null & echo STARTED"],
                 capture_output=True, text=True, timeout=120)
             if "STARTED" not in (r.stdout or ""):
                 raise RuntimeError(
-                    f"starting iMac llm_director failed: "
+                    f"starting iMac {module} failed: "
                     f"{((r.stdout or '') + (r.stderr or '')).strip()[-300:]}")
             # NOTE: the SSH exit code is ignored here on purpose —
             # tsconnect reports "Broken pipe" (255) even when the
@@ -466,21 +473,50 @@ def run_llm_via_imac(task, imac_host, imac_repo, imac_ssh,
                     result = json.loads((tmp_path / "out.json").read_text())
                 except ValueError:
                     continue  # partial write; keep waiting
-                board = result.get("storyboard")
-                inner = result.get("info") or {}
-                if board is not None:
-                    inner["via"] = "imac"
-                    return board, inner
-                info["reason"] = inner.get("reason", "LLM returned no board")
-                return None, info
+                if isinstance(result, dict):
+                    inner = result.get("info") or {}
+                    merged = {"fallback": False, "via": "imac"}
+                    merged.update(inner)
+                    merged["via"] = "imac"
+                    return result, merged
+                return result, {"fallback": False, "via": "imac"}
             # Timed out: stop the remote run so it cannot hold the
             # model for the next task, then fall back.
             subprocess.run(
                 [imac_ssh,
-                 f"pkill -f 'llm_director.py --task-file' || true"],
+                 f"pkill -f '{module} --task-file' || true"],
                 capture_output=True, text=True, timeout=60)
-            info["reason"] = f"iMac LLM run timed out after {timeout}s"
+            label = run_label or module
+            info["reason"] = f"iMac {label} run timed out after {timeout}s"
             return None, info
     except Exception as e:  # noqa: BLE001 - any failure falls back
         info["reason"] = str(e)[:500]
         return None, info
+
+
+def run_llm_via_imac(task, imac_host, imac_repo, imac_ssh,
+                     imac_rsync_ssh, timeout=420):
+    """Run the LLM Director on the iMac via SSH (VM-side entry).
+
+    Thin wrapper over run_module_via_imac with the narrated
+    director's module + file set; signature and behavior are
+    unchanged (returns (storyboard_or_None, info); never raises
+    for model/transport failures — the caller falls back to the
+    deterministic Director).
+    """
+    result, info = run_module_via_imac(
+        task, "llm_director.py",
+        ("llm_director.py", "concepts.py",
+         "harness_director.py", "motion_taste.md"),
+        imac_host, imac_repo, imac_ssh, imac_rsync_ssh,
+        timeout=timeout, run_label="LLM")
+    if result is not None:
+        board = result.get("storyboard")
+        inner = result.get("info") or {}
+        if board is not None:
+            inner["via"] = "imac"
+            return board, inner
+        info = {"fallback": True, "via": "imac"}
+        info["reason"] = inner.get("reason", "LLM returned no board")
+        return None, info
+    return None, info

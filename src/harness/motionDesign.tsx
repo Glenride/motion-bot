@@ -124,31 +124,55 @@ export const beatGridFrames = (bpm: number, fps: number, totalFrames: number): n
  * first snaps to the nearest beat, at least one beat after the
  * previous start, so cuts land on the grid. A storyboard without a
  * BPM renders exactly as before.
+ *
+ * Weighted split (Writer stage, opt-in): when `weights` is supplied
+ * — one positive number per scene — totalFrames splits
+ * proportionally to the weights (remainder to the last scene) and
+ * the BPM snap, when set, applies on top of the weighted starts
+ * exactly as it does on the even split. When weights are absent,
+ * short, or contain a non-positive value, the even split above is
+ * byte-for-byte the old behavior.
  */
 export const sceneStarts = (
   totalFrames: number,
   sceneCount: number,
   bpm: number | undefined,
   fps: number,
+  weights?: number[],
 ): { starts: number[]; lengths: number[] } => {
   const n = Math.max(1, sceneCount);
-  const base = Math.floor(totalFrames / n);
-  const even: number[] = [];
-  let at = 0;
-  for (let i = 0; i < n; i++) {
-    even.push(at);
-    at += i === n - 1 ? totalFrames - at : base;
+  const useWeights =
+    !!weights &&
+    weights.length === n &&
+    weights.every((w) => typeof w === "number" && w > 0);
+  let base: number[];
+  if (useWeights) {
+    const total = (weights as number[]).reduce((a, b) => a + b, 0);
+    base = [0];
+    let acc = 0;
+    for (let i = 0; i < n - 1; i++) {
+      acc += (weights as number[])[i];
+      base.push(Math.round((totalFrames * acc) / total));
+    }
+  } else {
+    const per = Math.floor(totalFrames / n);
+    base = [];
+    let at = 0;
+    for (let i = 0; i < n; i++) {
+      base.push(at);
+      at += i === n - 1 ? totalFrames - at : per;
+    }
   }
   if (!bpm || bpm <= 0) {
     return {
-      starts: even,
-      lengths: even.map((s, i) => (i === n - 1 ? totalFrames - s : even[i + 1] - s)),
+      starts: base,
+      lengths: base.map((s, i) => (i === n - 1 ? totalFrames - s : base[i + 1] - s)),
     };
   }
   const fpb = framesPerBeat(bpm, fps);
   const starts = [0];
   for (let i = 1; i < n; i++) {
-    const snapped = Math.round(even[i] / fpb) * fpb;
+    const snapped = Math.round(base[i] / fpb) * fpb;
     const prev = starts[i - 1];
     starts.push(Math.max(prev + Math.round(fpb), Math.min(snapped, totalFrames - Math.round(fpb))));
   }

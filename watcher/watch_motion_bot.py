@@ -86,6 +86,7 @@ from harness_director import (  # noqa: E402
     is_narrated_task,
 )
 from llm_director import run_llm_via_imac  # noqa: E402
+from harness_writer import write_beats  # noqa: E402
 from skill_router import route as skill_route, craft_notes, load_skill_text  # noqa: E402
 from skill_verify import verify as skill_verify, has_alpha  # noqa: E402
 from harness_director import parse_data_rows, parse_labels, draft_data_rows  # noqa: E402
@@ -1184,9 +1185,44 @@ def main():
                     # for the Harness route (narrated keeps it).
                     # The route dict gains a "skills" key so the rung
                     # chain below reads it unchanged.
-                    _route = phase1_route(task)
+                    # Writer stage (Harness route only — NOT narrated,
+                    # NOT Signalwood): condense the task into 2-5
+                    # capped beats BEFORE routing, so the router's
+                    # content fit and the Director's scenes both read
+                    # the beats. ANY Writer failure falls back to the
+                    # deterministic path (beats=None). Kill-switch:
+                    # MOTION_BOT_WRITER=0 disables the Writer.
+                    _beats = None
+                    _writer_info = {"fallback": True,
+                                    "reason": "writer disabled"}
+                    if os.environ.get("MOTION_BOT_WRITER", "1") != "0":
+                        try:
+                            _beats, _writer_info = write_beats(
+                                title, task.get("details") or "")
+                        except Exception as _w_e:  # noqa: BLE001
+                            _beats = None
+                            _writer_info = {
+                                "fallback": True,
+                                "reason": f"write_beats raised: {_w_e}"[:300]}
+                    if _beats:
+                        entry["writer"] = {
+                            "model": _writer_info.get("model"),
+                            "endpoint": _writer_info.get("endpoint"),
+                            "attempts": _writer_info.get("attempts"),
+                            "beats": len(_beats),
+                        }
+                    else:
+                        entry["writer_fallback"] = str(
+                            _writer_info.get("reason", ""))[:300]
+                    _route = phase1_route(task, beats=_beats)
                     _route["skills"] = phase1_skills_for(_route.get("style"))
-                    storyboard = build_storyboard(task, route=_route)
+                    storyboard = build_storyboard(
+                        task, route=_route, beats=_beats,
+                        writer_info=_writer_info)
+                    if not _beats:
+                        storyboard.setdefault("notes", []).append(
+                            "writer fallback: "
+                            + str(_writer_info.get("reason", ""))[:200])
                     storyboard["skills"] = _route["skills"]
                     storyboard["format"] = _route.get("format", "landscape")
                     storyboard["craft_notes"] = phase1_craft_notes(_route)
@@ -1204,8 +1240,12 @@ def main():
                         # (v2.8); Unit:/Mode: labels pass through.
                         # Phase 1 draft-first: a chart-style pick
                         # with no numbers still renders, with
-                        # placeholder bars — never a refusal.
-                        if not _rows:
+                        # placeholder bars — never a refusal. Writer
+                        # bars (storyboard["bars"] from stat beats)
+                        # are real brief numbers: never overwritten
+                        # with placeholders, and explicit Data: rows
+                        # win over them when present.
+                        if not _rows and not storyboard.get("bars"):
                             _rows = draft_data_rows(task.get("details") or "")
                             storyboard.setdefault("notes", []).append(
                                 "phase1 draft: chart brief carries no "
@@ -1220,7 +1260,8 @@ def main():
                             # without this the record would claim D3Chart
                             # while the rung rendered Chart.
                             _composition = "D3Chart"
-                        storyboard["bars"] = _rows
+                        if _rows:
+                            storyboard["bars"] = _rows
                         storyboard["chartTitle"] = storyboard.get("hook", "")
                         if _labels.get("unit"):
                             storyboard["unit"] = _labels["unit"]
