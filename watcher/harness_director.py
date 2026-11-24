@@ -1020,6 +1020,37 @@ def _words_minus_numbers(words, parse_number):
     return [w for w in words if parse_number(w) is None]
 
 
+_QUOTED_RE = re.compile(r'"([^"]+)"')
+_PLACEHOLDER_RE = re.compile(r"\[(?:VALUE|BENCHMARK|ROW|OPTION|POWER|DEMO|FACT|QUESTION|FEATURE|IDEA|NAME|TIER|PRICE|CAP|QUOTE)[^\]]*NEEDED\]")
+
+
+def extract_screen_text(text):
+    """A story beat -> the words the audience should see, or None.
+
+    Story beats are often written as stage directions —
+    `[BEAT 1: Title slams in large: "Your Brain on ChatGPT"]` —
+    and the old path printed the whole direction verbatim, brackets
+    and all. Only the quoted lines inside a direction are audience
+    copy; a direction with no quoted line carries no words (the
+    caller falls back to the hook). A quoted fragment that is only
+    digits is a beat number, not copy, and is dropped. Plain
+    narrative passes through unchanged, except bracketed
+    `[X NEEDED]` placeholder tokens, which are never shown."""
+    text = (text or "").strip()
+    if not text:
+        return None
+    if text.startswith("["):
+        quoted = [q.strip() for q in _QUOTED_RE.findall(text)]
+        quoted = [q for q in quoted
+                  if q and not re.fullmatch(r"[\d.,%]+", q)]
+        if not quoted:
+            return None
+        return " ".join(quoted) or None
+    text = _PLACEHOLDER_RE.sub("", text)
+    text = re.sub(r"\s+", " ", text).strip(" ,")
+    return text or None
+
+
 def build_storyboard(task, route=None, beats=None, writer_info=None):
     """Mission Control task dict -> storyboard dict (Harness props).
 
@@ -1104,6 +1135,19 @@ def build_storyboard(task, route=None, beats=None, writer_info=None):
         notes.append(f"mood '{mood['word']}' -> tone {mood['tone']}, "
                      f"pacing {mood['pacing']}")
 
+    # Screen-text rule (Nov 24): a story beat is production notes
+    # until proven otherwise — extract only the visual (the quoted
+    # line inside a stage direction), never the beat label or the
+    # direction itself. A direction with no quoted line, or a beat
+    # that is only a placeholder token, yields no words and the hook
+    # stands in for that scene. Runs AFTER the writer override, so
+    # it also strips any [VALUE NEEDED] a Writer beat carried.
+    story_beats = [
+        {"title": b.get("title", ""), "start": b.get("start"),
+         "end": b.get("end"),
+         "text": extract_screen_text(b.get("text") or "") or title}
+        for b in story_beats
+    ]
     if story_beats:
         # Story-first: each beat's narrative text is one scene, in
         # beat order. Beat windows are recorded in the storyboard for
@@ -1859,16 +1903,15 @@ def build_everest_panel(task, storyboard, matched_packs, draft=False):
                          "old": float(m.group(2)),
                          "new": float(m.group(3))})
         if not bars:
-            if not draft:
-                notes.append("everest DROPPED: models-benchmarks needs "
-                             "`Benchmark: <label> <old> -> <new>` lines — "
-                             "no numbers in the task, none invented")
-                return None
-            bars = [{"label": "[BENCHMARK NEEDED]", "old": 0, "new": 0}]
-            notes.append("everest draft: models-benchmarks has no "
-                         "Benchmark: lines — placeholder bar at 0 with "
-                         "a [BENCHMARK NEEDED] label, add Benchmark: "
-                         "lines to replace it")
+            # Nov 24: no placeholder bar, draft or not. A 0-value bar
+            # labelled [BENCHMARK NEEDED] used to render on screen —
+            # internal notes the audience never needs. The panel is
+            # dropped and the clip falls back to the Harness with the
+            # story's own words; the note says what to add.
+            notes.append("everest DROPPED: models-benchmarks needs "
+                         "`Benchmark: <label> <old> -> <new>` lines — "
+                         "no numbers in the task, none invented")
+            return None
         panel["bars"] = bars
         notes.append(f"everest 'models-benchmarks': {len(bars)} bar(s)")
     elif category == "comparisons":
@@ -1880,19 +1923,15 @@ def build_everest_panel(task, storyboard, matched_packs, draft=False):
                          "right": rm.group(3).strip(),
                          "winner": (rm.group(4) or "right").strip().lower()})
         if not m or not rows:
-            if not draft:
-                notes.append("everest DROPPED: comparisons needs "
-                             "`Compare: <A> vs <B>` plus `Row: <label> | "
-                             "<left> | <right> | <left|right>` lines")
-                return None
-            m = None
-            rows = [{"label": "[ROW NEEDED]", "left": "—",
-                     "right": "—", "winner": "right"}]
-            notes.append("everest draft: comparisons has no Compare:/"
-                         "Row: lines — placeholder comparison, add "
-                         "Compare: and Row: lines to replace it")
-        panel["comparison"] = {"left": m.group(1).strip() if m else "[OPTION A NEEDED]",
-                               "right": m.group(2).strip() if m else "[OPTION B NEEDED]", "rows": rows}
+            # Nov 24: no placeholder comparison, draft or not — a
+            # [ROW NEEDED] / [OPTION NEEDED] panel used to render on
+            # screen. Panel dropped, clip falls back to the Harness.
+            notes.append("everest DROPPED: comparisons needs "
+                         "`Compare: <A> vs <B>` plus `Row: <label> | "
+                         "<left> | <right> | <left|right>` lines")
+            return None
+        panel["comparison"] = {"left": m.group(1).strip(),
+                               "right": m.group(2).strip(), "rows": rows}
         notes.append(f"everest 'comparisons': {m.group(1).strip()} vs "
                      f"{m.group(2).strip()}, {len(rows)} row(s)")
     elif category == "launch-news":

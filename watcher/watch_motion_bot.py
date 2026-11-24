@@ -112,6 +112,10 @@ from question_gate import (  # noqa: E402
 )
 from story_gate import STORY_ASKED_PATH, auto_story, check_story  # noqa: E402
 import hq_bridge  # noqa: E402
+try:
+    import ucis as _ucis  # noqa: E402 — UCIS adapter; failure-silent
+except Exception:  # noqa: BLE001 — a broken adapter must never break renders
+    _ucis = None
 
 # ---------------------------------------------------------------- config
 API_BASE = "https://mission-control-hq-api.mwszghdkkf.workers.dev"
@@ -495,6 +499,68 @@ def critic_summary(report):
         cues = checks.get("captions_present", {}).get("number", "?")
         summary += f" [narrated: voice {audio} dB, {cues} caption cues]"
     return summary
+
+
+# ------------------------------------------------------- UCIS adapter
+# (UCIS v1.0, 2026-11-23; see watcher/UCIS-ADAPTER.md). Every helper
+# here is failure-silent: a UCIS error is logged and the render
+# continues exactly as before, with the fallback reason in the trace.
+# Kill switch: MOTION_BOT_UCIS=0 disables the adapter (default on).
+def _ucis_on():
+    return (os.environ.get("MOTION_BOT_UCIS", "1") != "0"
+            and _ucis is not None)
+
+
+def _ucis_start(task_id, title, details, entry):
+    """Begin the thinking trace at task start. Returns the trace or
+    None. Never raises."""
+    if not _ucis_on():
+        return None
+    try:
+        trace = _ucis.start_trace(task_id, title, details or "")
+        entry["ucis"] = {
+            "mode": trace["mode"],
+            "concept": (trace.get("selected_concept") or {}).get("name"),
+            "concepts": len(trace.get("concepts") or []),
+        }
+        return trace
+    except Exception as e:  # noqa: BLE001
+        log(f"task {task_id}: UCIS trace start failed ({e}); continuing")
+        return None
+
+
+def _ucis_finish(trace, entry, critic=None, skills=None,
+                 composition=None, mp4=None, outcome="rendered",
+                 read_map=None):
+    """Complete the trace after the critic runs and write the files.
+    Returns a short note for the MC completion report ("" when the
+    trace is off or failed). Never raises. read_map names the skills
+    whose SKILL.md text was actually loaded on this route."""
+    if trace is None or not _ucis_on():
+        return ""
+    try:
+        if isinstance(skills, list) and read_map:
+            _ucis.attach_skills(trace, skills, read_map=read_map)
+            skills = None
+        _ucis.complete_trace(trace, critic=critic, skills=skills,
+                             composition=composition, mp4=mp4,
+                             outcome=outcome)
+        json_path, md_path = _ucis.write_trace(trace)
+        entry["ucis"] = {
+            "mode": trace["mode"],
+            "concept": (trace.get("selected_concept") or {}).get("name"),
+            "concepts": len(trace.get("concepts") or []),
+            "gate": (trace.get("evaluation") or {}).get("gate"),
+            "trace_md": md_path,
+            "trace_json": json_path,
+        }
+        if md_path:
+            return f" — UCIS thinking trace: watcher/ucis_traces/task-{trace['task_id']}.md ({_ucis.trace_summary(trace)})"
+        return ""
+    except Exception as e:  # noqa: BLE001
+        log(f"task {trace.get('task_id')}: UCIS trace finish failed "
+            f"({e}); continuing")
+        return ""
 
 
 # ------------------------------------------------------- Phase 1 routing
@@ -977,6 +1043,9 @@ def main():
         entry = {"task_id": tid, "title": title or None,
                  "outcome": None, "mp4": None, "error": None}
         summary["tasks"].append(entry)
+        _trace = None  # UCIS trace; set after claim. Initialized here so
+        # the failure handler below never reads an unbound name when
+        # the story gate, question gate, or claim itself raises.
         try:
             # 0a. Story gate (v2.5, all tasks) — BEFORE claiming: a
             # task with no story NO LONGER waits on him. The bot
@@ -1021,6 +1090,9 @@ def main():
             # 1. Claim first — never render twice.
             patch_task(password, tid, {"status": "in_progress"})
             record_claim(tid)
+
+            # 1b. UCIS thinking trace (failure-silent; see UCIS-ADAPTER.md).
+            _trace = _ucis_start(tid, title, task.get("details") or "", entry)
 
             # 2. No usable message text: block, ask for the hook.
             if not title:
@@ -1142,12 +1214,18 @@ def main():
                             + ", ".join(structural_fail) + "): "
                             + critic_summary(critic)
                         )
+                    _ucis_note = _ucis_finish(
+                        _trace, entry, critic=critic,
+                        skills=_route.get("skills") or [],
+                        composition="Narrated", mp4=mp4_name,
+                        read_map={_detail_pack: True} if _detail_pack else None)
                     _done = mark_done(password, tid, (
                         f"Motion Bot rendered (Narrated, "
                         f"{enriched.get('lengthSeconds', 12)}s): "
                         f"out/{mp4_name} — video file: "
                         f"~/workspace/repos/motion-bot/out/{mp4_name} — "
                         + critic_summary(critic)
+                        + _ucis_note
                     ))
                     entry["outcome"] = ("rendered" if _done
                                         else "held-by-race (done skipped)")
@@ -1263,12 +1341,17 @@ def main():
                             })
                         except Exception as _h_e:
                             log(f"task {tid}: phase1 history append failed: {_h_e}")
+                        _ucis_note = _ucis_finish(
+                            _trace, entry, critic=_ecritic, skills=_eroute,
+                            composition=_eroute.get("composition"),
+                            mp4=_emp4_name)
                         _done = mark_done(password, tid, (
                             f"Motion Bot rendered ({_eroute.get('composition')}, "
                             f"{ENGINE_DURATIONS[_engine]}s): "
                             f"out/{_emp4_name} — video file: "
                             f"~/workspace/repos/motion-bot/out/{_emp4_name} — "
                             + critic_summary(_ecritic)
+                            + _ucis_note
                         ))
                         entry["outcome"] = ("rendered" if _done
                                             else "held-by-race (done skipped)")
@@ -1335,6 +1418,20 @@ def main():
                     else:
                         entry["writer_fallback"] = str(
                             _writer_info.get("reason", ""))[:300]
+                    # UCIS: record the Writer beats in the trace.
+                    # Concepts stay as built from the task's own story;
+                    # attach_beats does not rebuild them from Writer
+                    # copy (task 493: rebuilding mangled the subject).
+                    if _trace is not None and _beats:
+                        try:
+                            _ucis.attach_beats(_trace, _beats)
+                            entry["ucis"] = {
+                                "mode": _trace["mode"],
+                                "concept": (_trace.get("selected_concept") or {}).get("name"),
+                                "concepts": len(_trace.get("concepts") or []),
+                            }
+                        except Exception as _u_e:  # noqa: BLE001
+                            log(f"task {tid}: UCIS attach_beats failed ({_u_e})")
                     _route = phase1_route(task, beats=_beats)
                     _route["skills"] = phase1_skills_for(_route.get("style"))
                     storyboard = build_storyboard(
@@ -1352,27 +1449,18 @@ def main():
                     _labels = parse_labels(task.get("details") or "")
                     _rows = parse_data_rows(task.get("details") or "")
                     _style = _route.get("style") or ""
-                    if _rows or _style.startswith("chart."):
+                    if _rows or storyboard.get("bars"):
                         # Chart rung (v2.3, v2.8): data rows ALONE fire
                         # the chart — a task carrying Data: rows is a
                         # data task, no chart trigger words needed.
                         # Numbers from the task, nothing invented.
                         # Count-up / build-and-hold live in Chart.tsx
                         # (v2.8); Unit:/Mode: labels pass through.
-                        # Phase 1 draft-first: a chart-style pick
-                        # with no numbers still renders, with
-                        # placeholder bars — never a refusal. Writer
-                        # bars (storyboard["bars"] from stat beats)
-                        # are real brief numbers: never overwritten
-                        # with placeholders, and explicit Data: rows
-                        # win over them when present.
-                        if not _rows and not storyboard.get("bars"):
-                            _rows = draft_data_rows(task.get("details") or "")
-                            storyboard.setdefault("notes", []).append(
-                                "phase1 draft: chart brief carries no "
-                                "numbers — placeholder bars "
-                                "[VALUE 1/2 NEEDED] at 0; add Data: "
-                                "rows and re-render")
+                        # Nov 24: a chart-style pick with no numbers
+                        # no longer renders placeholder bars — the
+                        # [VALUE 1/2 NEEDED] labels used to print on
+                        # screen. It keeps the Harness route instead,
+                        # and the note says what to add for a chart.
                         _composition = "Chart"
                         if _labels.get("chart", "").lower() == "d3" or _style == "chart.d3":
                             # D3 rung (Nov 3 2026, opt-in only): d3 scales
@@ -1392,6 +1480,14 @@ def main():
                             storyboard["mode"] = "stats"
                         elif _style == "chart.count-up":
                             storyboard["mode"] = "bars"
+                    elif _style.startswith("chart."):
+                        # Nov 24: a chart-style pick with no numbers
+                        # keeps the Harness route — the old path
+                        # rendered [VALUE 1/2 NEEDED] bars on screen.
+                        storyboard.setdefault("notes", []).append(
+                            "chart skipped: brief carries no "
+                            "numbers — add Data: rows and re-render "
+                            "for a chart")
                     elif "ecommerce-video-skills" in _route["skills"] or _labels.get("product"):
                         # Product-demo rung (v2.8): ProductDemo comp.
                         # build_product_demo returns None without a
@@ -1619,10 +1715,14 @@ def main():
                             })
                         except Exception as _h_e:
                             log(f"task {tid}: phase1 history append failed: {_h_e}")
+                        _ucis_note = _ucis_finish(
+                            _trace, entry, critic=None, skills=_route,
+                            composition="LowerThird", mp4=mp4_name)
                         _done = mark_done(password, tid, (
                             f"Motion Bot rendered (LowerThird, transparent ProRes .mov): "
                             f"out/{mp4_name} — video file: "
                             f"~/workspace/repos/motion-bot/out/{mp4_name}"
+                            + _ucis_note
                         ))
                         entry["outcome"] = ("rendered" if _done
                                             else "held-by-race (done skipped)")
@@ -1773,6 +1873,9 @@ def main():
                         })
                     except Exception as _h_e:
                         log(f"task {tid}: phase1 history append failed: {_h_e}")
+                    _ucis_note = _ucis_finish(
+                        _trace, entry, critic=critic, skills=_route,
+                        composition=_composition, mp4=mp4_name)
                     _done = mark_done(password, tid, (
                         f"Motion Bot rendered ({_composition}, "
                         f"{storyboard.get('lengthSeconds', 12)}s): "
@@ -1781,6 +1884,7 @@ def main():
                         + critic_summary(critic)
                         + _sc_note
                         + _fin_note
+                        + _ucis_note
                     ))
                     entry["outcome"] = ("rendered" if _done
                                         else "held-by-race (done skipped)")
@@ -1834,11 +1938,16 @@ def main():
                 f" (Generic fallback: {entry['harness_fallback']})"
                 if entry.get("harness_fallback") else ""
             )
+            _ucis_note = _ucis_finish(
+                _trace, entry, critic=None, skills=None,
+                composition=composition, mp4=mp4_name,
+                outcome="rendered-generic-fallback")
             _done = mark_done(password, tid, (
                 f"Motion Bot rendered ({composition}, "
                 f"{brief.get('lengthSeconds', 12)}s): out/{mp4_name} — "
                 f"video file: ~/workspace/repos/motion-bot/out/{mp4_name}"
                 f"{fallback_note}"
+                + _ucis_note
             ))
             entry["outcome"] = ("rendered" if _done
                                 else "held-by-race (done skipped)")
@@ -1853,6 +1962,13 @@ def main():
             entry["outcome"] = "failed"
             entry["error"] = str(e)[:1000]
             log(f"task {tid} failed: {e}")
+            # UCIS: the trace still gets written, so a failed task
+            # shows what was tried and where it stopped.
+            if _trace is not None:
+                _trace.setdefault("fallback_reasons", []).append(
+                    f"render failed: {str(e)[:200]}")
+                _ucis_finish(_trace, entry, critic=None, skills=None,
+                             composition=None, mp4=None, outcome="failed")
             try:
                 patch_task(password, tid, {
                     "status": "blocked",
