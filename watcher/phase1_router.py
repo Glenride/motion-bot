@@ -254,11 +254,15 @@ def route(task, beats=None, exclude_ids=None):
     (used after a Check 8 FAIL). `beats` (Writer stage) is a list
     of writer beats: their dominant content_type steers Step 2 fit
     ahead of rotation — stat -> chart family, sequence/list ->
-    explainer family, statement/quote -> no style pick (plain host)
-    with motion.kinetic + kinetic.word forced. Step 1 label override
-    still wins over everything, and LRU stays only the tiebreaker
-    among styles that fit. Pure function of the task + the
-    registry file + the history log: no model calls, no network.
+    explainer family, statement/quote -> explainer family too
+    (Nov 24: plain briefs got no style pick at all, so every
+    statement rendered the plain host; the family cap interleaves
+    plain-host renders). motion.kinetic + kinetic.word are still
+    forced for statement/quote unless a Step-1 label set them.
+    Step 1 label override still wins over everything, and LRU stays
+    only the tiebreaker among styles that fit. Pure function of the
+    task + the registry file + the history log: no model calls, no
+    network.
     """
     # Backward compat: an old positional caller passed exclude_ids
     # as the second argument (phase1_proof.py).
@@ -462,7 +466,28 @@ def route(task, beats=None, exclude_ids=None):
         picks["assumptions"].append(
             f"writer beats: dominant content_type '{dominant}'")
     if "style" not in picks and dominant in ("statement", "quote"):
-        pass  # plain host: no style pick, kinetic headline below
+        # Plain briefs rotate styles too (Nov 24: statement/quote
+        # briefs got NO style pick at all, so every one rendered
+        # the plain host — the "same default" the user keeps
+        # catching. The purpose of the request is a bot that uses
+        # every style on its own, no labels needed). Explainer is
+        # the safe family for a landscape statement brief: 16:9,
+        # renders from the story beats (build_explainer takes
+        # ideas from beats), no numbers/product/name needed.
+        # Canvas/TikTok are 9:16-only, Chart needs numbers,
+        # Everest needs data, ProductDemo needs a product — none
+        # of those may fire on a plain brief. The family cap (2/5)
+        # interleaves plain-host renders, so the plain look still
+        # appears instead of every statement becoming an Explainer.
+        fit_entries = [e for e in registry.get("entries", [])
+                       if e.get("family") == "explainer"
+                       and e["id"] not in exclude]
+        fit_entries = [e for e in fit_entries
+                       if not family_over_cap(e.get("family"))]
+        if fit_entries:
+            chosen = _lru_from(fit_entries)
+            if chosen:
+                picks["style"] = chosen["id"]
     elif "style" not in picks:
         fit_families = {SIGNAL_TO_FAMILY[s] for s in signals
                         if SIGNAL_TO_FAMILY.get(s)}
