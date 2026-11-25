@@ -438,13 +438,27 @@ def critic(mp4_path, storyboard, imac_mp4=None, srt_path=None,
             path = Path(tmp) / f"frame-{t}.png"
             extract_frame(mp4_path, t, path)
             frames.append((t, load_pixels(path)))
-        # 2. Frames differ.
+        # 2. Frames differ. A clip is frozen only if it does not move
+        # overall: one failed pair is a static tail, not a frozen
+        # clip (Nov 24: five Explainer renders failed on the last
+        # pair alone — the end-card hold, diff ~1.1 — while the body
+        # moved at 7-19 per pair. The old all-pairs rule blocked
+        # them all). PASS when at most one pair fails AND the mean
+        # diff stays above 3.0; a clip that barely moves throughout
+        # (e.g. task 500: pairs 4.61/2.46/2.47/0.69, mean 2.56)
+        # still fails on the mean.
         diffs = {}
         for (t1, p1), (t2, p2) in zip(frames, frames[1:]):
             diffs[f"{t1}s-vs-{t2}s"] = round(mean_abs_diff(p1, p2), 2)
+        _failed_pairs = [d for d in diffs.values() if d <= DIFF_PASS]
+        _mean_diff = (sum(diffs.values()) / len(diffs)) if diffs else 0.0
         checks["frames_differ"] = {
-            "status": "PASS" if all(d > DIFF_PASS for d in diffs.values()) else "FAIL",
-            "detail": f"mean abs diff /255 per pair: {diffs} (pass > {DIFF_PASS})",
+            "status": "PASS" if (len(_failed_pairs) <= 1
+                                 and _mean_diff > 3.0) else "FAIL",
+            "detail": (f"mean abs diff /255 per pair: {diffs} "
+                       f"(mean {_mean_diff:.2f}, failed pairs "
+                       f"{len(_failed_pairs)}; pass when <=1 failed "
+                       f"and mean > 3.0)"),
             "numbers": diffs,
         }
         # 3 + 4. Palette presence + blank frames, per sampled frame.

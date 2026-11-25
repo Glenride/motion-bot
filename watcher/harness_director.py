@@ -2174,5 +2174,10 @@ def build_explainer(task, storyboard, draft=False, style=None):
                    "camera": CAMERA_MOVES[len(ideas) % len(CAMERA_MOVES)],
                    "transitionOut": "none"})
     explainer["scenes"] = scenes
-    explainer["lengthSeconds"] = len(ideas) * 4 + 3
+    # Cap at the brief's length (Nov 24: a 12s brief rendered 19s —
+    # 4 ideas x 4s + 3s end card ignored the Length label, so
+    # Explainer sections ran 7s long against the rest of the video).
+    _brief_length = storyboard.get("lengthSeconds") or 12
+    explainer["lengthSeconds"] = min(len(ideas) * 4 + 3,
+                                     int(_brief_length))
     return explainer
