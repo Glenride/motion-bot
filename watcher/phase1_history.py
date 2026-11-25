@@ -127,6 +127,40 @@ def append_run(record):
     return stored
 
 
+def stamp_picks(picks):
+    """Stamp a route's picks as used, at route time.
+
+    Rotation must advance on the PICK, not only on a successful
+    render. append_run only fires after a render, so a batch whose
+    renders all fail re-picks the identical LRU entry on every
+    retry — Nov 24: six tasks, six identical card/orbit/sans
+    briefs, because the registry was frozen at the last successful
+    batch. Stamping updates last_used_at only; use_count stays
+    the render counter, incremented by append_run. A stamped pick
+    that never renders still consumed its rotation slot, which is
+    the point: the next pick is a different entry.
+    """
+    picks = picks or {}
+    picked_ids = [v for v in picks.values() if isinstance(v, str)]
+    if not picked_ids:
+        return
+    registry = load_registry()
+    by_id = {e.get("id"): e for e in registry.get("entries", [])}
+    # Microsecond precision: a fast batch stamps several picks
+    # inside one second, and second-precision stamps tie — LRU
+    # then falls back to use_count and repeats the same entry.
+    now = datetime.now(timezone.utc).isoformat(timespec="microseconds")
+    changed = False
+    for entry_id in picked_ids:
+        entry = by_id.get(entry_id)
+        if entry is None:
+            continue
+        entry["last_used_at"] = now
+        changed = True
+    if changed:
+        _save_registry(registry)
+
+
 def recent_runs(n=COOLDOWN_WINDOW):
     """The last n run records (oldest first within the window)."""
     return load_history(limit=n)

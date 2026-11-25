@@ -92,6 +92,7 @@ from skill_verify import verify as skill_verify, has_alpha  # noqa: E402
 from harness_director import parse_data_rows, parse_labels, draft_data_rows  # noqa: E402
 from phase1_router import route as phase1_route  # noqa: E402
 from phase1_history import append_run as phase1_append_run  # noqa: E402
+from phase1_history import stamp_picks as phase1_stamp_picks  # noqa: E402
 from harness_director import (  # noqa: E402
     ad_beat_scenes,
     build_ad_variant,
@@ -1260,6 +1261,10 @@ def main():
                     _eroute = phase1_route(task)
                     _engine = _eroute.get("engine")
                     if _engine:
+                        # Rotation advances on the pick, not only on a
+                        # successful render (Nov 24: a failed batch
+                        # re-picked the identical entry every retry).
+                        phase1_stamp_picks(_eroute)
                         _edetails = task.get("details") or ""
                         _esub = ""
                         for _line in _edetails.splitlines():
@@ -1433,6 +1438,10 @@ def main():
                         except Exception as _u_e:  # noqa: BLE001
                             log(f"task {tid}: UCIS attach_beats failed ({_u_e})")
                     _route = phase1_route(task, beats=_beats)
+                    # Rotation advances on the pick, not only on a
+                    # successful render (Nov 24: a failed batch
+                    # re-picked the identical entry every retry).
+                    phase1_stamp_picks(_route)
                     _route["skills"] = phase1_skills_for(_route.get("style"))
                     storyboard = build_storyboard(
                         task, route=_route, beats=_beats,
